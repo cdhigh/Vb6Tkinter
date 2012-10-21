@@ -1,0 +1,96 @@
+[Root]
+Most Recent Package=标准安装软件包 1
+
+
+[Package|标准安装软件包 1|Root]
+SubWizProgID=PDWizard.SetupPkgSubWiz
+BuildFolder=D:\My Documents\编程类\Python\pack
+
+[Package|标准安装软件包 1|Configure DAO ISAMs]
+Applicable=No
+
+[Package|标准安装软件包 1|Configure DAO ODBC]
+JetWorkspace=
+ODBCDirect=
+
+[Package|标准安装软件包 1|Files Found]
+
+[Package|标准安装软件包 1|Files Released]
+3=
+
+[Package|标准安装软件包 1|Missing Dependency Information]
+C:\Program Files\Common Files\Microsoft Shared\OFFICE12\MSO.DLL=
+C:\WINDOWS\system32\uxtheme.dll=
+C:\WINDOWS\system32\msimg32.dll=
+
+[Package|标准安装软件包 1|Out-of-Date Dependency Information]
+C:\WINDOWS\system32\MSCOMCTL.OCX=
+
+[Package|标准安装软件包 1|Files Added]
+
+[Package|标准安装软件包 1|Files Removed]
+c:\program files\microsoft visual studio\vb98\wizards\pdwizard\redist\mdac_typ.exe=
+c:\windows\system32\mscmcchs.dll=
+c:\windows\system32\mscomctl.ocx=
+c:\windows\system32\msimg32.dll=
+c:\program files\common files\microsoft shared\office12\mso.dll=
+c:\windows\system32\uxtheme.dll=
+c:\windows\system32\msvbvm60.dll=
+c:\windows\system32\oleaut32.dll=
+c:\windows\system32\olepro32.dll=
+c:\windows\system32\asycfilt.dll=
+c:\windows\system32\stdole2.tlb=
+c:\program files\microsoft visual studio\vb98\wizards\pdwizard\redist\comcat.dll=
+c:\windows\system32\vb6chs.dll=
+
+[Package|标准安装软件包 1|Files In Project]
+D:\My Documents\编程类\Python\Visual Tkinter(Addin)\Visual Tkinter.dll=Yes
+C:\WINDOWS\system32\msvbvm60.dll=No
+C:\WINDOWS\system32\oleaut32.dll=No
+C:\WINDOWS\system32\olepro32.dll=No
+C:\WINDOWS\system32\asycfilt.dll=No
+C:\WINDOWS\system32\stdole2.tlb=No
+C:\Program Files\Microsoft Visual Studio\VB98\WIZARDS\PDWizard\Redist\COMCAT.DLL=No
+C:\WINDOWS\system32\VB6CHS.DLL=No
+C:\WINDOWS\system32\msimg32.dll=No
+C:\WINDOWS\system32\uxtheme.dll=No
+C:\Program Files\Common Files\Microsoft Shared\OFFICE12\MSO.DLL=No
+C:\WINDOWS\system32\MSCOMCTL.OCX=No
+C:\WINDOWS\system32\MSCMCCHS.DLL=No
+C:\Program Files\Microsoft Visual Studio\VB98\WIZARDS\PDWizard\Redist\MDAC_TYP.EXE=No
+C:\Program Files\Microsoft Visual Studio\VB98\WIZARDS\PDWizard\SETUP.EXE=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\WIZARDS\PDWizard\SETUP1.EXE=Yes
+C:\WINDOWS\system32\VB6STKIT.DLL=Yes
+C:\Program Files\Microsoft Visual Studio\VB98\WIZARDS\PDWizard\ST6UNST.EXE=Yes
+
+[Package|标准安装软件包 1|Configure Registry Files]
+Applicable=No
+
+[Package|标准安装软件包 1|Configure Remote Servers]
+Applicable=No
+
+[Package|标准安装软件包 1|Install Locations]
+D:\My Documents\编程类\Python\Visual Tkinter(Addin)\Visual Tkinter.dll=$(AppPath)
+C:\Program Files\Microsoft Visual Studio\VB98\WIZARDS\PDWizard\SETUP.EXE=$(AppPath)
+C:\Program Files\Microsoft Visual Studio\VB98\WIZARDS\PDWizard\SETUP1.EXE=$(WinPath)
+C:\WINDOWS\system32\VB6STKIT.DLL=$(WinSysPathSysFile)
+C:\Program Files\Microsoft Visual Studio\VB98\WIZARDS\PDWizard\ST6UNST.EXE=$(WinPath)
+
+[Package|标准安装软件包 1|Configure Shared Files]
+Applicable=Yes
+D:\My Documents\编程类\Python\Visual Tkinter(Addin)\Visual Tkinter.dll=No
+
+[Package|标准安装软件包 1|Distribution]
+Type=single
+Size=
+Title=Visual Tkinter
+
+[Package|标准安装软件包 1|Package]
+PackageFolder=D:\My Documents\编程类\Python\pack
+ProjectFolder=D:\My Documents\编程类\Python\Visual Tkinter(Addin)
+ServerSideCab=
+File1=D:\My Documents\编程类\Python\pack\setup.exe
+File2=D:\My Documents\编程类\Python\pack\Setup.Lst
+File3=D:\My Documents\编程类\Python\pack\Visual Tkinter.CAB
+Handler1=PDWizard.FolderDplySubWiz
+Handler2=PDWizard.WebPostDplySubWiz

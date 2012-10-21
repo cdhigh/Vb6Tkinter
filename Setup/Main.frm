@@ -1,0 +1,262 @@
+VERSION 5.00
+Begin VB.Form Form1 
+   Caption         =   "Setup for VisualTkinter"
+   ClientHeight    =   3120
+   ClientLeft      =   60
+   ClientTop       =   450
+   ClientWidth     =   7740
+   Icon            =   "Main.frx":0000
+   LinkTopic       =   "Form1"
+   MaxButton       =   0   'False
+   ScaleHeight     =   3120
+   ScaleWidth      =   7740
+   StartUpPosition =   3  '窗口缺省
+   Begin VB.CommandButton CmdUninstall 
+      Caption         =   "卸载(&U)"
+      Enabled         =   0   'False
+      Height          =   615
+      Left            =   2760
+      TabIndex        =   4
+      Top             =   2400
+      Width           =   1935
+   End
+   Begin VB.CheckBox ChkXpStyle 
+      Caption         =   "VB开发环境呈现为XP风格(&V)"
+      BeginProperty Font 
+         Name            =   "宋体"
+         Size            =   10.5
+         Charset         =   134
+         Weight          =   400
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
+      Height          =   255
+      Left            =   720
+      TabIndex        =   3
+      Top             =   1920
+      Value           =   1  'Checked
+      Visible         =   0   'False
+      Width           =   5655
+   End
+   Begin VB.CommandButton CmdQuit 
+      Caption         =   "退出(&Q)"
+      Height          =   615
+      Left            =   5280
+      TabIndex        =   2
+      Top             =   2400
+      Width           =   1935
+   End
+   Begin VB.CommandButton CmdSetup 
+      Caption         =   "安装(&S)"
+      Height          =   615
+      Left            =   240
+      TabIndex        =   1
+      Top             =   2400
+      Width           =   1935
+   End
+   Begin VB.Label Label1 
+      Caption         =   "Label1"
+      BeginProperty Font 
+         Name            =   "宋体"
+         Size            =   12
+         Charset         =   134
+         Weight          =   400
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
+      Height          =   1695
+      Left            =   120
+      TabIndex        =   0
+      Top             =   120
+      Width           =   7575
+   End
+End
+Attribute VB_Name = "Form1"
+Attribute VB_GlobalNameSpace = False
+Attribute VB_Creatable = False
+Attribute VB_PredeclaredId = True
+Attribute VB_Exposed = False
+Option Explicit
+
+Private Declare Sub InitCommonControls Lib "comctl32.dll" ()
+Private Declare Function WritePrivateProfileString Lib "kernel32" Alias "WritePrivateProfileStringA" (ByVal lpApplicationName As String, ByVal lpKeyName As Any, ByVal lpString As Any, ByVal lpFileName As String) As Long
+Private Declare Function GetPrivateProfileString Lib "kernel32" Alias "GetPrivateProfileStringA" (ByVal lpApplicationName As String, ByVal lpKeyName As Any, ByVal lpDefault As String, ByVal lpReturnedString As String, ByVal nSize As Long, ByVal lpFileName As String) As Long
+Private Declare Function FindWindow Lib "user32" Alias "FindWindowA" (ByVal lpClassName As String, ByVal lpWindowName As String) As Long
+Private Declare Function GetSystemDefaultLCID Lib "kernel32" () As Long
+
+Private m_vb6manifest As String
+Private m_English As Boolean
+
+Private Sub AddToINI()
+    WritePrivateProfileString "Add-Ins32", "VisualTkinter.Connect", "3", "VBADDIN.INI"
+End Sub
+Private Sub DelFromINI()
+    WritePrivateProfileString "Add-Ins32", "VisualTkinter.Connect", vbNullString, "VBADDIN.INI"
+End Sub
+
+Private Sub CmdQuit_Click()
+    End
+End Sub
+
+Private Sub CmdSetup_Click()
+    
+    Dim sf As String
+    
+    sf = App.Path & IIf(Right(App.Path, 1) = "\", "", "\") & "VisualTkinter.dll"
+    
+    If Dir(sf) = "" Then
+        If m_English Then
+            MsgBox "Please run the setup program in directory of VisualTkinter.dll", vbInformation
+        Else
+            MsgBox "请在VIsualTkinter.dll的同一目录下执行此软件。", vbInformation
+        End If
+        Exit Sub
+    End If
+    
+    '判断VB6是否在运行，如果运行的话，建议先退出
+    If FindWindow("wndclass_desked_gsk", vbNullString) <> 0 Then
+        If m_English Then
+            MsgBox "A process VB6.EXE detected, please quit VB6.EXE firstly.", vbInformation
+        Else
+            MsgBox "当前检测到VB6正在运行，建议先退出VB6，然后再执行此安装程序。", vbInformation
+        End If
+        Exit Sub
+    End If
+    
+    AddToINI
+    
+    Shell "regsvr32 /s " & Chr(34) & sf & Chr(34)
+    
+    If ChkXpStyle.Visible And ChkXpStyle.Value <> 0 And m_vb6manifest <> "" Then
+        VB6XpStyle
+    End If
+    
+    MsgBox IIf(m_English, "Setup successed!", "注册完成！"), vbInformation
+    
+End Sub
+
+Private Sub CmdUninstall_Click()
+    
+    Dim sf As String
+    
+    sf = App.Path & IIf(Right(App.Path, 1) = "\", "", "\") & "VisualTkinter.dll"
+    
+    If Dir(sf) = "" Then
+        If m_English Then
+            MsgBox "Please run the setup program in directory of VisualTkinter.dll", vbInformation
+        Else
+            MsgBox "请在VIsualTkinter.dll的同一目录下执行此软件。", vbInformation
+        End If
+        Exit Sub
+    End If
+    
+    '判断VB6是否在运行，如果运行的话，建议先退出
+    If FindWindow("wndclass_desked_gsk", vbNullString) <> 0 Then
+        If m_English Then
+            MsgBox "A process VB6.EXE detected, please quit VB6.EXE firstly.", vbInformation
+        Else
+            MsgBox "当前检测到VB6正在运行，建议先退出VB6，然后再执行卸载程序。", vbInformation
+        End If
+        Exit Sub
+    End If
+    
+    Shell "regsvr32 /u " & Chr(34) & sf & Chr(34)
+    
+    DelFromINI
+    
+End Sub
+
+Private Sub Form_Initialize()
+    InitCommonControls
+End Sub
+
+Private Sub Form_Load()
+    Dim svb6 As String, s As String, n As Long
+    
+    n = GetSystemDefaultLCID()
+    Select Case n
+        Case &H804, &H1004, &H404, &HC04
+            Label1.Caption = "这个程序用于注册Visual Tkinter插件，你也可以手工完成：" & vbCrLf & vbCrLf & _
+                "1. 运行：regsvr32 /s 你的目录\VisualTkinter.dll" & vbCrLf & _
+                "2. 在C:\WINDOWS\VBADDIN.INI的段[Add-Ins32]增加一行：" & vbCrLf & _
+                "      VisualTkinter.Connect=3"
+            m_English = False
+        Case Else
+            CmdSetup.Caption = "Install(&S)"
+            CmdUninstall.Caption = "Uninstall(&U)"
+            CmdQuit.Caption = "Quit(&Q)"
+            ChkXpStyle.Caption = "Build file for XP style of VB6.EXE(&V)"
+            
+            Label1.Caption = "The programe will finish the setup procedure for addin of VB 'VisaulTkinter', you can do it manually too." & vbCrLf & vbCrLf & _
+                "1. Run Command : regsvr32 /s path\VisualTkinter.dll" & vbCrLf & _
+                "2. Add a line in section Add-Ins32 of c:\windows\vbaddin.ini:" & vbCrLf & _
+                "      VisualTkinter.Connect=3"
+            m_English = True
+    End Select
+    
+    '确认VB6位置
+    svb6 = "C:\Program Files\Microsoft Visual Studio\VB98\VB6.EXE"
+    If Dir(svb6) = "" Then
+        svb6 = "C\Program Files\VB6精简版\VB6.EXE"
+        If Dir(svb6) <> "" Then
+            If Dir(svb6 & ".manifest") = "" Then
+                m_vb6manifest = svb6 & ".manifest"
+                ChkXpStyle.Visible = True
+            End If
+        Else '尝试读注册表确认VB6位置
+            s = GetStringValue("HKEY_CLASSES_ROOT\VisualBasic.Project\Shell\Open\Command", "")
+            If Right(s, 4) = Chr(34) & "%1" & Chr(34) Then
+                s = Trim(Replace(Left(s, Len(s) - 4), Chr(34), ""))
+                If Dir(s) <> "" Then
+                    If Dir(s & ".manifest") = "" Then
+                        m_vb6manifest = svb6 & ".manifest"
+                        ChkXpStyle.Visible = True
+                    End If
+                Else  '在注册表中还是没有找到或不是VB6，则最后到同一目录下查找
+                    svb6 = App.Path & IIf(Right(App.Path, 1) = "\", "", "\") & "VB6.EXE"
+                    If Dir(svb6) <> "" And Dir(svb6 & ".manifest") = "" Then
+                        m_vb6manifest = svb6 & ".manifest"
+                        ChkXpStyle.Visible = True
+                    End If
+                End If
+            Else '注册表对应项为空，无法确认，只能到本目录下查找
+                svb6 = App.Path & IIf(Right(App.Path, 1) = "\", "", "\") & "VB6.EXE"
+                If Dir(svb6) <> "" And Dir(svb6 & ".manifest") = "" Then
+                    m_vb6manifest = svb6 & ".manifest"
+                    ChkXpStyle.Visible = True
+                End If
+            End If
+        End If
+    ElseIf Dir(svb6 & ".manifest") = "" Then
+        m_vb6manifest = svb6 & ".manifest"
+        ChkXpStyle.Visible = True
+    End If
+    
+    '确认是否已经安装
+    CmdUninstall.Enabled = IsRegistered("VisualTkinter.Connect")
+    
+End Sub
+
+'在VB6目录下写一个VB6.exe.manifest文件
+Private Sub VB6XpStyle()
+    On Error Resume Next
+    Dim arr() As Byte
+    arr = LoadResData(1, 24)
+    Open m_vb6manifest For Binary As #1
+    Put #1, , arr
+    Close #1
+    On Error GoTo 0
+End Sub
+
+'判断对应组件是否已经注册
+Private Function IsRegistered(ByVal KJname As String) As Boolean
+    On Error Resume Next
+    Dim oCheckup As Object
+    Set oCheckup = CreateObject(KJname)
+    IsRegistered = (Err.Number = 0)
+    Set oCheckup = Nothing
+    On Error GoTo 0
+End Function
+

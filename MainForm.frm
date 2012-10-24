@@ -154,6 +154,24 @@ Begin VB.Form FrmMain
       Top             =   120
       Width           =   2175
    End
+   Begin VB.ComboBox cmbEditCombo 
+      Height          =   300
+      Left            =   6360
+      TabIndex        =   14
+      Text            =   "Combo1"
+      Top             =   840
+      Visible         =   0   'False
+      Width           =   1095
+   End
+   Begin VB.ComboBox cmbEditList 
+      Height          =   300
+      Left            =   7560
+      Style           =   2  'Dropdown List
+      TabIndex        =   15
+      Top             =   840
+      Visible         =   0   'False
+      Width           =   1095
+   End
    Begin VB.Label lblCurPrjName 
       Caption         =   "当前工程："
       Height          =   345
@@ -670,7 +688,7 @@ Private Sub CmdOutput_Click()
     '在输出代码前先更新一下当前显示的数据
     UpdateCfgtoCls LstComps.ListIndex
     
-    strHead.Append "#!#!/usr/bin/python"
+    strHead.Append "#!/usr/bin/python"
     strHead.Append "#-*- coding:utf-8 -*-" & vbCrLf
     strHead.Append "import os, sys"
     
@@ -867,6 +885,10 @@ Private Sub LstCfg_ItemChecked(Row As Long)
 End Sub
 
 Private Sub LstCfg_RequestEdit(ByVal Row As Long, ByVal Col As Long, Cancel As Boolean)
+    
+    '自动添加所需的属性选择项，存在可选列表时，在下拉列表中选择，否则切换成文本框
+    FillcmbEdit Row, Col
+    
     If Col = 0 Or InStr(1, " x, y, relx, rely, width, height, relwidth, relheight, ", " " & LstCfg.CellText(Row, 0) & ",") Then Cancel = True
 End Sub
 
@@ -931,8 +953,8 @@ Private Sub FetchCfgFromCls(idx As Long)
     If idx < 0 Or idx > UBound(m_Comps) Then Exit Sub
     
     LstCfg.Redraw = False
+    If LstCfg.ItemCount > 0 Then LstCfg.TopRow = 0  '这个操作是为了规避GridOcx的滚动条BUG，就是切换控件后有部分项目无法完整显示
     LstCfg.Clear
-    
     Set cItms = m_Comps(idx).Allitems()
     For Each cfg In cItms
         nRow = LstCfg.AddItem(Left(cfg, InStr(1, cfg, "|") - 1))
@@ -1267,6 +1289,41 @@ End Sub
 Private Sub mnuV2andV3Code_Click()
     mnuV2andV3Code.Checked = Not mnuV2andV3Code.Checked
     SaveSetting App.Title, "Settings", "V2andV3Code", IIf(mnuV2andV3Code.Checked, "1", "0")
+End Sub
+
+'自动填充编辑用的组合框内容
+Private Sub FillcmbEdit(Row As Long, Col As Long)
+    
+    Dim sa() As String, i As Long, nEditType As Long
+    
+    If LstComps.ListCount = 0 Or LstComps.ListIndex < 0 Then Exit Sub
+    
+    '0表示内置文本编辑框，1表示仅限下拉列表，2表示下拉列表加文本输入
+    nEditType = m_Comps(LstComps.ListIndex).GetAttrValueList(LstCfg.CellText(Row, 0), sa)
+    
+    If nEditType = 0 Then
+        LstCfg.BindControl 1, Nothing  '使用内置文本编辑框
+    ElseIf nEditType = 1 Then
+        LstCfg.BindControl 1, cmbEditList
+        cmbEditList.Clear
+        cmbEditList.AddItem ""  '在第一行放一个空字符串，这样就可以不设置对应的参数。
+        For i = 0 To UBound(sa)
+            cmbEditList.AddItem sa(i)
+            If sa(i) = LstCfg.CellText(Row, Col) Then
+                cmbEditList.ListIndex = i + 1
+            End If
+        Next
+    Else
+        LstCfg.BindControl 1, cmbEditCombo
+        cmbEditCombo.Clear
+        For i = 0 To UBound(sa)
+            cmbEditCombo.AddItem sa(i)
+            If sa(i) = LstCfg.CellText(Row, Col) Then
+                cmbEditCombo.ListIndex = i
+            End If
+        Next
+    End If
+    
 End Sub
 
 Private Sub TxtCode_DblClick()

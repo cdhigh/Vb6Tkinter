@@ -75,13 +75,20 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long)
     
 End Sub
 
+'设置属性值的可能值列表
+'返回值：0-没有可选值，1-有一个严格限制的可选值列表，2-除提供的可选值列表外，还可以手动输入其他值
+'输出：sa()可选值列表数组
+Public Function GetAttrValueList(sAttr As String, ByRef sa() As String) As Long
+    GetAttrValueList = m_Base.GetAttrValueList(sAttr, sa)
+End Function
+
 Public Function Tips(sAttr As String) As String
     Tips = sAttr & vbCrLf
     Select Case sAttr:
-    Case "wraplength":
-        Tips = Tips & L("l_TipWrapLen", "多少个字符后自动换行。用于多行显示。")
-    Case Else:
-        Tips = m_Base.Tips(sAttr)
+        Case "wraplength":
+            Tips = Tips & L("l_TipWrapLen", "多少个字符后自动换行。用于多行显示。")
+        Case Else:
+            Tips = m_Base.Tips(sAttr)
     End Select
 End Function
 

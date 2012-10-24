@@ -66,7 +66,7 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long)
     m_dicTotal("resolution") = o.Properties("SmallChange")
     m_dicTotal("relief") = "FLAT"
     m_dicTotal("digits") = 0
-    m_dicTotal("orient") = IIf(o.Properties("Orientation"), "VERTICAL", "HORIZONTAL")
+    m_dicTotal("orient") = IIf(o.Properties("Orientation"), "'vertical'", "'horizontal'")
     m_dicTotal("showvalue") = 1
     m_dicTotal("variable") = ""
     m_dicTotal("sliderlength") = 30
@@ -95,6 +95,22 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long)
     If m_dicTotal("takefocus") = 0 Then m_Base("takefocus") = m_dicTotal("takefocus")
     
 End Sub
+
+'设置属性值的可能值列表
+'返回值：0-没有可选值，1-有一个严格限制的可选值列表，2-除提供的可选值列表外，还可以手动输入其他值
+'输出：sa()可选值列表数组
+Public Function GetAttrValueList(sAttr As String, ByRef sa() As String) As Long
+    GetAttrValueList = 1
+    If sAttr = "showvalue" Then
+        sa = Split("1,0", ",")
+    ElseIf sAttr = "digits" Then
+        sa = Split("0,1,2,3,4", ",")
+    ElseIf sAttr = "sliderrelief" Then
+        sa = Split("FLAT,GROOVE,RAISED,RIDGE,SOLID,SUNKEN", ",")
+    Else
+        GetAttrValueList = m_Base.GetAttrValueList(sAttr, sa)
+    End If
+End Function
 
 Public Function Tips(sAttr As String) As String
     Tips = sAttr & vbCrLf

@@ -403,7 +403,31 @@ Public Sub SetSingleConfig(sAttr As String)
     m_dic(sa(0)) = sa(1)
 End Sub
 
+'设置属性值的可能值列表
+'返回值：0-没有可选值，1-有一个严格限制的可选值列表，2-除提供的可选值列表外，还可以手动输入其他值
+'输出：sa()可选值列表数组
+Public Function GetAttrValueList(sAttr As String, ByRef sa() As String) As Long
+    GetAttrValueList = 1
+    Select Case sAttr
+        Case "anchor"
+            sa = Split("'w','n','s','e','nw','ne','sw','se','center'", ",")
+        Case "relief"
+            sa = Split("FLAT,GROOVE,RAISED,RIDGE,SOLID,SUNKEN", ",")
+        Case "takefocus"
+            sa = Split("1,0", ",")
+        Case "state"
+            sa = Split("'normal','disabled'", ",")
+        Case "justify"
+            sa = Split("'left','right','center'", ",")
+        Case "orient"
+            sa = Split("'horizontal','vertical'", ",")
+        Case Else
+            GetAttrValueList = 0
+    End Select
+            
+End Function
 
+'返回属性在线帮助
 Public Function Tips(sAttr As String) As String
     
     Tips = sAttr & vbCrLf
@@ -437,7 +461,7 @@ Public Function Tips(sAttr As String) As String
     Case "state":
         Tips = Tips & L("l_TipState", "控件状态，可选值有：'normal', 'disabled'")
     Case "underline":
-        Tips = Tips & L("l_TipUnderline", "在哪个字母上添加下划线，做为快捷方式的表示。")
+        Tips = Tips & L("l_TipUnderline", "在哪个字母上添加下划线，做为快捷方式的表示，第一个字母索引为0。")
     Case "justify":
         Tips = Tips & L("l_TipJustify", "控制多行字符的对齐方式，请使用单引号或双引号括起来，可能值为：" & vbCrLf & "left, right, center。")
     Case "padding":

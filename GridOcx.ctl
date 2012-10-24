@@ -1169,6 +1169,7 @@ Public Sub Clear()
     mSortColumn = -1
     mSortSubColumn = -1
     
+    mPendingScrollBar = False
     mScrollAction = 0
     mItemCount = -1
     
@@ -3824,6 +3825,10 @@ Private Function UpdateCell() As Boolean
         If mCols(mColPtr(mEditCol)).EditCtrl Is Nothing Then
             bRequestUpdate = (mItems(mRowPtr(mEditRow)).Cell(mColPtr(mEditCol)).sValue <> txtEdit.Text)
             sNewValue = txtEdit.Text
+        'cdhigh added in 2012.10.23, if combobox, updatecell
+        ElseIf TypeOf mCols(mColPtr(mEditCol)).EditCtrl Is VB.ComboBox Then
+            bRequestUpdate = (mItems(mRowPtr(mEditRow)).Cell(mColPtr(mEditCol)).sValue <> mCols(mColPtr(mEditCol)).EditCtrl.Text)
+            sNewValue = mCols(mColPtr(mEditCol)).EditCtrl.Text
         Else
             bRequestUpdate = True
         End If

@@ -130,6 +130,18 @@ Public Sub InitConfig(o As Object, nWidth As Long, nHeight As Long)
     
 End Sub
 
+'设置属性值的可能值列表
+'返回值：0-没有可选值，1-有一个严格限制的可选值列表，2-除提供的可选值列表外，还可以手动输入其他值
+'输出：sa()可选值列表数组
+Public Function GetAttrValueList(sAttr As String, ByRef sa() As String) As Long
+    GetAttrValueList = 1
+    If sAttr = "resizable" Or sAttr = "iconembedding" Then
+        sa = Split("1,0", ",")
+    Else
+        GetAttrValueList = 0
+    End If
+End Function
+
 Public Function Tips(sAttr As String) As String
     Tips = sAttr & vbCrLf
     Select Case sAttr:

@@ -76,7 +76,7 @@ l_TipBd=边框宽度，单位为像素。
 l_TipAnchor=控件内文字的对齐方式，请使用单引号或双引号括起来，可能值为：\n'w'|'n'|'s'|'e'|'nw'|'ne'|'sw'|'se'|'center'.
 l_TipRelief=外观效果，可选值有：FLAT, GROOVE, RAISED, RIDGE, SOLID, SUNKEN。
 l_TipTakeFocus=是否允许TAB选择控件。设置为1为允许，设置为0则TAB跳过此控件。
-l_TipUnderline=在哪个字母上添加下划线，做为快捷方式的表示。
+l_TipUnderline=在哪个字母上添加下划线，做为快捷方式的表示，第一個字母索引為0。
 l_TipPadding=控件内部额外间距，一般不需要设置。如果需要设置，控件内部额外间距，一般不需要设置。如果需要设置，请提供'左 上 右 下'四个值，或三个值'左 上 右'(下=上)，两个值'左 上'(右=左,下=上)，一个值'左'(上=下=右=左)。
 l_TipOrient=控件方向类型，全大写不用括号，小写则需要括号括起来，可选值有：'horizontal', 'vertical'。
 l_TipVariable=控件值和一个变量绑定，通过变量可以获取或设置控件的值。\n如果需要这个特性，这个属性设置为变量名。
@@ -386,7 +386,7 @@ l_TipBd=Width of the border around the outside of widget.
 l_TipAnchor=Controls where the text is positioned, text quoted expected.\nThey are: 'w'|'n'|'s'|'e'|'nw'|'ne'|'sw'|'se'|'center'.
 l_TipRelief=refers to certain simulated 3-D effects around the outside of widget.\nThey are: FLAT, GROOVE, RAISED, RIDGE, SOLID, SUNKEN.
 l_TipTakeFocus=Normally, keyboard focus does visit widget.\nSet to zero to prevent focus from visiting the widget.
-l_TipUnderline=If nonnegative, the corresponding text character will be underlined.
+l_TipUnderline=If nonnegative, the corresponding text character will be underlined, index of first char is 0.
 l_TipPadding=Specifies the amount of extra space to add around the outside of the widget.
 l_TipOrient=One of 'horizontal' or 'vertical'. Specifies the orientation of the widget.
 l_TipVariable=The control variable that tracks the current state/value of the widget.

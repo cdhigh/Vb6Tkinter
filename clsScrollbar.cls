@@ -57,7 +57,7 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long)
     m_dicTotal("rely") = Format(o.Properties("Top") / parentHeight, "0.###")
     m_dicTotal("relwidth") = Format(o.Properties("Width") / parentWidth, "0.###")
     m_dicTotal("relheight") = Format(o.Properties("Height") / parentHeight, "0.###")
-    m_dicTotal("orient") = IIf(o.ClassName = "HScrollBar", "HORIZONTAL", "VERTICAL")
+    m_dicTotal("orient") = IIf(o.ClassName = "HScrollBar", "'horizontal'", "'vertical'")
     m_dicTotal("bg") = ""
     m_dicTotal("bd") = ""
     m_dicTotal("jump") = 0
@@ -82,12 +82,26 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long)
     
 End Sub
 
+'设置属性值的可能值列表
+'返回值：0-没有可选值，1-有一个严格限制的可选值列表，2-除提供的可选值列表外，还可以手动输入其他值
+'输出：sa()可选值列表数组
+Public Function GetAttrValueList(sAttr As String, ByRef sa() As String) As Long
+    GetAttrValueList = 1
+    If sAttr = "jump" Then
+        sa = Split("1,0", ",")
+    ElseIf sAttr = "activerelief" Then
+        sa = Split("FLAT,GROOVE,RAISED,RIDGE,SOLID,SUNKEN", ",")
+    Else
+        GetAttrValueList = m_Base.GetAttrValueList(sAttr, sa)
+    End If
+End Function
+
 Public Function Tips(sAttr As String) As String
     Tips = sAttr & vbCrLf
     Select Case sAttr:
-    Case "jump":
+    Case "jump"
         Tips = Tips & L("l_TipJump", "设置为0（默认值）则每次滚动条数值变化就调用一次回调函数，设置为1则等鼠标松开后才调一次回调函数。")
-    Case "activerelief":
+    Case "activerelief"
         Tips = Tips & L("l_TipActiveRelief", "设置鼠标指针移动在滚动条上时的式样，可选值：FLAT, GROOVE, RAISED, RIDGE, SOLID, SUNKEN。")
     Case Else:
         Tips = m_Base.Tips(sAttr)

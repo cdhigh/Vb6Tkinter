@@ -64,6 +64,18 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long)
     
 End Sub
 
+'设置属性值的可能值列表
+'返回值：0-没有可选值，1-有一个严格限制的可选值列表，2-除提供的可选值列表外，还可以手动输入其他值
+'输出：sa()可选值列表数组
+Public Function GetAttrValueList(sAttr As String, ByRef sa() As String) As Long
+    If sAttr = "labelanchor" Then
+        GetAttrValueList = 1
+        sa = Split("'nw','wn','en','n','ne','w','e','ws','es','sw','s','se'", ",")
+    Else
+        GetAttrValueList = m_Base.GetAttrValueList(sAttr, sa)
+    End If
+End Function
+
 Public Function Tips(sAttr As String) As String
     
     If sAttr = "labelanchor" Then

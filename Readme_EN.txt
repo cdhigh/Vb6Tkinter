@@ -1,9 +1,9 @@
 1.Introduce
     The program is a addin of VB6(Visual Basic 6), It allow you design
     your GUI layout of Tkinter (standard GUI library of Python)in VB6 
-    Intergrate Develope Environment.
+    Integrated Development Environment.
     The addin VisualTkinter will generate python code of GUI framework
-    for you. All extra things you need to do is add your logical code
+    for you. the only thing you need to do is add your logical code
     in Callback of GUI framework.
 
 2. List of VB Controls Supported
@@ -54,6 +54,12 @@
     import modules filedialog, simpledialog, colorchooser.    
 
 3. History
+  v1.2.3
+    1. Add a property 'protocol' to Form.
+    2. Delete the option 'Build file for XP style of VB6.EXE', you can do it
+       youself by using google. the keyword is 'vb xp manifest' etc.
+  v1.2.2
+    Provide a combobox to choose some value in it.
   v1.2
     1.Supports feature multi-language.
     2.Add supports of Statusbar.

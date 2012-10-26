@@ -15,12 +15,14 @@ Option Explicit
 
 '窗体类的抽象，保存VB窗体属性
 
+Private m_Base As clsBaseControl
 Private m_Name As String
 Private m_Title As String
 Private m_Geometry As String
 Private m_Resizable As Boolean
 Private m_IconFile As String
 Private m_IconEmbedding As Boolean
+Private m_Protocol As String
 Private m_FrmPath As String          '保存窗体所在目录
 Private m_ScaleMode As Long
 
@@ -31,7 +33,7 @@ Private m_ScaleMode As Long
 'usettk:是否使用TTK主题扩展
 Public Function toString(ByRef sCmdFunc As cStrBuilder, rel As Boolean, oop As Boolean, usettk As Boolean) As String
     
-    Dim sOut As New cStrBuilder, s As String, sBase64 As String
+    Dim sOut As New cStrBuilder, s As String, sBase64 As String, sa() As String, i As Long
     
     If oop Then
         sOut.Append "        self.master.title('" & m_Title & "')"
@@ -41,7 +43,7 @@ Public Function toString(ByRef sCmdFunc As cStrBuilder, rel As Boolean, oop As B
         '处理窗体图标
         s = UCase(FileExt(m_IconFile))
         If s = "GIF" And m_IconEmbedding Then
-            sBase64 = GetIconBase64(Space(12)) '使用BASE64将GIF图片嵌入源码
+            sBase64 = CreateIconBase64(Space(12)) '使用BASE64将GIF图片嵌入源码
             If Len(sBase64) Then
                 sOut.Append "        self.icondata = " & String(3, Chr(34)) & vbCrLf & sBase64 & String(3, Chr(34))
                 sOut.Append "        self.iconimg = PhotoImage(data=self.icondata)"
@@ -53,6 +55,20 @@ Public Function toString(ByRef sCmdFunc As cStrBuilder, rel As Boolean, oop As B
             sOut.Append "        self.iconimg = PhotoImage(file=r'" & m_IconFile & "')"
             sOut.Append "        self.master.tk.call('wm', 'iconphoto', self.master._w, self.iconimg)"
         End If
+        
+        '窗口消息拦截，如果有的话
+        If Len(m_Protocol) Then
+            sa = Split(m_Protocol, ",")
+            For i = 0 To UBound(sa)
+                sOut.Append "        self.master.protocol('" & sa(i) & "', self.EV_" & sa(i) & ")"
+                If sa(i) = "WM_DELETE_WINDOW" Then
+                    s = "        if askyesno(message='Are you sure to quit?'):" & vbCrLf & Space(12) & "self.master.destroy()"
+                    sCmdFunc.Append m_Base.CreateFuncDefOOP("EV_" & sa(i), "event=None", s)
+                Else
+                    sCmdFunc.Append m_Base.CreateFuncDefOOP("EV_" & sa(i), "event=None")
+                End If
+            Next
+        End If
     Else
         sOut.Append "    " & m_Name & " = Tk()"
         sOut.Append "    " & m_Name & ".title('" & m_Title & "')"
@@ -62,7 +78,7 @@ Public Function toString(ByRef sCmdFunc As cStrBuilder, rel As Boolean, oop As B
         '处理窗体图标
         s = UCase(FileExt(m_IconFile))
         If s = "GIF" And m_IconEmbedding Then
-            sBase64 = GetIconBase64(Space(8))
+            sBase64 = CreateIconBase64(Space(8))
             If Len(sBase64) Then
                 sOut.Append "    icondata = " & String(3, Chr(34)) & vbCrLf & sBase64 & String(3, Chr(34))
                 sOut.Append "    iconimg = PhotoImage(data=icondata)"
@@ -75,6 +91,20 @@ Public Function toString(ByRef sCmdFunc As cStrBuilder, rel As Boolean, oop As B
             sOut.Append "    " & m_Name & ".tk.call('wm', 'iconphoto', " & m_Name & "._w, iconimg)"
         End If
         
+        '窗口消息拦截，如果有的话
+        If Len(m_Protocol) Then
+            sa = Split(m_Protocol, ",")
+            For i = 0 To UBound(sa)
+                sOut.Append "    " & m_Name & ".protocol('" & sa(i) & "', EV_" & sa(i) & ")"
+                If sa(i) = "WM_DELETE_WINDOW" Then
+                    s = "    if askyesno(message='Are you sure to quit?'):" & vbCrLf & "        gComps['" & m_Name & "'].destroy()"
+                    sCmdFunc.Append m_Base.CreateFuncDef("EV_" & sa(i), "event=None", s)
+                Else
+                    sCmdFunc.Append m_Base.CreateFuncDef("EV_" & sa(i), "event=None")
+                End If
+            Next
+        End If
+        
         sOut.Append "    gComps['" & m_Name & "'] = " & m_Name & vbCrLf
     End If
     
@@ -82,11 +112,11 @@ Public Function toString(ByRef sCmdFunc As cStrBuilder, rel As Boolean, oop As B
     
 End Function
 
-Private Function GetIconBase64(sPrexSpace As String) As String
+Private Function CreateIconBase64(sPrexSpace As String) As String
 
     Dim sIconFile As String, abContent() As Byte
     
-    GetIconBase64 = ""
+    CreateIconBase64 = ""
     If Len(m_IconFile) <= 0 Then Exit Function
     
     sIconFile = IIf(InStr(1, m_IconFile, "\") Or InStr(1, m_IconFile, "/"), "", m_FrmPath) & m_IconFile
@@ -101,7 +131,7 @@ Private Function GetIconBase64(sPrexSpace As String) As String
         Exit Function
     End If
     
-    Base64Encode abContent, GetIconBase64, sPrexSpace
+    Base64Encode abContent, CreateIconBase64, sPrexSpace
     
 End Function
 
@@ -117,6 +147,7 @@ Public Sub InitConfig(o As Object, nWidth As Long, nHeight As Long)
     m_Resizable = IIf(o.Properties("MaxButton"), True, False)
     m_IconEmbedding = True
     m_IconFile = ""
+    m_Protocol = ""
     
     On Error Resume Next
     s = o.FileNames(1)
@@ -152,9 +183,11 @@ Public Function Tips(sAttr As String) As String
         Case "resizable"
             Tips = Tips & L("l_TipFrmResizable", "用户是否可以改变窗体的大小。可选值：1/0。")
         Case "icon"
-            Tips = Tips & L("l_TipFrmIcon", "图标文件名，支持ico,gif,ppm,xpm格式，省略路径名则在当前VB窗体目录下查找。")
+            Tips = Tips & L("l_TipFrmIcon", "图标文件名，支持ico,gif,ppm,pgm格式，省略路径名则在当前VB窗体目录下查找。")
         Case "iconembedding"
             Tips = Tips & L("l_TipFrmIconEmbedding", "是否将图标文件转换为base64编码嵌入源代码，仅支持GIF格式嵌入。")
+        Case "protocol"
+            Tips = Tips & L("l_TipFrmProtocol", "处理窗口消息，比如设置为'WM_DELETE_WINDOW'则处理窗口关闭事件，如果要拦截多个消息，请使用逗号分隔，比如'WM_DELETE_WINDOW,WM_SAVE'")
         Case Else:
             Tips = Tips & L("l_TipUnknown", "未知属性")
     End Select
@@ -171,6 +204,8 @@ Public Function Allitems() As Collection
     re.Add "resizable|" & IIf(m_Resizable, 1, 0) & "|1"
     re.Add "icon||1"
     re.Add "iconembedding|" & IIf(m_IconEmbedding, 1, 0) & "|1"
+    re.Add "protocol||1"
+    
     Set Allitems = re
     
 End Function
@@ -193,6 +228,8 @@ Public Sub SetConfig(sAttrs As String)
                 m_IconFile = UnQuote(Trim(sa(i + 1)))
             Case "iconembedding"
                 m_IconEmbedding = IIf(Trim(sa(i + 1)) = "0", False, True)
+            Case "protocol"
+                m_Protocol = Trim(Replace(Replace(Replace(sa(i + 1), Chr(34), ""), "'", ""), " ", ""))
         End Select
     Next
     
@@ -222,4 +259,10 @@ Public Property Let ScaleMode(nV As Long)
     m_ScaleMode = nV
 End Property
 
+Private Sub Class_Initialize()
+    Set m_Base = New clsBaseControl
+End Sub
 
+Private Sub Class_Terminate()
+    Set m_Base = Nothing
+End Sub

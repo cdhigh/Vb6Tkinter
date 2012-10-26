@@ -549,20 +549,28 @@ Private Sub Class_Initialize()
     Set m_dic = New Dictionary
 End Sub
 
-'构建一个函数空骨架; FuncName: 函数名，Params: 参数
-Public Function CreateFuncDef(FuncName As String, Optional sparams As String = "") As String
+'构建一个函数空骨架; FuncName: 函数名，Params: 参数，sbody: 函数体
+Public Function CreateFuncDef(FuncName As String, Optional sparams As String = "", Optional sbody As String = "") As String
     If Len(FuncName) = 0 Then Exit Function
     CreateFuncDef = "def " & FuncName & "(" & sparams & "):" & vbCrLf
-    CreateFuncDef = CreateFuncDef & Space(4) & "#TODO, Please finish the function here!" & vbCrLf
-    CreateFuncDef = CreateFuncDef & Space(4) & "pass" & vbCrLf
+    If Len(sbody) Then
+        CreateFuncDef = CreateFuncDef & sbody & vbCrLf
+    Else
+        CreateFuncDef = CreateFuncDef & Space(4) & "#TODO, Please finish the function here!" & vbCrLf
+        CreateFuncDef = CreateFuncDef & Space(4) & "pass" & vbCrLf
+    End If
 End Function
 
-'构建一个函数空骨架（面向对象代码）; FuncName: 函数名，Params: 参数
-Public Function CreateFuncDefOOP(FuncName As String, Optional sparams As String = "") As String
+'构建一个函数空骨架（面向对象代码）; FuncName: 函数名，Params: 参数，sbody: 函数体
+Public Function CreateFuncDefOOP(FuncName As String, Optional sparams As String = "", Optional sbody As String = "") As String
     If Len(FuncName) = 0 Then Exit Function
     CreateFuncDefOOP = "    def " & FuncName & "(self" & IIf(Len(sparams), ", ", "") & sparams & "):" & vbCrLf
-    CreateFuncDefOOP = CreateFuncDefOOP & Space(8) & "#TODO, Please finish the function here!" & vbCrLf
-    CreateFuncDefOOP = CreateFuncDefOOP & Space(8) & "pass" & vbCrLf
+    If Len(sbody) Then
+        CreateFuncDefOOP = CreateFuncDefOOP & sbody & vbCrLf
+    Else
+        CreateFuncDefOOP = CreateFuncDefOOP & Space(8) & "#TODO, Please finish the function here!" & vbCrLf
+        CreateFuncDefOOP = CreateFuncDefOOP & Space(8) & "pass" & vbCrLf
+    End If
 End Function
 
 'VB颜色转Python的RGB颜色

@@ -333,7 +333,7 @@ Private Sub Form_Load()
     
     CmdRefsFormsList_Click
     
-    Me.Caption = "Visual Tkinter of Python - cdhigh@sohu.com - v" & App.Major & "." & App.Minor
+    Me.Caption = "Visual Tkinter of Python - cdhigh@sohu.com - v" & App.Major & "." & App.Minor & IIf(App.Revision > 0, "." & App.Revision, "")
     
     mnuOopCode.Checked = GetSetting(App.Title, "Settings", "OopCode", "1") = "1"
     mnuV2andV3Code.Checked = GetSetting(App.Title, "Settings", "V2andV3Code", "1") = "1"
@@ -893,9 +893,7 @@ Private Sub LstCfg_RequestEdit(ByVal Row As Long, ByVal Col As Long, Cancel As B
 End Sub
 
 Private Sub LstCfg_RequestUpdate(ByVal Row As Long, ByVal Col As Long, NewValue As String, Cancel As Boolean)
-    If LstCfg.CellText(Row, Col) <> "" And NewValue = "" And LstCfg.ItemChecked(Row) Then
-        LstCfg.ItemChecked(Row) = False
-    ElseIf NewValue <> "" Then
+    If NewValue <> "" Then
         LstCfg.ItemChecked(Row) = True
     End If
 End Sub
@@ -1307,6 +1305,7 @@ Private Sub FillcmbEdit(Row As Long, Col As Long)
         LstCfg.BindControl 1, cmbEditList
         cmbEditList.Clear
         cmbEditList.AddItem ""  '在第一行放一个空字符串，这样就可以不设置对应的参数。
+        If LstCfg.CellText(Row, Col) = "" Then cmbEditList.ListIndex = 0
         For i = 0 To UBound(sa)
             cmbEditList.AddItem sa(i)
             If sa(i) = LstCfg.CellText(Row, Col) Then

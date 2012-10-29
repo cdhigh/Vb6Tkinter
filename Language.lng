@@ -369,7 +369,7 @@ l_msgFailedScaleMode=Found form'{0}', but its ScaleMode={1}, now can only suppor
 l_fdOpen=Please Choose file:
 l_fdSave=Save file to:
 l_cmtClsApp=#The class will implement callback function for events and your logical code.
-l_cmtClsUi=#The class created widgets for UI.
+l_cmtClsUi=#The class will create all widgets for UI.
 l_cmtgComps=#Global dictionary of widgets for using in others functions.
 l_cmtTodoCols=#TODO Add list of titles here, first column fixed for tree view.
 l_cmtTodoDisCols=#TODO Add list of titles will be displayed, first column fixed for tree view.

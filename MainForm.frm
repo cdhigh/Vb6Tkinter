@@ -1054,7 +1054,10 @@ Private Sub mnuOutAll_Click()
     Dim sF As String
     sF = FileDialog(Me, True, L("l_fdSave", "将Python文件保存到："), "*.py", m_prevsf)
     
-    If Len(sF) Then Utf8File_Write_VB sF, TxtCode.Text
+    If Len(sF) Then
+        If Len(FileExt(sF)) = 0 Then sF = sF & ".py"  '如果文件名没有扩展名，自动添加.py扩展名
+        Utf8File_Write_VB sF, TxtCode.Text
+    End If
     
     m_prevsf = sF
     
@@ -1072,6 +1075,7 @@ Private Sub mnuOutMainOnly_Click()
     If nm > 0 And nf > 0 Then
         sF = FileDialog(Me, True, L("l_fdSave", "将Python文件保存到："), "*.py", m_prevsf)
         If Len(sF) Then
+            If Len(FileExt(sF)) = 0 Then sF = sF & ".py"  '如果文件名没有扩展名，自动添加.py扩展名
             Utf8File_Write_VB sF, Mid(s, nm, nf - nm)
         End If
     Else
@@ -1094,6 +1098,7 @@ Private Sub mnuOutUiOnly_Click()
     If nui > 0 And napp > 0 Then
         sF = FileDialog(Me, True, "将Python文件保存到：", "*.py", m_prevsf)
         If Len(sF) Then
+            If Len(FileExt(sF)) = 0 Then sF = sF & ".py"  '如果文件名没有扩展名，自动添加.py扩展名
             Utf8File_Write_VB sF, Mid(s, nui, napp - nui)
         End If
     Else

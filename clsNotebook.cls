@@ -15,9 +15,10 @@ Option Explicit
 
 '选项卡类，用于设置和保持相应的属性和值，并生成对应PYTHON的TKinter代码
 
-Private m_dicTotal As Dictionary                                                '保存全部的属性，包括默认值
-Private m_Base As clsBaseControl                                                '基础控件类
-Private m_Tabs() As String                                                      '选项卡数目和标题
+Private m_dicTotal As Dictionary       '保存全部的属性，包括默认值
+Private m_Base As clsBaseControl       '基础控件类
+Private m_Tabs() As String             '选项卡标题，下标从1开始的，0实际没用
+Private m_nTabs As Long                '选项卡数目
 
 '输出PYTHON代码,
 'sCmdFunc: 输出参数，事件处理回调代码;
@@ -33,28 +34,28 @@ Public Function toString(ByRef sCmdFunc As cStrBuilder, rel As Boolean, oop As B
     '增加选项卡
     If oop Then
         sOut.Append vbCrLf & Space(8) & L("l_cmtTodoNBFrame", "#TODO，请在各个Frame(代表各选项卡内容)里面添加需要的控件。")
-        For i = 0 To UBound(m_Tabs)
-            s = "self." & m_Base.Name & "Frame" & i + 1
+        For i = 1 To m_nTabs  'TAB下标从1开始
+            s = "self." & m_Base.Name & "Frame" & i
             sOut.Append Space(8) & s & " = Frame(self." & m_Base.Name & ")"
             sOut.Append Space(8) & s & "Lbl = Label(" & s & ", text='Please Add Controls:" & m_Tabs(i) & "')"
             sOut.Append Space(8) & s & "Lbl.place(relx=0.1,rely=0.5)" & vbCrLf
         Next
         
-        For i = 0 To UBound(m_Tabs)
-            s = "self." & m_Base.Name & "Frame" & i + 1
+        For i = 1 To m_nTabs
+            s = "self." & m_Base.Name & "Frame" & i
             sOut.Append Space(8) & "self." & m_Base.Name & ".add(" & s & ", text='" & m_Tabs(i) & "')"
         Next
     Else
         sOut.Append vbCrLf & Space(4) & L("l_cmtTodoNBFrame", "#TODO，请在各个Frame(代表各选项卡内容)里面添加需要的控件。")
-        For i = 0 To UBound(m_Tabs)
-            s = m_Base.Name & "Frame" & i + 1
+        For i = 1 To m_nTabs
+            s = m_Base.Name & "Frame" & i
             sOut.Append Space(4) & s & " = Frame(" & m_Base.Name & ")"
             sOut.Append Space(4) & s & "Lbl = Label(" & s & ", text='Please Add Controls:" & m_Tabs(i) & "')"
             sOut.Append Space(4) & s & "Lbl.place(relx=0.1,rely=0.5)" & vbCrLf
         Next
         
-        For i = 0 To UBound(m_Tabs)
-            s = m_Base.Name & "Frame" & i + 1
+        For i = 1 To m_nTabs
+            s = m_Base.Name & "Frame" & i
             sOut.Append Space(4) & m_Base.Name & ".add(" & s & ", text='" & m_Tabs(i) & "')"
         Next
     End If
@@ -67,13 +68,17 @@ End Function
 '创建对象后要马上调用这个函数初始化各参数
 Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long)
     
-    Dim nTabs As Long, i As Long
+    Dim i As Long, oiTabs As ITabs
     
     m_Base.Name = o.Properties("Name")
     
-    ReDim m_Tabs(1) As String
-    m_Tabs(0) = "Tab1"
-    m_Tabs(1) = "Tab2"
+    Set oiTabs = o.Properties("Tabs").object
+    m_nTabs = oiTabs.Count
+    
+    ReDim m_Tabs(m_nTabs) As String
+    For i = 1 To m_nTabs
+        m_Tabs(i) = oiTabs.Item(i).Caption  'TAB下标从1开始
+    Next
     
     '这些是所有的默认值
     m_dicTotal("x") = m_Base.toPixelX(o.Properties("Left"))

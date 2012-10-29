@@ -1,10 +1,10 @@
 1.Introduce
     The program is a addin of VB6(Visual Basic 6), It allow you design
-    your GUI layout of Tkinter (standard GUI library of Python)in VB6 
+    your GUI layout of Tkinter (standard GUI library of Python) in VB6 
     Integrated Development Environment.
-    The addin VisualTkinter will generate python code of GUI framework
-    for you. the only thing you need to do is add your logical code
-    in Callback of GUI framework.
+    The addin will generate python code of GUI framework for you. the 
+    only thing you need to do is add your logical code in Callback of 
+    GUI framework.
 
 2. List of VB Controls Supported
   2.1 Label
@@ -54,6 +54,8 @@
     import modules filedialog, simpledialog, colorchooser.    
 
 3. History
+  v1.2.4
+    Widget Notebook create tabs as same of TabStrip(VB)
   v1.2.3
     1. Add a property 'protocol' to Form.
     2. Delete the option 'Build file for XP style of VB6.EXE', you can do it
@@ -71,3 +73,4 @@
   v1.0 First version
     Supports : Label, Entry, LabelFrame, Button, Checkbutton, Radiobutton,
     OptionMenu, Combobox, Listbox, Scrollbar, Scale, Canvas, Menu
+

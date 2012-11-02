@@ -42,13 +42,13 @@ Private Function toStringStructure(ByRef sCmd As cStrBuilder, rel As Boolean) As
     
     Dim sOut As New cStrBuilder, s() As String, i As Long, extra As String
     
-    extra = IIf(m_Base("tearoff") <> "", ", tearoff=" & m_Base("tearoff"), "")
+    extra = IIf(Len(m_Base("tearoff")), ", tearoff=" & m_Base("tearoff"), "")
     
     sOut.Append Space(4) & m_Base.Name & " = Menu(" & m_Base.Parent & extra & ")"
     
     '逐个输出各顶级菜单，各顶级菜单下的子菜单由各顶级菜单负责生成对应的代码
     For i = 0 To m_numChilds - 1
-        sOut.Append m_Childs(i).toString(sCmd, rel, False)
+        sOut.Append m_Childs(i).toString(sCmd, rel, False, False)
     Next
     
     sOut.Append Space(4) & m_Base.Parent & "['menu'] = " & m_Base.Name
@@ -63,13 +63,13 @@ Private Function toStringOOP(ByRef sCmd As cStrBuilder, rel As Boolean) As Strin
     
     Dim sOut As New cStrBuilder, s() As String, i As Long, extra As String
     
-    extra = IIf(m_Base("tearoff") <> "", ", tearoff=" & m_Base("tearoff"), "")
+    extra = IIf(Len(m_Base("tearoff")), ", tearoff=" & m_Base("tearoff"), "")
     
     sOut.Append Space(8) & "self." & m_Base.Name & " = Menu(self." & m_Base.Parent & extra & ")"
     
     '逐个输出各顶级菜单，各顶级菜单下的子菜单由各顶级菜单负责生成对应的代码
     For i = 0 To m_numChilds - 1
-        sOut.Append m_Childs(i).toString(sCmd, rel, True)
+        sOut.Append m_Childs(i).toString(sCmd, rel, True, False)
     Next
     
     sOut.Append Space(8) & "self." & m_Base.Parent & "['menu'] = self." & m_Base.Name

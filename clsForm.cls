@@ -36,7 +36,7 @@ Public Function toString(ByRef sCmdFunc As cStrBuilder, rel As Boolean, oop As B
     Dim sOut As New cStrBuilder, s As String, sBase64 As String, sa() As String, i As Long
     
     If oop Then
-        sOut.Append "        self.master.title('" & m_Title & "')"
+        sOut.Append "        self.master.title(" & U(m_Title) & ")"
         sOut.Append "        self.master.geometry('" & m_Geometry & "')"
         If Not m_Resizable Then sOut.Append "        self.master.resizable(0,0)"
         
@@ -71,7 +71,7 @@ Public Function toString(ByRef sCmdFunc As cStrBuilder, rel As Boolean, oop As B
         End If
     Else
         sOut.Append "    " & m_Name & " = Tk()"
-        sOut.Append "    " & m_Name & ".title('" & m_Title & "')"
+        sOut.Append "    " & m_Name & ".title(" & U(m_Title) & ")"
         sOut.Append "    " & m_Name & ".geometry('" & m_Geometry & "')"
         If Not m_Resizable Then sOut.Append "    " & m_Name & ".resizable(0,0)"
         
@@ -266,3 +266,13 @@ End Sub
 Private Sub Class_Terminate()
     Set m_Base = Nothing
 End Sub
+
+'对象序列化函数
+Public Function Serializer(vSer As clsSerialization)
+    'vSer.Serializer m_Base
+End Function
+
+Public Function Deserializer(vSer As clsSerialization)
+    'vSer.Deserializer m_Base
+End Function
+

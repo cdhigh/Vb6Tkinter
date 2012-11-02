@@ -46,20 +46,17 @@ Public Function toStringStructure(ByRef sCmdFunc As cStrBuilder, rel As Boolean,
     Dim sOut As New cStrBuilder, s() As String, i As Long, extra As String, sStyle As String
     Dim sTmp As String, dTmp As Double, sCmdName As String
     
-    Debug.Assert m_Type <> "" And m_Name <> ""
+    'Debug.Assert m_Type <> "" And m_Name <> ""
     
     '如果需要变量绑定，则先创建对应的变量
     If Len(Dic("textvariable")) Then
-        sTmp = IIf(Left(Dic("text"), 1) <> Chr(34) And Left(Dic("text"), 1) <> "'", "'" & Dic("text") & "'", Dic("text")) '自动加引号
-        sOut.Append Space(4) & Dic("textvariable") & " = StringVar(value=" & IIf(Len(sTmp), sTmp, "''") & ")"
+        sOut.Append Space(4) & Dic("textvariable") & " = StringVar(value=" & U(Dic("text")) & ")"
     End If
     If Len(Dic("variable")) Then
-        sTmp = IIf(Left(m_Value, 1) <> Chr(34) And Left(m_Value, 1) <> "'", "'" & m_Value & "'", m_Value) '自动加引号
-        sOut.Append Space(4) & Dic("variable") & " = StringVar(value=" & IIf(Len(sTmp), sTmp, "''") & ")"
+        sOut.Append Space(4) & Dic("variable") & " = StringVar(value=" & U(m_Value) & ")"
     End If
     If Len(Dic("listvariable")) Then
-        sTmp = IIf(Left(m_Value, 1) <> Chr(34) And Left(m_Value, 1) <> "'", "'" & m_Value & "'", m_Value) '自动加引号
-        sOut.Append Space(4) & Dic("listvariable") & " = StringVar(value=" & IIf(Len(sTmp), sTmp, "''") & ")"
+        sOut.Append Space(4) & Dic("listvariable") & " = StringVar(value=" & U(m_Value) & ")"
     End If
     If Not usettk And Len(Dic("font")) Then
         sOut.Append Space(4) & m_Name & "Font = Font(" & Dic("font") & ")"
@@ -167,20 +164,17 @@ Public Function toStringOOP(ByRef sCmdFunc As cStrBuilder, rel As Boolean, usett
     Dim sOut As New cStrBuilder, s() As String, i As Long, extra As String
     Dim sTmp As String, sStyle As String, sCmdName As String
     
-    Debug.Assert m_Type <> "" And m_Name <> ""
+    'Debug.Assert m_Type <> "" And m_Name <> ""
     
     '如果需要变量绑定，则先创建对应的变量
     If Len(Dic("textvariable")) Then
-        sTmp = IIf(Left(Dic("text"), 1) <> Chr(34) And Left(Dic("text"), 1) <> "'", "'" & Dic("text") & "'", Dic("text")) '自动加引号
-        sOut.Append Space(8) & "self." & Dic("textvariable") & " = StringVar(value=" & IIf(Len(sTmp), sTmp, "''") & ")"
+        sOut.Append Space(8) & "self." & Dic("textvariable") & " = StringVar(value=" & U(Dic("text")) & ")"
     End If
     If Len(Dic("variable")) Then
-        sTmp = IIf(Left(m_Value, 1) <> Chr(34) And Left(m_Value, 1) <> "'", "'" & m_Value & "'", m_Value) '自动加引号
-        sOut.Append Space(8) & "self." & Dic("variable") & " = StringVar(value=" & IIf(Len(sTmp), sTmp, "''") & ")"
+        sOut.Append Space(8) & "self." & Dic("variable") & " = StringVar(value=" & U(m_Value) & ")"
     End If
     If Len(Dic("listvariable")) Then
-        sTmp = IIf(Left(m_Value, 1) <> Chr(34) And Left(m_Value, 1) <> "'", "'" & m_Value & "'", m_Value) '自动加引号
-        sOut.Append Space(8) & "self." & Dic("listvariable") & " = StringVar(value=" & IIf(Len(sTmp), sTmp, "''") & ")"
+        sOut.Append Space(8) & "self." & Dic("listvariable") & " = StringVar(value=" & U(m_Value) & ")"
     End If
     If Not usettk And Len(Dic("font")) Then
         sOut.Append Space(8) & "self." & m_Name & "Font = Font(" & Dic("font") & ")"
@@ -278,15 +272,6 @@ Public Function GetPositionParams(rel As Boolean) As String
     End If
 End Function
 
-'如果给定字符串没有单引号或双引号括起来，这个函数将其括起来
-Private Function QuatedIfNecessary(ByVal s As String, Optional typeQuated As String = "'") As String
-    s = Trim(s)
-    If (Left(s, 1) <> "'" And Left(s, 1) <> Chr(34)) Then s = typeQuated & s
-    If (Right(s, 1) <> "'" And Right(s, 1) <> Chr(34)) Then s = s & typeQuated
-    QuatedIfNecessary = s
-End Function
-
-
 '除了必选参数外，这个函数生成用户选择的其他参数列表
 Public Function GetExtraParams(oop As Boolean, usettk As Boolean) As String
     
@@ -297,9 +282,12 @@ Public Function GetExtraParams(oop As Boolean, usettk As Boolean) As String
     For Each k In ks
         If isExtra(k, usettk) And Len(Dic(k)) Then
             '需要使用引号括起来的属性，如果用户忘了，则在这里自动添加
-            sValue = Dic(k)
-            If InStr(1, " text, fg, bg, anchor, justify, show, label, state, activestyle, labelanchor, mode, ", " " & k & ",") Then
-                sValue = QuatedIfNecessary(Dic(k))
+            If k = "text" Or k = "label" Then
+                sValue = U(Dic(k))
+            ElseIf InStr(1, " fg, bg, anchor, justify, show, state, activestyle, labelanchor, mode, ", " " & k & ",") Then
+                sValue = Quote(Dic(k))
+            Else
+                sValue = Dic(k)
             End If
             s.Append k & "=" & sValue
         End If
@@ -347,9 +335,9 @@ Private Function GetStyleParams(oop As Boolean) As String
     
     If Len(Dic("relief")) Then s.Append "relief=" & Dic("relief")
     If Len(Dic("activerelief")) Then s.Append "activerelief=" & Dic("activerelief")
-    If Len(Dic("anchor")) Then s.Append "anchor=" & QuatedIfNecessary(Dic("anchor"))
-    If Len(Dic("fg")) Then s.Append "foreground=" & QuatedIfNecessary(Dic("fg"))
-    If Len(Dic("bg")) Then s.Append "background=" & QuatedIfNecessary(Dic("bg"))
+    If Len(Dic("anchor")) Then s.Append "anchor=" & Quote(Dic("anchor"))
+    If Len(Dic("fg")) Then s.Append "foreground=" & Quote(Dic("fg"))
+    If Len(Dic("bg")) Then s.Append "background=" & Quote(Dic("bg"))
     If Len(Dic("bd")) Then s.Append "borderwidth=" & Dic("bd")
     If Len(Dic("jump")) Then s.Append "jump=" & Dic("jump")
     If Len(Dic("indicatoron")) Then s.Append "indicatoron=" & Dic("indicatoron")
@@ -367,7 +355,6 @@ End Function
 '设置/获取字典的值
 Public Property Get Dic(ByVal sKey As String) As String
 Attribute Dic.VB_UserMemId = 0
-    Dic = ""
     If m_dic.Exists(sKey) Then Dic = m_dic(sKey)
 End Property
 
@@ -433,7 +420,7 @@ Public Function Tips(sAttr As String) As String
     Tips = sAttr & vbCrLf
     Select Case sAttr:
     Case "text", "label":
-        Tips = Tips & L("l_TipText", "控件的显示文本，请使用单引号或双引号括起来。")
+        Tips = Tips & L("l_TipText", "控件的显示文本。")
     Case "x", "y":
         Tips = Tips & L("l_TipXY", "控件的放置位置。")
     Case "width":
@@ -573,16 +560,6 @@ Public Function CreateFuncDefOOP(FuncName As String, Optional sparams As String 
     End If
 End Function
 
-'VB颜色转Python的RGB颜色
-'要使用调色板的颜色才能转换为RGB颜色，使用系统颜色无法转换
-Public Function ColorToRGBStr(ByVal dwColor As Long) As String
-    Dim clrHex As String
-    ColorToRGBStr = ""
-    If dwColor > 0 Then
-        clrHex = Replace(Format(Hex$(dwColor), "@@@@@@"), " ", "0")
-        ColorToRGBStr = "'#" & Mid$(clrHex, 5, 2) & Mid$(clrHex, 3, 2) & Mid$(clrHex, 1, 2) & "'"
-    End If
-End Function
 
 '将各种单位转换为像素
 Public Function toPixelX(nX As Long) As Long

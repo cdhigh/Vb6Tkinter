@@ -19,7 +19,7 @@ Option Explicit
 
 Private m_dicTotal As Dictionary                                                '保存全部的属性，包括默认值
 Private m_Base As clsBaseControl                                                '基础控件类
-Private m_List As String
+Private m_List() As String
 
 '输出PYTHON代码,
 'sCmdFunc: 输出参数，事件处理回调代码;
@@ -44,9 +44,15 @@ End Function
 '输出结构化代码
 Private Function toStringStructure(ByRef sCmdFunc As cStrBuilder, rel As Boolean, usettk As Boolean) As String
     
-    Dim sOut As New cStrBuilder, s() As String, i As Long, extra As String
+    Dim sOut As New cStrBuilder, s() As String, i As Long, sList As String, extra As String
     
-    sOut.Append Space(4) & m_Base.Name & "List = " & m_List
+    '生成列表
+    For i = 0 To UBound(m_List)
+        sList = sList & U(m_List(i)) & ","
+    Next
+    sList = "(" & sList & ")"
+    
+    sOut.Append Space(4) & m_Base.Name & "List = " & sList
     sOut.Append Space(4) & m_Base("variable") & " = StringVar(value=" & m_Base.Name & "List[0])"
     
     extra = m_Base("variable") & ", *" & m_Base.Name & "List"
@@ -77,9 +83,15 @@ End Function
 '输出面向对象代码
 Private Function toStringOOP(ByRef sCmdFunc As cStrBuilder, rel As Boolean, usettk As Boolean) As String
     
-    Dim sOut As New cStrBuilder, s() As String, i As Long, extra As String
+    Dim sOut As New cStrBuilder, s() As String, i As Long, sList As String, extra As String
     
-    sOut.Append Space(8) & "self." & m_Base.Name & "List = " & m_List
+    '生成列表
+    For i = 0 To UBound(m_List)
+        sList = sList & U(m_List(i)) & ","
+    Next
+    sList = "(" & sList & ")"
+    
+    sOut.Append Space(8) & "self." & m_Base.Name & "List = " & sList
     sOut.Append Space(8) & "self." & m_Base("variable") & " = StringVar(value=self." & m_Base.Name & "List[0])"
     
     extra = "self." & m_Base("variable") & ", *self." & m_Base.Name & "List"
@@ -109,20 +121,27 @@ End Function
 '创建对象后要马上调用这个函数初始化各参数
 Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long)
     
-    Dim i As Long, oList As Object, sList As String
+    Dim i As Long, oList As Object, sList As String, numList As Long
     
     m_Base.Name = o.Properties("Name")
     
     '保存下拉选项值
     Set oList = o.Properties("List")
-    sList = "("
-    i = IIf(o.Properties("Style") = 2, 1, 0)                                    ' 2-Dropdown List时第一项IndexedValue为控件名，所以从第二项开始
+    Erase m_List
+    numList = 0
+    i = IIf(o.Properties("Style") = 2, 1, 0)         ' 2-Dropdown List时第一项IndexedValue为控件名，所以从第二项开始
     Do While True
         If oList.IndexedValue(i) = "" Then Exit Do
-        sList = sList & "'" & oList.IndexedValue(i) & "',"
+        
+        ReDim Preserve m_List(numList) As String
+        m_List(numList) = oList.IndexedValue(i)
         i = i + 1
+        numList = numList + 1
     Loop
-    m_List = sList & IIf(sList = "(", "'Add items in design or code!',)", ")")
+    If numList = 0 Then
+        ReDim m_List(0) As String
+        m_List(0) = "Add Items in designer or code!"
+    End If
     
     m_dicTotal("x") = m_Base.toPixelX(o.Properties("Left"))
     m_dicTotal("y") = m_Base.toPixelY(o.Properties("Top"))

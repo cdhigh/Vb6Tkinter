@@ -36,15 +36,16 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long)
     
     m_Base.Name = o.Properties("Name")
     
-    '连接列表各行，中间用空格隔开
-    Set oList = o.Properties("List")
+    '保存列表，中间使用空格隔开
     i = 0
+    Set oList = o.Properties("List")
     Do While True
         If oList.IndexedValue(i) = "" Then Exit Do
-        sList = sList & " " & oList.IndexedValue(i) & " "
+        
+        sList = sList & " " & oList.IndexedValue(i)
         i = i + 1
     Loop
-    m_Base.Value = IIf(Len(Trim(sList)), "'" & Trim(sList) & "'", "")
+    m_Base.Value = Trim(sList)
     
     m_dicTotal("x") = m_Base.toPixelX(o.Properties("Left"))
     m_dicTotal("y") = m_Base.toPixelY(o.Properties("Top"))
@@ -56,8 +57,8 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long)
     m_dicTotal("relheight") = Format(o.Properties("Height") / parentHeight, "0.###")
     m_dicTotal("activestyle") = "'none'"
     m_dicTotal("listvariable") = o.Properties("Name") & "Var"
-    m_dicTotal("fg") = m_Base.ColorToRGBStr(o.Properties("ForeColor"))
-    m_dicTotal("bg") = m_Base.ColorToRGBStr(o.Properties("BackColor"))
+    m_dicTotal("fg") = ColorToRGBStr(o.Properties("ForeColor"))
+    m_dicTotal("bg") = ColorToRGBStr(o.Properties("BackColor"))
     m_dicTotal("bd") = "1"
     m_dicTotal("relief") = "SUNKEN"
     m_dicTotal("selectmode") = "SINGLE"

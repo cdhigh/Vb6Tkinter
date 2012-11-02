@@ -70,7 +70,7 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long)
     i = IIf(o.Properties("Style") = 2, 1, 0)                                    ' 2-Dropdown List时第一项IndexedValue为控件名，所以从第二项开始
     Do While True
         If oList.IndexedValue(i) = "" Then Exit Do
-        sList = sList & "'" & oList.IndexedValue(i) & "',"
+        sList = sList & U(oList.IndexedValue(i)) & ","
         i = i + 1
     Loop
     m_List = sList & IIf(sList = "[", "'Add items in design or code!',]", "]")
@@ -85,8 +85,8 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long)
     m_dicTotal("relheight") = Format(o.Properties("Height") / parentHeight, "0.###")
     m_dicTotal("displayrows") = ""
     m_dicTotal("textvariable") = m_Base.Name & "Var"
-    m_dicTotal("fg") = m_Base.ColorToRGBStr(o.Properties("ForeColor"))
-    m_dicTotal("bg") = m_Base.ColorToRGBStr(o.Properties("BackColor"))
+    m_dicTotal("fg") = ColorToRGBStr(o.Properties("ForeColor"))
+    m_dicTotal("bg") = ColorToRGBStr(o.Properties("BackColor"))
     m_dicTotal("bd") = "1"
     m_dicTotal("relief") = "SUNKEN"
     m_dicTotal("justify") = "'left'"

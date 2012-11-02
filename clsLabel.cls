@@ -45,8 +45,8 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long)
     m_dicTotal("relheight") = Format(o.Properties("Height") / parentHeight, "0.###")
     m_dicTotal("text") = Replace(o.Properties("Caption"), "&", "")
     m_dicTotal("relief") = IIf(o.Properties("BorderStyle"), "SUNKEN", "FLAT")
-    m_dicTotal("fg") = m_Base.ColorToRGBStr(o.Properties("ForeColor"))
-    m_dicTotal("bg") = m_Base.ColorToRGBStr(o.Properties("BackColor"))
+    m_dicTotal("fg") = ColorToRGBStr(o.Properties("ForeColor"))
+    m_dicTotal("bg") = ColorToRGBStr(o.Properties("BackColor"))
     m_dicTotal("bd") = ""
     m_dicTotal("wraplength") = 100
     m_dicTotal("justify") = "'left'"

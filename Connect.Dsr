@@ -63,14 +63,6 @@ End Sub
 '------------------------------------------------------
 Private Sub AddinInstance_OnConnection(ByVal Application As Object, ByVal ConnectMode As AddInDesignerObjects.ext_ConnectMode, ByVal AddInInst As Object, custom() As Variant)
     
-    Dim cbStandard As CommandBar
-    
-    On Error Resume Next
-    Err.Clear
-    Set cbStandard = Application.CommandBars("标准")
-    If Err.Number Then Set cbStandard = Application.CommandBars("Standard")
-    Err.Clear
-    
     On Error GoTo error_handler
     
     '保存 vb 实例
@@ -84,17 +76,15 @@ Private Sub AddinInstance_OnConnection(ByVal Application As Object, ByVal Connec
         Me.Show
     Else
         Set mcbMenuCommandBar = AddToAddInCommandBar(App.Title & "(&T)")
-        '吸取事件
-        Set Me.MenuHandler = VBE.Events.CommandBarEvents(mcbMenuCommandBar)
+        If Not mcbMenuCommandBar Is Nothing Then
+            Set Me.MenuHandler = VBE.Events.CommandBarEvents(mcbMenuCommandBar)
+        End If
         
-        If Not cbStandard Is Nothing Then
-            Set mcbToolBoxCommandBar = cbStandard.Controls.Add(msoControlButton, , , cbStandard.Controls.Count)
-            mcbToolBoxCommandBar.BeginGroup = True
-            mcbToolBoxCommandBar.Caption = App.Title
-            Clipboard.SetData LoadResPicture(101, vbResBitmap)
-            mcbToolBoxCommandBar.PasteFace
+        Set mcbToolBoxCommandBar = AddToAddInToolBox(App.Title)
+        If Not mcbToolBoxCommandBar Is Nothing Then
             Set Me.ToolBoxHandler = VBE.Events.CommandBarEvents(mcbToolBoxCommandBar)
         End If
+        
     End If
     
     If ConnectMode = ext_cm_AfterStartup Then
@@ -133,6 +123,8 @@ Private Sub AddinInstance_OnDisconnection(ByVal RemoveMode As AddInDesignerObjec
     
     Unload mfrmAddIn
     Set mfrmAddIn = Nothing
+    
+    On Error GoTo 0
     
 End Sub
 
@@ -174,6 +166,39 @@ Function AddToAddInCommandBar(sCaption As String) As Office.CommandBarControl
 AddToAddInCommandBarErr:
     
 End Function
+
+
+Function AddToAddInToolBox(sCaption As String) As Office.CommandBarControl
+    Dim cbToolboxCommandBar As Office.CommandBarControl
+    Dim cbStandard As CommandBar
+    
+    '察看能否找到标准工具栏
+    On Error Resume Next
+    Set cbStandard = VBE.CommandBars("标准")
+    If Err.Number Then Set cbStandard = VBE.CommandBars("Standard")
+    
+    If cbStandard Is Nothing Then
+        Exit Function
+    End If
+    
+    Err.Clear
+    On Error GoTo AddToAddInToolboxErr
+    
+    '添加它到工具栏
+    Set cbToolboxCommandBar = cbStandard.Controls.Add(msoControlButton, , , cbStandard.Controls.Count)
+    cbToolboxCommandBar.BeginGroup = True
+    cbToolboxCommandBar.Caption = sCaption
+    Clipboard.SetData LoadResPicture(101, vbResBitmap)
+    cbToolboxCommandBar.PasteFace
+    
+    Set AddToAddInToolBox = cbToolboxCommandBar
+    
+    Exit Function
+    
+AddToAddInToolboxErr:
+    
+End Function
+
 
 Private Sub ToolBoxHandler_Click(ByVal CommandBarControl As Object, handled As Boolean, CancelDefault As Boolean)
     Me.Show

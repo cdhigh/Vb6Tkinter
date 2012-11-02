@@ -28,7 +28,7 @@ Private m_Base As clsBaseControl                                                
 Public Function toString(ByRef sCmdFunc As cStrBuilder, rel As Boolean, oop As Boolean, usettk As Boolean) As String
     
     Dim s As String
-    If usettk And Len(m_Base("label")) Then
+    If usettk And Len(m_Base("label")) Then  'TTK库不支持Scale的label属性
         s = m_Base("label")
         m_Base("label") = ""
     End If

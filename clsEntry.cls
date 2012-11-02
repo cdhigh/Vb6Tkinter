@@ -44,8 +44,8 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long)
     m_dicTotal("relheight") = Format(o.Properties("Height") / parentHeight, "0.###")
     m_dicTotal("text") = o.Properties("Text")
     m_dicTotal("textvariable") = m_Base.Name & "Var"
-    m_dicTotal("fg") = m_Base.ColorToRGBStr(o.Properties("ForeColor"))
-    m_dicTotal("bg") = m_Base.ColorToRGBStr(o.Properties("BackColor"))
+    m_dicTotal("fg") = ColorToRGBStr(o.Properties("ForeColor"))
+    m_dicTotal("bg") = ColorToRGBStr(o.Properties("BackColor"))
     m_dicTotal("bd") = "1"
     m_dicTotal("relief") = "SUNKEN"
     m_dicTotal("state") = IIf(o.Properties("Enabled"), IIf(o.Properties("Locked"), "'readonly'", "'normal'"), "'disabled'")

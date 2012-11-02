@@ -80,7 +80,7 @@ End Function
 
 Public Sub ChangeControlLanguage(ctl As Control, Language As String)
     Select Case TypeName(ctl)
-    Case "Label", "CommandButton", "CheckBox", "OptionButton", "Frame", "Menu"
+    Case "Label", "CommandButton", "CheckBox", "OptionButton", "Frame", "Menu", "RKShadeButton"
         ctl.Caption = GetString(Language, ctl.Name, ctl.Caption)
     End Select
 End Sub

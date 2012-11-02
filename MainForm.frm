@@ -2,23 +2,43 @@ VERSION 5.00
 Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.0#0"; "MSCOMCTL.OCX"
 Begin VB.Form FrmMain 
    Caption         =   "Visual Tkinter of Python - cdhigh@sohu.com"
-   ClientHeight    =   8775
+   ClientHeight    =   8130
    ClientLeft      =   60
-   ClientTop       =   750
+   ClientTop       =   675
    ClientWidth     =   12960
    Icon            =   "MainForm.frx":0000
    LinkTopic       =   "Form1"
-   MaxButton       =   0   'False
-   ScaleHeight     =   585
+   ScaleHeight     =   542
    ScaleMode       =   3  'Pixel
    ScaleWidth      =   864
    StartUpPosition =   2  '屏幕中心
+   Begin VisualTkinter.RKShadeButton CmdAddUsrProperty 
+      Height          =   375
+      Left            =   2640
+      TabIndex        =   6
+      Top             =   840
+      Width           =   6015
+      _ExtentX        =   10610
+      _ExtentY        =   661
+      Caption         =   "增加一个自定义属性(&P)"
+   End
+   Begin VisualTkinter.RKShadeButton CmdRefsFormsList 
+      Height          =   495
+      Left            =   120
+      TabIndex        =   0
+      Top             =   120
+      Width           =   2295
+      _ExtentX        =   4048
+      _ExtentY        =   873
+      Caption         =   "刷新窗体列表(&R)"
+      HotColor        =   255
+   End
    Begin MSComctlLib.StatusBar stabar 
       Align           =   2  'Align Bottom
       Height          =   375
       Left            =   0
       TabIndex        =   12
-      Top             =   8400
+      Top             =   7755
       Width           =   12960
       _ExtentX        =   22860
       _ExtentY        =   661
@@ -30,49 +50,15 @@ Begin VB.Form FrmMain
          EndProperty
       EndProperty
    End
-   Begin VB.CommandButton CmdQuit 
-      Caption         =   "退出(&Q)"
-      Height          =   615
-      Left            =   10440
-      TabIndex        =   4
-      Top             =   120
-      Width           =   2175
-   End
-   Begin VB.CommandButton CmdRefsFormsList 
-      Caption         =   "刷新窗体列表(&R)"
-      Height          =   615
-      Left            =   120
-      TabIndex        =   0
-      Top             =   120
-      Width           =   2175
-   End
    Begin VB.ComboBox cmbFrms 
       Height          =   300
       ItemData        =   "MainForm.frx":0CCA
       Left            =   120
       List            =   "MainForm.frx":0CCC
       Style           =   2  'Dropdown List
-      TabIndex        =   5
-      Top             =   960
+      TabIndex        =   1
+      Top             =   840
       Width           =   2415
-   End
-   Begin VB.CommandButton CmdSaveFile 
-      Caption         =   "保存到文件(&F)"
-      Enabled         =   0   'False
-      Height          =   615
-      Left            =   7860
-      TabIndex        =   3
-      Top             =   120
-      Width           =   2175
-   End
-   Begin VB.CommandButton CmdAddUsrProperty 
-      Caption         =   "增加一个自定义属性(&P)"
-      Enabled         =   0   'False
-      Height          =   375
-      Left            =   2640
-      TabIndex        =   10
-      Top             =   960
-      Width           =   6015
    End
    Begin VB.TextBox TxtTips 
       BeginProperty Font 
@@ -84,30 +70,30 @@ Begin VB.Form FrmMain
          Italic          =   0   'False
          Strikethrough   =   0   'False
       EndProperty
-      Height          =   3135
+      Height          =   2775
       Left            =   120
       Locked          =   -1  'True
       MultiLine       =   -1  'True
       ScrollBars      =   2  'Vertical
-      TabIndex        =   7
-      Top             =   5160
+      TabIndex        =   8
+      Top             =   4920
       Width           =   2415
    End
    Begin VB.ListBox LstComps 
-      Height          =   3660
+      Height          =   3480
       Left            =   120
-      TabIndex        =   6
-      Top             =   1440
+      TabIndex        =   7
+      Top             =   1320
       Width           =   2415
    End
    Begin VisualTkinter.GridOcx LstCfg 
-      Height          =   6855
+      Height          =   6372
       Left            =   2640
-      TabIndex        =   8
-      Top             =   1440
-      Width           =   6015
+      TabIndex        =   9
+      Top             =   1320
+      Width           =   6012
       _ExtentX        =   10610
-      _ExtentY        =   12091
+      _ExtentY        =   11245
       BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
          Name            =   "宋体"
          Size            =   9
@@ -117,15 +103,6 @@ Begin VB.Form FrmMain
          Italic          =   0   'False
          Strikethrough   =   0   'False
       EndProperty
-   End
-   Begin VB.CommandButton CmdClip 
-      Caption         =   "拷贝到剪贴板(&C)"
-      Enabled         =   0   'False
-      Height          =   615
-      Left            =   5280
-      TabIndex        =   2
-      Top             =   120
-      Width           =   2175
    End
    Begin VB.TextBox TxtCode 
       BeginProperty Font 
@@ -137,48 +114,83 @@ Begin VB.Form FrmMain
          Italic          =   0   'False
          Strikethrough   =   0   'False
       EndProperty
-      Height          =   6855
+      Height          =   6372
       Left            =   8760
       MultiLine       =   -1  'True
       ScrollBars      =   3  'Both
-      TabIndex        =   9
-      Top             =   1440
+      TabIndex        =   10
+      Top             =   1320
       Width           =   4095
    End
-   Begin VB.CommandButton CmdOutput 
-      Caption         =   "生成代码(&G)"
-      Enabled         =   0   'False
-      Height          =   615
-      Left            =   2700
-      TabIndex        =   1
-      Top             =   120
-      Width           =   2175
-   End
    Begin VB.ComboBox cmbEditCombo 
-      Height          =   300
+      Height          =   276
       Left            =   6360
       TabIndex        =   14
       Text            =   "Combo1"
-      Top             =   840
+      Top             =   720
       Visible         =   0   'False
       Width           =   1095
    End
    Begin VB.ComboBox cmbEditList 
-      Height          =   300
+      Height          =   276
       Left            =   7560
       Style           =   2  'Dropdown List
       TabIndex        =   15
-      Top             =   840
+      Top             =   720
       Visible         =   0   'False
       Width           =   1095
    End
+   Begin VisualTkinter.RKShadeButton CmdOutput 
+      Height          =   495
+      Left            =   2730
+      TabIndex        =   2
+      Top             =   120
+      Width           =   2295
+      _ExtentX        =   4048
+      _ExtentY        =   873
+      Caption         =   "生成代码(&G)"
+      HotColor        =   255
+   End
+   Begin VisualTkinter.RKShadeButton CmdClip 
+      Height          =   495
+      Left            =   5340
+      TabIndex        =   3
+      Top             =   120
+      Width           =   2295
+      _ExtentX        =   4048
+      _ExtentY        =   873
+      Caption         =   "拷贝到剪贴板(&C)"
+      HotColor        =   255
+   End
+   Begin VisualTkinter.RKShadeButton CmdSaveFile 
+      Height          =   495
+      Left            =   7950
+      TabIndex        =   4
+      Top             =   120
+      Width           =   2295
+      _ExtentX        =   4048
+      _ExtentY        =   873
+      Caption         =   "保存到文件(&F)"
+      HotColor        =   255
+   End
+   Begin VisualTkinter.RKShadeButton CmdQuit 
+      Height          =   495
+      Left            =   10560
+      TabIndex        =   5
+      Top             =   120
+      Width           =   2295
+      _ExtentX        =   4048
+      _ExtentY        =   873
+      Caption         =   "退出(&Q)"
+      HotColor        =   255
+   End
    Begin VB.Label lblCurPrjName 
       Caption         =   "当前工程："
-      Height          =   345
+      Height          =   348
       Left            =   8760
       TabIndex        =   13
-      Top             =   960
-      Width           =   1695
+      Top             =   840
+      Width           =   1692
    End
    Begin VB.Label lblWP 
       Alignment       =   2  'Center
@@ -194,10 +206,10 @@ Begin VB.Form FrmMain
          Strikethrough   =   0   'False
       EndProperty
       ForeColor       =   &H80000008&
-      Height          =   345
+      Height          =   348
       Left            =   10560
       TabIndex        =   11
-      Top             =   960
+      Top             =   840
       Width           =   2280
    End
    Begin VB.Menu mnuFile 
@@ -247,6 +259,9 @@ Begin VB.Form FrmMain
          Caption         =   "使用相对坐标(&R)"
          Checked         =   -1  'True
       End
+      Begin VB.Menu mnuUnicodePrefixU 
+         Caption         =   "Unicode字符串增加前缀u(&U)"
+      End
    End
    Begin VB.Menu mnuLanguage 
       Caption         =   "语言(&L)"
@@ -294,13 +309,16 @@ Option Explicit
 Public VBE As VBIDE.VBE
 Public Connect As Connect
 
-Private m_Comps() As Object                                                     '和LstComps行数一样多，对应各组件生成的实例
-Private m_MainMenu As clsMenu                                                   '菜单对象
+Private m_Comps() As Object             '和LstComps行数一样多，对应各组件生成的实例
+Private m_MainMenu As clsMenu              '菜单对象
 Private m_PrevCompIdx As Long
 Private m_curFrm As Object
 Private m_prevsf As String
-Private m_nLngNum As Long                                                       ' 语言种类
+Private m_nLngNum As Long                   ' 语言种类
 Private m_HasCommonDialog As Boolean
+
+Private m_TxtCodeExpanded As Boolean
+Private m_TxtTipsExpanded As Boolean
 
 Const NAME_TOPWINDOW = "top"
 
@@ -317,6 +335,8 @@ Private Declare Function GetSystemDefaultLCID Lib "kernel32" () As Long
 
 Private Sub Form_Load()
     
+    Dim s As String
+    
     '多语种支持
     InitMultiLanguage
     
@@ -325,7 +345,7 @@ Private Sub Form_Load()
     LstCfg.EditType = EnterKey Or MouseDblClick Or F2Key
     LstCfg.CheckBoxes = True
     LstCfg.AddColumn "Property", 2260, lgAlignCenterCenter
-    LstCfg.AddColumn "Value", 3400, lgAlignCenterCenter
+    LstCfg.AddColumn "Value", 3450, lgAlignCenterCenter
     LstCfg.ColAlignment(0) = lgAlignLeftCenter
     LstCfg.ColAlignment(1) = lgAlignLeftCenter
     LstCfg.SelectBackColor = &HFCC597 'vbHighlight
@@ -340,7 +360,14 @@ Private Sub Form_Load()
     mnuUseTtk.Checked = GetSetting(App.Title, "Settings", "UseTtk", "1") = "1"
     mnuRelPos.Checked = GetSetting(App.Title, "Settings", "RelPos", "1") = "1"
     
+    mnuUnicodePrefixU.Checked = GetSetting(App.Title, "Settings", "UnicodePrefix", "0") = "1"
+    g_bUnicodePrefixU = mnuUnicodePrefixU.Checked
+    
     m_HasCommonDialog = False
+    m_TxtCodeExpanded = False
+    m_TxtTipsExpanded = False
+    
+    ResizeInit Me
     
 End Sub
 
@@ -500,7 +527,7 @@ End Sub
 '更新各个列表，创建对应的控件类实例, 返回false表示初始化失败
 Private Function ResetLstComps(frm As Object) As Boolean
     
-    Dim obj As Object, ObjClsModule As Object, i As Long, s As String, j As Long, nScaleWidth As Long, nScaleHeight As Long
+    Dim Obj As Object, ObjClsModule As Object, i As Long, s As String, j As Long, nScaleWidth As Long, nScaleHeight As Long
     
     ResetLstComps = False
     If frm Is Nothing Then Exit Function
@@ -524,9 +551,9 @@ Private Function ResetLstComps(frm As Object) As Boolean
     m_HasCommonDialog = False
     
     '将控件添加到列表中
-    For Each obj In frm.Designer.VBControls
+    For Each Obj In frm.Designer.VBControls
         
-        CreateObj obj, ObjClsModule                                             '生成对应类模块实例
+        CreateObj Obj, ObjClsModule                                             '生成对应类模块实例
         
         If Not ObjClsModule Is Nothing Then
             
@@ -534,7 +561,7 @@ Private Function ResetLstComps(frm As Object) As Boolean
             ObjClsModule.ScaleMode = frm.Properties("ScaleMode")
             
             '如果窗体存在菜单控件，则创建主菜单对象，主菜单控件将管理所有的菜单项
-            If obj.ClassName = "Menu" And m_MainMenu Is Nothing Then
+            If Obj.ClassName = "Menu" And m_MainMenu Is Nothing Then
                 ReDim Preserve m_Comps(i) As Object
                 Set m_MainMenu = New clsMenu
                 Set m_Comps(i) = m_MainMenu
@@ -546,35 +573,35 @@ Private Function ResetLstComps(frm As Object) As Boolean
             '添加控件到控件列表
             ReDim Preserve m_Comps(i) As Object
             Set m_Comps(i) = ObjClsModule
-            LstComps.AddItem obj.Properties("Name") & " (" & obj.ClassName & ")"
+            LstComps.AddItem Obj.Properties("Name") & " (" & Obj.ClassName & ")"
             
             '初始化各控件对应的类模块对象
-            If obj.Container Is frm.Designer Then
-                m_Comps(i).InitConfig obj, frm.Properties("ScaleWidth"), frm.Properties("ScaleHeight")
-                m_Comps(i).Parent = IIf(obj.ClassName = "Menu", "MainMenu", NAME_TOPWINDOW)
-            ElseIf obj.Container.ClassName = "Menu" Then  '子菜单
-                m_Comps(i).InitConfig obj, 0, 0
-                m_Comps(i).Parent = obj.Container.Properties("Name")
+            If Obj.Container Is frm.Designer Then
+                m_Comps(i).InitConfig Obj, frm.Properties("ScaleWidth"), frm.Properties("ScaleHeight")
+                m_Comps(i).Parent = IIf(Obj.ClassName = "Menu", "MainMenu", NAME_TOPWINDOW)
+            ElseIf Obj.Container.ClassName = "Menu" Then  '子菜单
+                m_Comps(i).InitConfig Obj, 0, 0
+                m_Comps(i).Parent = Obj.Container.Properties("Name")
             Else
                 On Error Resume Next
-                nScaleWidth = obj.Container.Properties("ScaleWidth")
-                nScaleHeight = obj.Container.Properties("ScaleHeight")
+                nScaleWidth = Obj.Container.Properties("ScaleWidth")
+                nScaleHeight = Obj.Container.Properties("ScaleHeight")
                 If Err.Number Then                                     'Frame和个别其他容器不支持ScaleWidth属性，则使用Width代替
-                    nScaleWidth = obj.Container.Properties("Width")
-                    nScaleHeight = obj.Container.Properties("Height")
+                    nScaleWidth = Obj.Container.Properties("Width")
+                    nScaleHeight = Obj.Container.Properties("Height")
                 End If
                 Err.Clear
                 On Error GoTo 0
-                m_Comps(i).InitConfig obj, nScaleWidth, nScaleHeight
-                m_Comps(i).Parent = obj.Container.Properties("Name")
+                m_Comps(i).InitConfig Obj, nScaleWidth, nScaleHeight
+                m_Comps(i).Parent = Obj.Container.Properties("Name")
             End If
             
             i = i + 1
             ResetLstComps = True
-        ElseIf obj.ClassName = "CommonDialog" Then
+        ElseIf Obj.ClassName = "CommonDialog" Then
             m_HasCommonDialog = True
         Else
-            MsgBox L_F("l_msgCtlNotSupport", "当前暂不支持'{0}'控件\n\n程序将不生成此控件的代码。", obj.ClassName), vbInformation, App.Title
+            MsgBox L_F("l_msgCtlNotSupport", "当前暂不支持'{0}'控件\n\n程序将不生成此控件的代码。", Obj.ClassName), vbInformation, App.Title
         End If
     Next
     
@@ -654,6 +681,7 @@ Private Sub CmdOutput_Click()
     Dim i As Long, o As Object
     Dim strHead As New cStrBuilder, strOut As New cStrBuilder, strCmd As New cStrBuilder, s As String
     Dim OutOnlyV3 As Boolean, OutOOP As Boolean, OutRelPos As Boolean, usettk As Boolean
+    Dim bUnicodePrefix As Boolean  '临时保存UNICODE前缀方式
     
     If LstComps.ListCount = 0 Or LstCfg.ItemCount = 0 Then Exit Sub
     
@@ -685,10 +713,15 @@ Private Sub CmdOutput_Click()
         Next
     End If
     
+    bUnicodePrefix = g_bUnicodePrefixU '先暂存，在函数最后恢复
+    If OutOnlyV3 Then
+        g_bUnicodePrefixU = False  'V3模式下不需要任何前缀
+    End If
+    
     '在输出代码前先更新一下当前显示的数据
     UpdateCfgtoCls LstComps.ListIndex
     
-    strHead.Append "#!/usr/bin/python"
+    strHead.Append "#!/usr/bin/env python"
     strHead.Append "#-*- coding:utf-8 -*-" & vbCrLf
     strHead.Append "import os, sys"
     
@@ -701,7 +734,9 @@ Private Sub CmdOutput_Click()
         strHead.Append "#Usage:f=tkFileDialog.askopenfilename(initialdir='E:/Python')"
         strHead.Append IIf(m_HasCommonDialog, "", "#") & "import tkinter.filedialog as tkFileDialog"
         strHead.Append IIf(m_HasCommonDialog, "", "#") & "import tkinter.simpledialog as tkSimpleDialog  #askstring()"
-        If m_HasCommonDialog Then strHead.Append "import tkinter.colorchooser as tkColorChooser  #askcolor()"
+        If m_HasCommonDialog Then
+            strHead.Append "import tkinter.colorchooser as tkColorChooser  #askcolor()"
+        End If
         strHead.Append vbCrLf
     Else
         strHead.Append "try:"
@@ -710,21 +745,29 @@ Private Sub CmdOutput_Click()
         strHead.Append "    PythonVersion = 2"
         strHead.Append "    from Tkinter import *"
         strHead.Append "    from tkFont import Font"
-        If usettk Then strHead.Append "    from ttk import *"
+        If usettk Then
+            strHead.Append "    from ttk import *"
+        End If
         strHead.Append "    #Usage:showinfo/warning/error,askquestion/okcancel/yesno/retrycancel"
         strHead.Append "    from tkMessageBox import *"
         strHead.Append "    #Usage:f=tkFileDialog.askopenfilename(initialdir='E:/Python')"
         strHead.Append "    " & IIf(m_HasCommonDialog, "", "#") & "import tkFileDialog"
         strHead.Append "    " & IIf(m_HasCommonDialog, "", "#") & "import tkSimpleDialog"
-        If m_HasCommonDialog Then strHead.Append "    import tkColorChooser  #askcolor()"
+        If m_HasCommonDialog Then
+            strHead.Append "    import tkColorChooser  #askcolor()"
+        End If
         strHead.Append "else:  #Python 3.x"
         strHead.Append "    PythonVersion = 3"
         strHead.Append "    from tkinter.font import Font"
-        If usettk Then strHead.Append "    from tkinter.ttk import *"
+        If usettk Then
+            strHead.Append "    from tkinter.ttk import *"
+        End If
         strHead.Append "    from tkinter.messagebox import *"
         strHead.Append "    " & IIf(m_HasCommonDialog, "", "#") & "import tkinter.filedialog as tkFileDialog"
         strHead.Append "    " & IIf(m_HasCommonDialog, "", "#") & "import tkinter.simpledialog as tkSimpleDialog    #askstring()"
-        If m_HasCommonDialog Then strHead.Append "    import tkinter.colorchooser as tkColorChooser  #askcolor()"
+        If m_HasCommonDialog Then
+            strHead.Append "    import tkinter.colorchooser as tkColorChooser  #askcolor()"
+        End If
         strHead.Append vbCrLf
     End If
     
@@ -801,6 +844,8 @@ Private Sub CmdOutput_Click()
     strHead.Reset
     strCmd.Reset
     
+    g_bUnicodePrefixU = bUnicodePrefix    '恢复UNICODE前缀模式
+    
 End Sub
 
 Private Sub CmdRefsFormsList_Click()
@@ -867,6 +912,39 @@ Private Sub Form_QueryUnload(Cancel As Integer, UnloadMode As Integer)
         TxtTips_DblClick
         Cancel = True
     End If
+End Sub
+
+Private Sub Form_Resize()
+    
+    Dim sLstCfgWidth As Single
+    
+    If Me.WindowState = vbMinimized Then
+        Exit Sub
+    End If
+    
+    If m_TxtCodeExpanded Then
+        TxtCode_DblClick
+    ElseIf m_TxtTipsExpanded Then
+        TxtTips_DblClick
+    End If
+    
+    If Me.Width < 9000 Then Me.Width = 9000
+    If Me.Height < 6750 Then Me.Height = 6750
+    
+    If LstCfg.ItemCount > 0 Then LstCfg.TopRow = 0  '规避此控件的一个BUG，这个BUG可能会导致部分项目显示不全
+    
+    ResizeForm Me
+    
+    '调整配置列表框的列宽度
+    sLstCfgWidth = GetOrignalWidth(LstCfg)
+    If LstCfg.Width < sLstCfgWidth Then
+        LstCfg.ColWidth(0) = 2260
+        LstCfg.ColWidth(1) = 3450
+    ElseIf sLstCfgWidth > 1 Then '确认宽度值有效
+        LstCfg.ColWidth(0) = 2260 * LstCfg.Width / sLstCfgWidth
+        LstCfg.ColWidth(1) = 3450 * LstCfg.Width / sLstCfgWidth
+    End If
+    
 End Sub
 
 Private Sub lblWP_Click()
@@ -1143,7 +1221,7 @@ Private Sub mnuRestoreConfig_Click()
     
     Dim cSerial As New clsSerialization
     Dim sIn As String, i As Long, s As String, sF As String
-    Dim re As New RegExp, Matches As MatchCollection, Mth As Match
+    Dim re As RegExp, Matches As MatchCollection, Mth As Match
     Dim csa() As String
     
     If Len(cmbFrms.Text) = 0 Or LstComps.ListCount = 0 Or LstCfg.ItemCount = 0 Then
@@ -1151,8 +1229,19 @@ Private Sub mnuRestoreConfig_Click()
         Exit Sub
     End If
     
+    '判断是否安装了正则表达式组件VBScript.dll
     On Error Resume Next
+    Set re = New RegExp
+    If Err.Number <> 0 Then
+        MsgBox L("l_msgNoRegExp", "系统没有注册VBScript.dll正则表达式组件，无法执行此功能！"), vbInformation
+        mnuRestoreConfig.Enabled = False
+        mnuSaveConfig.Enabled = False
+        Exit Sub
+    End If
+    Err.Clear
+    
     sF = m_curFrm.FileNames(1) & ".save"
+    
     On Error GoTo 0
     
     If sF = "" Or sF = ".save" Then
@@ -1196,6 +1285,8 @@ Private Sub mnuRestoreConfig_Click()
     FetchCfgFromCls 0
     m_PrevCompIdx = 0
     LstComps.ListIndex = 0
+    
+    Set re = Nothing
     
     MsgBox L_F("l_msgRestoreCfgSuccesed", "已经成功从文件\n{0}\n恢复自定义配置！", sF), vbInformation
     
@@ -1242,6 +1333,16 @@ Private Sub mnuSaveConfig_Click()
     '保存到文件
     Utf8File_Write_VB sF, sOut.toString()
     MsgBox L_F("l_msgCfgSaved", "配置已经保存到：\n{0}", sF), vbInformation
+    
+End Sub
+
+Private Sub mnuUnicodePrefixU_Click()
+    
+    mnuUnicodePrefixU.Checked = Not mnuUnicodePrefixU.Checked
+    
+    g_bUnicodePrefixU = mnuUnicodePrefixU.Checked
+    
+    SaveSetting App.Title, "Settings", "UnicodePrefix", IIf(mnuUnicodePrefixU.Checked, "1", "0")
     
 End Sub
 
@@ -1332,11 +1433,11 @@ End Sub
 
 Private Sub TxtCode_DblClick()
     Static s_l As Single, s_t As Single, s_w As Single, s_h As Single
-    Static s_txt As String, s_Expand As Boolean
+    Static s_txt As String
     
-    If s_Expand Then
+    If m_TxtCodeExpanded Then
         TxtCode.Move s_l, s_t, s_w, s_h
-        s_Expand = False
+        m_TxtCodeExpanded = False
     Else
         s_l = TxtCode.Left
         s_t = TxtCode.Top
@@ -1344,9 +1445,8 @@ Private Sub TxtCode_DblClick()
         s_h = TxtCode.Height
         TxtCode.ZOrder 0
         TxtCode.Move 0, 0, Me.ScaleWidth, Me.ScaleHeight
-        s_Expand = True
+        m_TxtCodeExpanded = True
     End If
-    
 End Sub
 
 Private Sub TxtCode_KeyUp(KeyCode As Integer, Shift As Integer)
@@ -1371,6 +1471,7 @@ Private Sub TxtTips_DblClick()
             TxtTips.ZOrder 0
             TxtTips.Move 0, 0, Me.ScaleWidth, Me.ScaleHeight
             s_txt = TxtTips.Text
+            m_TxtTipsExpanded = True
             TxtTips.Text = "<再次双击返回>" & vbCrLf & _
             "bindcommand" & vbCrLf & _
             "使用bind()绑定的事件处理事件列表，需要绑定多个则使用逗号分隔，如果不需要则留空。" & vbCrLf & _
@@ -1401,6 +1502,7 @@ Private Sub TxtTips_DblClick()
         ElseIf Left(s, Len("<再次双击返回>")) = "<再次双击返回>" Then
             TxtTips.Move s_l, s_t, s_w, s_h
             TxtTips.Text = s_txt
+            m_TxtTipsExpanded = False
         End If
     End If
 End Sub

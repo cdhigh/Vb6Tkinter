@@ -37,26 +37,26 @@ Public Function toString(ByRef sCmdFunc As cStrBuilder, rel As Boolean, oop As B
         For i = 1 To m_nTabs  'TAB下标从1开始
             s = "self." & m_Base.Name & "Frame" & i
             sOut.Append Space(8) & s & " = Frame(self." & m_Base.Name & ")"
-            sOut.Append Space(8) & s & "Lbl = Label(" & s & ", text='Please Add Controls:" & m_Tabs(i) & "')"
+            sOut.Append Space(8) & s & "Lbl = Label(" & s & ", text='Please add widgets in code.')"
             sOut.Append Space(8) & s & "Lbl.place(relx=0.1,rely=0.5)" & vbCrLf
         Next
         
         For i = 1 To m_nTabs
             s = "self." & m_Base.Name & "Frame" & i
-            sOut.Append Space(8) & "self." & m_Base.Name & ".add(" & s & ", text='" & m_Tabs(i) & "')"
+            sOut.Append Space(8) & "self." & m_Base.Name & ".add(" & s & ", text=" & U(m_Tabs(i)) & ")"
         Next
     Else
         sOut.Append vbCrLf & Space(4) & L("l_cmtTodoNBFrame", "#TODO，请在各个Frame(代表各选项卡内容)里面添加需要的控件。")
         For i = 1 To m_nTabs
             s = m_Base.Name & "Frame" & i
             sOut.Append Space(4) & s & " = Frame(" & m_Base.Name & ")"
-            sOut.Append Space(4) & s & "Lbl = Label(" & s & ", text='Please Add Controls:" & m_Tabs(i) & "')"
+            sOut.Append Space(4) & s & "Lbl = Label(" & s & ", text='Please add widgets in code.')"
             sOut.Append Space(4) & s & "Lbl.place(relx=0.1,rely=0.5)" & vbCrLf
         Next
         
         For i = 1 To m_nTabs
             s = m_Base.Name & "Frame" & i
-            sOut.Append Space(4) & m_Base.Name & ".add(" & s & ", text='" & m_Tabs(i) & "')"
+            sOut.Append Space(4) & m_Base.Name & ".add(" & s & ", text=" & U(m_Tabs(i)) & ")"
         Next
     End If
     

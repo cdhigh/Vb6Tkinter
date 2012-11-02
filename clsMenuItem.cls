@@ -49,7 +49,7 @@ Public Sub toStringStructure(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilde
     
     Dim i As Long, extra As String, var As String, sTmp As String, s() As String
     
-    extra = IIf(m_Base("tearoff") <> "", ", tearoff=" & m_Base("tearoff"), "")
+    extra = IIf(Len(m_Base("tearoff")), ", tearoff=" & m_Base("tearoff"), "")
     
     If m_numChilds > 0 Then
         sOut.Append vbCrLf & Space(4) & m_Base.Name & " = Menu(" & m_Base.Parent & extra & ")"
@@ -114,7 +114,7 @@ Public Sub toStringOOP(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, rel
     
     Dim i As Long, extra As String, var As String, sTmp As String, s() As String
     
-    extra = IIf(m_Base("tearoff") <> "", ", tearoff=" & m_Base("tearoff"), "")
+    extra = IIf(Len(m_Base("tearoff")), ", tearoff=" & m_Base("tearoff"), "")
     
     If m_numChilds > 0 Then
         sOut.Append vbCrLf & Space(8) & "self." & m_Base.Name & " = Menu(self." & m_Base.Parent & extra & ")"
@@ -259,11 +259,12 @@ Public Function GetExtraParams(Optional oop As Boolean = False) As String
     For Each k In ks
         If isExtra(k) And Len(m_Base(k)) Then
             '需要使用引号括起来的属性，如果用户忘了，则在这里自动添加
-            sValue = m_Base(k)
-            If InStr(1, " fg, bg, label, state, accelerator, ", " " & k & ",") Then
-                If (Left(m_Base(k), 1) <> "'" And Left(m_Base(k), 1) <> Chr(34)) And (Right(m_Base(k), 1) <> "" And Right(m_Base(k), 1) <> Chr(34)) Then
-                    sValue = "'" & m_Base(k) & "'"
-                End If
+            If k = "label" Then
+                sValue = U(m_Base(k))
+            ElseIf InStr(1, " fg, bg, state, accelerator, ", " " & k & ",") Then
+                sValue = Quote(m_Base(k))
+            Else
+                sValue = m_Base(k)
             End If
             GetExtraParams = GetExtraParams & IIf(Len(GetExtraParams), ", ", "") & k & "=" & sValue
         End If

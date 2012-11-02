@@ -44,7 +44,7 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long)
     m_dicTotal("rely") = Format(o.Properties("Top") / parentHeight, "0.###")
     m_dicTotal("relwidth") = Format(o.Properties("Width") / parentWidth, "0.###")
     m_dicTotal("relheight") = Format(o.Properties("Height") / parentHeight, "0.###")
-    m_dicTotal("bg") = m_Base.ColorToRGBStr(o.Properties("BackColor"))
+    m_dicTotal("bg") = ColorToRGBStr(o.Properties("BackColor"))
     m_dicTotal("bd") = ""
     m_dicTotal("relief") = "FLAT"
     m_dicTotal("takefocus") = IIf(o.Properties("TabStop"), 1, 0)

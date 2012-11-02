@@ -54,6 +54,10 @@
     import modules filedialog, simpledialog, colorchooser.    
 
 3. History
+  v1.2.5
+    1. Add a option 'Add a prefix u to unicode string'.
+    2. Bugfix: can't generate code for menu.
+    3. the mainform is resizeable now.
   v1.2.4
     Widget Notebook create tabs as same of TabStrip(VB)
   v1.2.3

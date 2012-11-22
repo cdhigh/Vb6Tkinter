@@ -19,6 +19,14 @@ Private Type Size
 End Type
 
 Public g_bUnicodePrefixU As Boolean
+Public g_PythonExe As String
+
+Public Declare Function RegOpenKey Lib "advapi32.dll" Alias "RegOpenKeyA" (ByVal hKey As Long, ByVal lpSubKey As String, phkResult As Long) As Long
+Public Declare Function RegEnumKeyEx Lib "advapi32.dll" Alias "RegEnumKeyExA" (ByVal hKey As Long, ByVal dwIndex As Long, ByVal lpName As String, lpcbName As Long, ByVal lpReserved As Long, ByVal lpClass As String, lpcbClass As Long, lpftLastWriteTime As Long) As Long
+Public Declare Function RegCloseKey Lib "advapi32.dll" (ByVal hKey As Long) As Long
+Public Declare Function RegQueryValueEx Lib "advapi32.dll" Alias "RegQueryValueExA" (ByVal hKey As Long, ByVal lpValueName As String, ByVal lpReserved As Long, lpType As Long, ByVal lpData As Any, lpcbData As Long) As Long
+Public Const REG_SZ = 1
+Public Const HKEY_LOCAL_MACHINE = &H80000002
 
 'PYTHON中UNICODE字符串前缀的处理函数，如果字符串中存在双字节字符，则根据选项增加适当的前缀
 '否则，只是简单的增加单引号，即使空串也增加一对单引号
@@ -123,7 +131,6 @@ FileError:
     ReadFileBinaryContent = 0
     
 End Function
-        
 
 '提取文件名，包括扩展名，不包括路径名
 Public Function FileFullName(ByVal sF As String) As String
@@ -227,4 +234,47 @@ End Function
 '    End If
 'End Function
 
+
+' 获取系统中所有安装的Python路径
+Public Function GetAllInstalledPython() As String()
+    Dim nRe As Long, nHk As Long, nHk2 As Long, i As Long, nLen As Long
+    Dim sVer As String, sAllPath As String, sBuff As String, sPythonExe As String
+    
+    nRe = RegOpenKey(HKEY_LOCAL_MACHINE, "SOFTWARE\Python\PythonCore", nHk)
+    If nRe <> 0 Then
+        GetAllInstalledPython = Split("")
+        Exit Function
+    End If
+    
+    i = 0
+    nLen = 255
+    sBuff = String$(255, 0)
+    Do While (RegEnumKeyEx(nHk, i, sBuff, nLen, 0, vbNullString, ByVal 0&, ByVal 0&) = 0)
+        If nLen > 1 Then
+            sBuff = Left$(sBuff, InStr(1, sBuff, Chr(0)) - 1)
+            
+            '查询具体安装路径
+            nRe = RegOpenKey(HKEY_LOCAL_MACHINE, "SOFTWARE\Python\PythonCore\" & sBuff & "\InstallPath", nHk2)
+            If nRe = 0 Then
+                nLen = 255
+                sBuff = String$(255, 0)
+                nRe = RegQueryValueEx(nHk2, "", 0&, REG_SZ, sBuff, nLen)  '查询子键默认字符串值
+                
+                If nRe = 0 And nLen > 1 Then
+                    sBuff = Left$(sBuff, InStr(1, sBuff, Chr(0)) - 1)
+                    sPythonExe = sBuff & IIf(Right$(sBuff, 1) = "\", "", "\") & "python.exe"
+                    sPythonExe = sPythonExe & "," & sBuff & IIf(Right$(sBuff, 1) = "\", "", "\") & "pythonw.exe"
+                    sAllPath = sAllPath & IIf(Len(sAllPath), ",", "") & sPythonExe
+                End If
+                RegCloseKey nHk2
+            End If
+        End If
+        i = i + 1
+        nLen = 255
+        sBuff = String$(255, 0)
+    Loop
+    RegCloseKey nHk
+    
+    GetAllInstalledPython = Split(sAllPath, ",")
+End Function
 

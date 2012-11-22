@@ -8,6 +8,7 @@ Attribute VB_Name = "MultiLanguage"
 '
 'ChangeLanguage(语言名)   : 切换控件显示语言，这个函数也会一次性缓存对应语种的所有字符串到内存
 'L(名字,默认字符串)       : 获取指定字符串
+'L_F(名字,默认字符串,其他参数) : 类似Python的{0}{1}格式化字符串
 'GetAllLanguageName()     : Language.lng中所有语种的名称，字符串数组
 
 Option Explicit
@@ -80,7 +81,7 @@ End Function
 
 Public Sub ChangeControlLanguage(ctl As Control, Language As String)
     Select Case TypeName(ctl)
-    Case "Label", "CommandButton", "CheckBox", "OptionButton", "Frame", "Menu", "RKShadeButton"
+    Case "Label", "CommandButton", "CheckBox", "OptionButton", "Frame", "Menu", "xpcmdbutton"
         ctl.Caption = GetString(Language, ctl.Name, ctl.Caption)
     End Select
 End Sub

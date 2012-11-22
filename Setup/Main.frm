@@ -76,6 +76,11 @@ Private Sub DelFromINI()
     WritePrivateProfileString "Add-Ins32", "VisualTkinter.Connect", vbNullString, "VBADDIN.INI"
 End Sub
 
+Private Sub DelRegister()
+    On Error Resume Next
+    DeleteSetting "Visual Tkinter"
+End Sub
+
 Private Sub CmdQuit_Click()
     End
 End Sub
@@ -141,6 +146,8 @@ Private Sub CmdUninstall_Click()
     Shell "regsvr32 /u " & Chr(34) & sf & Chr(34)
     
     DelFromINI
+    
+    DelRegister
     
 End Sub
 

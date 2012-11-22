@@ -12,17 +12,26 @@ Begin VB.Form FrmMain
    ScaleMode       =   3  'Pixel
    ScaleWidth      =   864
    StartUpPosition =   2  '屏幕中心
-   Begin VisualTkinter.RKShadeButton CmdAddUsrProperty 
+   Begin VisualTkinter.xpcmdbutton CmdAddUsrProperty 
       Height          =   375
       Left            =   2640
-      TabIndex        =   6
+      TabIndex        =   12
       Top             =   840
       Width           =   6015
       _ExtentX        =   10610
       _ExtentY        =   661
       Caption         =   "增加一个自定义属性(&P)"
+      BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
+         Name            =   "宋体"
+         Size            =   9
+         Charset         =   134
+         Weight          =   400
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
    End
-   Begin VisualTkinter.RKShadeButton CmdRefsFormsList 
+   Begin VisualTkinter.xpcmdbutton CmdRefsFormsList 
       Height          =   495
       Left            =   120
       TabIndex        =   0
@@ -31,13 +40,21 @@ Begin VB.Form FrmMain
       _ExtentX        =   4048
       _ExtentY        =   873
       Caption         =   "刷新窗体列表(&R)"
-      HotColor        =   255
+      BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
+         Name            =   "宋体"
+         Size            =   9
+         Charset         =   134
+         Weight          =   400
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
    End
    Begin MSComctlLib.StatusBar stabar 
       Align           =   2  'Align Bottom
       Height          =   375
       Left            =   0
-      TabIndex        =   12
+      TabIndex        =   15
       Top             =   7755
       Width           =   12960
       _ExtentX        =   22860
@@ -56,7 +73,7 @@ Begin VB.Form FrmMain
       Left            =   120
       List            =   "MainForm.frx":0CCC
       Style           =   2  'Dropdown List
-      TabIndex        =   1
+      TabIndex        =   5
       Top             =   840
       Width           =   2415
    End
@@ -75,21 +92,21 @@ Begin VB.Form FrmMain
       Locked          =   -1  'True
       MultiLine       =   -1  'True
       ScrollBars      =   2  'Vertical
-      TabIndex        =   8
+      TabIndex        =   7
       Top             =   4920
       Width           =   2415
    End
    Begin VB.ListBox LstComps 
       Height          =   3480
       Left            =   120
-      TabIndex        =   7
+      TabIndex        =   6
       Top             =   1320
       Width           =   2415
    End
    Begin VisualTkinter.GridOcx LstCfg 
       Height          =   6372
       Left            =   2640
-      TabIndex        =   9
+      TabIndex        =   8
       Top             =   1320
       Width           =   6012
       _ExtentX        =   10610
@@ -118,14 +135,14 @@ Begin VB.Form FrmMain
       Left            =   8760
       MultiLine       =   -1  'True
       ScrollBars      =   3  'Both
-      TabIndex        =   10
+      TabIndex        =   9
       Top             =   1320
       Width           =   4095
    End
    Begin VB.ComboBox cmbEditCombo 
       Height          =   276
       Left            =   6360
-      TabIndex        =   14
+      TabIndex        =   13
       Text            =   "Combo1"
       Top             =   720
       Visible         =   0   'False
@@ -135,60 +152,93 @@ Begin VB.Form FrmMain
       Height          =   276
       Left            =   7560
       Style           =   2  'Dropdown List
-      TabIndex        =   15
+      TabIndex        =   14
       Top             =   720
       Visible         =   0   'False
       Width           =   1095
    End
-   Begin VisualTkinter.RKShadeButton CmdOutput 
+   Begin VisualTkinter.xpcmdbutton CmdOutput 
       Height          =   495
-      Left            =   2730
-      TabIndex        =   2
+      Left            =   2760
+      TabIndex        =   1
       Top             =   120
       Width           =   2295
       _ExtentX        =   4048
       _ExtentY        =   873
       Caption         =   "生成代码(&G)"
-      HotColor        =   255
+      BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
+         Name            =   "宋体"
+         Size            =   9
+         Charset         =   134
+         Weight          =   400
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
    End
-   Begin VisualTkinter.RKShadeButton CmdClip 
+   Begin VisualTkinter.xpcmdbutton CmdClip 
       Height          =   495
       Left            =   5340
-      TabIndex        =   3
+      TabIndex        =   2
       Top             =   120
       Width           =   2295
       _ExtentX        =   4048
       _ExtentY        =   873
       Caption         =   "拷贝到剪贴板(&C)"
-      HotColor        =   255
+      BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
+         Name            =   "宋体"
+         Size            =   9
+         Charset         =   134
+         Weight          =   400
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
    End
-   Begin VisualTkinter.RKShadeButton CmdSaveFile 
+   Begin VisualTkinter.xpcmdbutton CmdSaveFile 
       Height          =   495
       Left            =   7950
-      TabIndex        =   4
+      TabIndex        =   3
       Top             =   120
       Width           =   2295
       _ExtentX        =   4048
       _ExtentY        =   873
       Caption         =   "保存到文件(&F)"
-      HotColor        =   255
+      BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
+         Name            =   "宋体"
+         Size            =   9
+         Charset         =   134
+         Weight          =   400
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
    End
-   Begin VisualTkinter.RKShadeButton CmdQuit 
+   Begin VisualTkinter.xpcmdbutton CmdQuit 
+      Cancel          =   -1  'True
       Height          =   495
       Left            =   10560
-      TabIndex        =   5
+      TabIndex        =   4
       Top             =   120
       Width           =   2295
       _ExtentX        =   4048
       _ExtentY        =   873
       Caption         =   "退出(&Q)"
-      HotColor        =   255
+      BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
+         Name            =   "宋体"
+         Size            =   9
+         Charset         =   134
+         Weight          =   400
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
    End
    Begin VB.Label lblCurPrjName 
       Caption         =   "当前工程："
       Height          =   348
       Left            =   8760
-      TabIndex        =   13
+      TabIndex        =   10
       Top             =   840
       Width           =   1692
    End
@@ -216,12 +266,14 @@ Begin VB.Form FrmMain
       Caption         =   "文件(&F)"
       Begin VB.Menu mnuRefreshForms 
          Caption         =   "刷新窗体列表(&R)"
+         Shortcut        =   ^R
       End
       Begin VB.Menu mnuSeparator1 
          Caption         =   "-"
       End
       Begin VB.Menu mnuGenCode 
          Caption         =   "生成代码(&G)"
+         Shortcut        =   ^G
       End
       Begin VB.Menu mnuSeparator2 
          Caption         =   "-"
@@ -261,6 +313,17 @@ Begin VB.Form FrmMain
       End
       Begin VB.Menu mnuUnicodePrefixU 
          Caption         =   "Unicode字符串增加前缀u(&U)"
+      End
+      Begin VB.Menu mnuPythonExe 
+         Caption         =   "设置Python.exe位置(&E)..."
+      End
+   End
+   Begin VB.Menu mnuTools 
+      Caption         =   "工具(&T)"
+      Begin VB.Menu mnuPreview 
+         Caption         =   "界面预览(&P)"
+         Enabled         =   0   'False
+         Shortcut        =   {F5}
       End
    End
    Begin VB.Menu mnuLanguage 
@@ -316,7 +379,7 @@ Private m_curFrm As Object
 Private m_prevsf As String
 Private m_nLngNum As Long                   ' 语言种类
 Private m_HasCommonDialog As Boolean
-
+Private m_saTmpFile() As String
 Private m_TxtCodeExpanded As Boolean
 Private m_TxtTipsExpanded As Boolean
 
@@ -359,13 +422,16 @@ Private Sub Form_Load()
     mnuV2andV3Code.Checked = GetSetting(App.Title, "Settings", "V2andV3Code", "1") = "1"
     mnuUseTtk.Checked = GetSetting(App.Title, "Settings", "UseTtk", "1") = "1"
     mnuRelPos.Checked = GetSetting(App.Title, "Settings", "RelPos", "1") = "1"
-    
     mnuUnicodePrefixU.Checked = GetSetting(App.Title, "Settings", "UnicodePrefix", "0") = "1"
     g_bUnicodePrefixU = mnuUnicodePrefixU.Checked
+    
+    g_PythonExe = GetSetting(App.Title, "Settings", "PythonExe", "")
     
     m_HasCommonDialog = False
     m_TxtCodeExpanded = False
     m_TxtTipsExpanded = False
+    
+    ReDim m_saTmpFile(0) As String
     
     ResizeInit Me
     
@@ -601,7 +667,7 @@ Private Function ResetLstComps(frm As Object) As Boolean
         ElseIf Obj.ClassName = "CommonDialog" Then
             m_HasCommonDialog = True
         Else
-            MsgBox L_F("l_msgCtlNotSupport", "当前暂不支持'{0}'控件\n\n程序将不生成此控件的代码。", Obj.ClassName), vbInformation, App.Title
+            MsgBox L_F("l_msgCtlNotSupport", "当前暂不支持'{0}'控件(控件名：{1})\n\n程序将不生成此控件的代码。", Obj.ClassName, Obj.Properties("Name")), vbInformation, App.Title
         End If
     Next
     
@@ -905,12 +971,22 @@ Private Sub CmdSaveFile_Click()
 End Sub
 
 Private Sub Form_QueryUnload(Cancel As Integer, UnloadMode As Integer)
+    Dim i As Long
     If TxtCode.Width = Me.ScaleWidth Then
         TxtCode_DblClick
         Cancel = True
     ElseIf TxtTips.Width = Me.ScaleWidth Then
         TxtTips_DblClick
         Cancel = True
+    ElseIf UBound(m_saTmpFile) > 0 Then '删除用于预览的临时文件
+        On Error Resume Next
+        For i = 0 To UBound(m_saTmpFile)
+            If Len(m_saTmpFile(i)) Then
+                Kill m_saTmpFile(i)
+            End If
+        Next
+        On Error GoTo 0
+        ReDim m_saTmpFile(0) As String
     End If
 End Sub
 
@@ -1187,6 +1263,72 @@ Private Sub mnuOutUiOnly_Click()
     
 End Sub
 
+Private Sub mnuPreview_Click()
+    
+    Dim bExeExisted As Boolean, sTmpFile As String
+    
+    '首先判断PYTHONEXE是否存在
+    If Len(g_PythonExe) = 0 Then
+        mnuPythonExe_Click
+    ElseIf Dir(g_PythonExe) = "" Then
+        g_PythonExe = ""
+        mnuPythonExe_Click  '如果没有设置python.exe位置，则先打开设置界面进行设置
+    Else
+        bExeExisted = True
+    End If
+    
+    '前面设置后再确认是否正确，不正确则退出
+    If Not bExeExisted And Len(g_PythonExe) = 0 Then
+        Exit Sub
+    End If
+    
+    '创建一个临时文件
+    sTmpFile = CreateTempFile("vt")
+    If Len(sTmpFile) Then
+        '暂存临时文件名，在ADDIN退出时全部删除
+        ReDim Preserve m_saTmpFile(UBound(m_saTmpFile) + 1) As String
+        m_saTmpFile(UBound(m_saTmpFile)) = sTmpFile
+        
+        Utf8File_Write_VB sTmpFile, TxtCode.Text
+        Shell Chr(34) & g_PythonExe & """ """ & sTmpFile & Chr(34)
+    Else
+        MsgBox L("l_msgCreateTempFileFailed", "创建临时文件失败！"), vbInformation
+    End If
+    
+End Sub
+
+Private Sub mnuPythonExe_Click()
+    Dim sExe As String, sExes() As String, i As Long
+    
+    Load frmOption
+    
+    '将系统中所有已经安装的Python都添加到组合框中提供选择
+    frmOption.cmbPythonExe.Clear
+    sExes = GetAllInstalledPython()
+    If UBound(sExes) >= 0 Then
+        For i = 0 To UBound(sExes)
+            frmOption.cmbPythonExe.AddItem sExes(i)
+        Next
+    End If
+    
+    '从注册表中读取保存的配置
+    sExe = GetSetting(App.Title, "Settings", "PythonExe", "")
+    If Len(sExe) > 0 Then
+        If Dir(sExe) = "" Then
+            sExe = ""
+        End If
+    End If
+    
+    If Len(sExe) Then
+        frmOption.cmbPythonExe.Text = sExe
+    ElseIf frmOption.cmbPythonExe.ListCount > 0 Then
+        frmOption.cmbPythonExe.ListIndex = 0
+    End If
+    
+    frmOption.Show vbModal  '在frmOption窗体中会设置g_PythonExe变量并保存到注册表
+    
+End Sub
+
 Private Sub mnuQuit_Click()
     Connect.Hide
 End Sub
@@ -1429,6 +1571,10 @@ Private Sub FillcmbEdit(Row As Long, Col As Long)
         Next
     End If
     
+End Sub
+
+Private Sub TxtCode_Change()
+    mnuPreview.Enabled = (Len(TxtCode.Text) > 0)
 End Sub
 
 Private Sub TxtCode_DblClick()

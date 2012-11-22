@@ -54,10 +54,14 @@
     import modules filedialog, simpledialog, colorchooser.    
 
 3. History
+  v1.2.6
+    1. Add feature 'preview'.
+    2. Delete all settings saved in register when uninstall the addin.
+    3. Substitute a XP-Style button control for shade-button.
   v1.2.5
     1. Add a option 'Add a prefix u to unicode string'.
     2. Bugfix: can't generate code for menu.
-    3. the mainform is resizeable now.
+    3. the mainform is resizeable now, and substitute a shade-button for standard-button.
   v1.2.4
     Widget Notebook create tabs as same of TabStrip(VB)
   v1.2.3

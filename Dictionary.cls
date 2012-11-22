@@ -94,9 +94,11 @@ Public Function Deserializer(vSer As clsSerialization)
     
 End Function
 
-
 Private Sub Class_Initialize()
     Set m_dic = CreateObject("Scripting.Dictionary")
+    If m_dic Is Nothing Then
+        MsgBox L("l_msgCreateDictionaryFailed", "创建Scripting.Dictionary对象失败，程序无法继续执行。\n请确认scrrun.dll是否存在！"), vbCritical
+    End If
 End Sub
 
 Private Sub Class_Terminate()

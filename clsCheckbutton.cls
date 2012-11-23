@@ -51,7 +51,8 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long)
     m_dicTotal("anchor") = "'w'"
     m_dicTotal("relief") = "FLAT"
     m_dicTotal("state") = "'normal'"
-    m_dicTotal("font") = "size=" & Round(o.Properties("Font")("Size")) & ",weight=" & IIf(o.Properties("Font")("Bold"), "'bold'", "'normal'") & ",slant=" & IIf(o.Properties("Font")("Italic"), "'italic'", "'roman'")
+    m_dicTotal("font") = "family='" & o.Properties("Font")("Name") & "',size=" & Round(o.Properties("Font")("Size")) & _
+                        ",weight=" & IIf(o.Properties("Font")("Bold"), "'bold'", "'normal'") & ",slant=" & IIf(o.Properties("Font")("Italic"), "'italic'", "'roman'")
     m_dicTotal("takefocus") = IIf(o.Properties("TabStop"), 1, 0)
     m_dicTotal("underline") = IIf(InStr(1, o.Properties("Caption"), "&"), InStr(1, o.Properties("Caption"), "&") - 1, "-1")
     m_dicTotal("command") = o.Properties("Name") & "_Cmd"
@@ -71,7 +72,7 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long)
     If m_dicTotal("fg") <> "" Then m_Base("fg") = m_dicTotal("fg")
     If m_dicTotal("bg") <> "" Then m_Base("bg") = m_dicTotal("bg")
     If m_dicTotal("state") <> "'normal'" Then m_Base("state") = m_dicTotal("state")
-    If m_dicTotal("font") <> "size=9,weight='normal',slant='roman'" Then m_Base("font") = m_dicTotal("font")
+    If m_dicTotal("font") <> "family='" & GetDefaultFontName() & "',size=9,weight='normal',slant='roman'" Then m_Base("font") = m_dicTotal("font")
     If m_dicTotal("takefocus") = 0 Then m_Base("takefocus") = m_dicTotal("takefocus")
     If m_dicTotal("underline") <> "-1" Then m_Base("underline") = m_dicTotal("underline")
     

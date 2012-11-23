@@ -54,6 +54,9 @@
     import modules filedialog, simpledialog, colorchooser.    
 
 3. History
+  v1.2.7
+    1. Add family name of font to properties of widgets. (if need)
+    2. improve the apparence of XP-Style button.
   v1.2.6
     1. Add feature 'preview'.
     2. Delete all settings saved in register when uninstall the addin.

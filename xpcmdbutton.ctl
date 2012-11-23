@@ -110,7 +110,7 @@ Begin VB.UserControl xpcmdbutton
    End
    Begin VB.Timer Timer1 
       Enabled         =   0   'False
-      Interval        =   10
+      Interval        =   100
       Left            =   1200
       Top             =   120
    End
@@ -135,11 +135,15 @@ Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 'Created by Teh Ming Han (teh_minghan@hotmail.com)
-'cdhigh modified in 2012.11.22, substitute control 'picture' for 'pictureclip'
-'Option Explicit
+'cdhigh modified in 2012.11.23,
+'   1. substitute control 'picture' for 'pictureclip'
+'   2. add some features
+'   3. fix some bugs
+Option Explicit
 
 Private Declare Function GetCursorPos Lib "user32" (lpPoint As POINT_API) As Long
-Private Declare Function ScreenToClient Lib "user32" (ByVal hWnd As Long, lpPoint As POINT_API) As Long
+Private Declare Function DrawFocusRect Lib "user32" (ByVal hdc As Long, lpRect As RECT) As Long
+Private Declare Function WindowFromPoint Lib "user32" (ByVal xPoint As Long, ByVal yPoint As Long) As Long
 
 Public Enum State_b
     Normal_ = 0
@@ -156,6 +160,13 @@ Private Type POINT_API
     y As Long
 End Type
 
+Private Type RECT
+    Left As Long
+    Top As Long
+    Right As Long
+    Bottom As Long
+End Type
+
 Dim s As Integer
 Event Click()
 Event KeyDown(KeyCode As Integer, Shift As Integer)
@@ -166,7 +177,10 @@ Event MouseDown(Button As Integer, Shift As Integer, x As Single, y As Single)
 Event MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
 Event MouseUp(Button As Integer, Shift As Integer, x As Single, y As Single)
 
+Private rcFocus As RECT
 Private m_left As Integer
+Private m_bFocused As Boolean
+Private m_shortcutKey As String
 
 Private Sub lbl_Change()
     UserControl_Resize
@@ -183,75 +197,106 @@ Private Sub lbl_MouseDown(Button As Integer, Shift As Integer, x As Single, y As
 End Sub
 
 Private Sub lbl_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
-         Call UserControl_MouseMove(Button, Shift, x, y)
+    Call UserControl_MouseMove(Button, Shift, x, y)
 End Sub
 
 Private Sub lbl_MouseUp(Button As Integer, Shift As Integer, x As Single, y As Single)
-         Call UserControl_MouseUp(Button, Shift, x, y)
+    Call UserControl_MouseUp(Button, Shift, x, y)
 End Sub
 
 Private Sub Timer1_Timer()
     Dim pnt As POINT_API
+    
     GetCursorPos pnt
-    ScreenToClient UserControl.hWnd, pnt
-
-    If pnt.x < UserControl.ScaleLeft Or _
-       pnt.y < UserControl.ScaleTop Or _
-       pnt.x > (UserControl.ScaleLeft + UserControl.ScaleWidth) Or _
-       pnt.y > (UserControl.ScaleTop + UserControl.ScaleHeight) Then
-       
+    If WindowFromPoint(pnt.x, pnt.y) <> UserControl.hwnd Then
         Timer1.Enabled = False
         RaiseEvent MouseOut
-        statevalue_pic
+        If m_bFocused Then
+            make_xpbutton 4
+        Else
+            statevalue_pic
+        End If
     End If
+    
 End Sub
 
 Private Sub UserControl_AccessKeyPress(KeyAscii As Integer)
-     RaiseEvent Click
+    RaiseEvent Click
 End Sub
 
 Private Sub UserControl_Click()
     If m_left = 1 Then RaiseEvent Click
-   ' RaiseEvent Click
+    ' RaiseEvent Click
+End Sub
+
+Private Sub UserControl_EnterFocus()
+    m_bFocused = True
+    make_xpbutton 4
+End Sub
+
+Private Sub UserControl_ExitFocus()
+    m_bFocused = False
+    If Not Timer1.Enabled Then
+        statevalue_pic
+    End If
 End Sub
 
 Private Sub UserControl_Initialize()
+    rcFocus.Left = 3
+    rcFocus.Top = 3
+    m_bFocused = False
     statevalue_pic
 End Sub
 
 Private Sub UserControl_InitProperties()
-    state_value = m_Def_State
+    m_State = m_Def_State
     Enabled = True
     Caption = Ambient.DisplayName
     Set Font = UserControl.Ambient.Font
 End Sub
 
 Private Sub UserControl_KeyDown(KeyCode As Integer, Shift As Integer)
-     RaiseEvent KeyDown(KeyCode, Shift)
+    RaiseEvent KeyDown(KeyCode, Shift)
 End Sub
 
 Private Sub UserControl_KeyPress(KeyAscii As Integer)
-      RaiseEvent KeyPress(KeyAscii)
+    RaiseEvent KeyPress(KeyAscii)
+    If m_bFocused And KeyAscii = vbKeySpace Then
+        make_xpbutton 1
+    End If
 End Sub
 
 Private Sub UserControl_KeyUp(KeyCode As Integer, Shift As Integer)
-     RaiseEvent KeyUp(KeyCode, Shift)
+    RaiseEvent KeyUp(KeyCode, Shift)
+    If m_bFocused Then
+        If KeyCode = vbKeySpace Then
+            RaiseEvent Click
+            make_xpbutton 4
+        ElseIf ((Shift And vbAltMask) <> 0) And Len(m_shortcutKey) Then
+            If LCase(Chr(KeyCode)) = m_shortcutKey Then
+                RaiseEvent Click
+            End If
+        End If
+    End If
 End Sub
 
 Private Sub UserControl_MouseDown(Button As Integer, Shift As Integer, x As Single, y As Single)
     m_left = Button
-    If m_left = 1 Then RaiseEvent MouseDown(Button, Shift, x, y)
-    make_xpbutton 1
+    If m_left = 1 Then
+        RaiseEvent MouseDown(Button, Shift, x, y)
+        make_xpbutton 1
+    End If
 End Sub
 
 Private Sub UserControl_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
     Timer1.Enabled = True
     If x >= 0 And y >= 0 And _
-       x <= UserControl.ScaleWidth And y <= UserControl.ScaleHeight Then
+        x <= UserControl.ScaleWidth And y <= UserControl.ScaleHeight Then
         RaiseEvent MouseMove(Button, Shift, x, y)
         If Button = vbLeftButton Then
             make_xpbutton 1
-        Else: make_xpbutton 3
+        Else
+            make_xpbutton 3
         End If
     End If
 End Sub
@@ -262,7 +307,7 @@ Private Sub UserControl_MouseUp(Button As Integer, Shift As Integer, x As Single
 End Sub
 
 Private Sub UserControl_ReadProperties(PropBag As PropertyBag)
-    state_value = PropBag.ReadProperty("State", m_Def_State)
+    State = PropBag.ReadProperty("State", m_Def_State)
     Enabled = PropBag.ReadProperty("Enabled", True)
     Caption = PropBag.ReadProperty("Caption", Ambient.DisplayName)
     Set Font = PropBag.ReadProperty("Font", UserControl.Ambient.Font)
@@ -273,13 +318,19 @@ Public Property Get Enabled() As Boolean
 End Property
 
 Public Property Let Enabled(ByVal New_Enabled As Boolean)
-    UserControl.Enabled() = New_Enabled
+    UserControl.Enabled = New_Enabled
     PropertyChanged "Enabled"
     statevalue_pic
-    If Enabled = True Then lbl.ForeColor = vbBlack Else lbl.ForeColor = RGB(161, 161, 146)
+    If Enabled = True Then
+        lbl.ForeColor = vbBlack
+    Else
+        lbl.ForeColor = RGB(161, 161, 146)
+    End If
 End Property
 
 Private Sub UserControl_Resize()
+    rcFocus.Right = UserControl.ScaleWidth - 3
+    rcFocus.Bottom = UserControl.ScaleHeight - 3
     statevalue_pic
     lbl.Top = (UserControl.ScaleHeight - lbl.Height) / 2
     lbl.Left = (UserControl.ScaleWidth - lbl.Width) / 2
@@ -319,18 +370,19 @@ Private Sub statevalue_pic()
     
     If UserControl.Enabled = True Then
         make_xpbutton s
-    Else: make_xpbutton 2
+Else:
+        make_xpbutton 2
     End If
 End Sub
 
 Private Sub make_xpbutton(z As Integer)
-    UserControl.ScaleMode = 3 'Draw in pixels
+    UserControl.ScaleMode = 3                                                   'Draw in pixels
     Dim brx, bry, bw, bh As Integer
     'Short cuts
-    brx = UserControl.ScaleWidth - 3 'right x
-    bry = UserControl.ScaleHeight - 3 'right y
-    bw = UserControl.ScaleWidth - 6 'border width - corners width
-    bh = UserControl.ScaleHeight - 6 'border height - corners height
+    brx = UserControl.ScaleWidth - 3                                            'right x
+    bry = UserControl.ScaleHeight - 3                                           'right y
+    bw = UserControl.ScaleWidth - 6                                             'border width - corners width
+    bh = UserControl.ScaleHeight - 6                                            'border height - corners height
     'Draws button
     'Goes clockwise first for corners(first four)
     'followed by borders(next four) and center(last step).
@@ -343,7 +395,11 @@ Private Sub make_xpbutton(z As Integer)
     UserControl.PaintPicture pc(z).Picture, 0, 3, 3, bh, 0, 3, 3, 15
     UserControl.PaintPicture pc(z).Picture, 3, bry, bw, 3, 3, 18, 12, 3
     UserControl.PaintPicture pc(z).Picture, 3, 3, bw, bh, 3, 3, 12, 15
-
+    
+    If m_bFocused Then
+        DrawFocusRect UserControl.hdc, rcFocus
+    End If
+    
 End Sub
 
 Public Property Get Caption() As String
@@ -351,8 +407,22 @@ Public Property Get Caption() As String
 End Property
 
 Public Property Let Caption(ByVal vNewCaption As String)
+    Dim idx As Long, ascii As Long
     lbl.Caption = vNewCaption
     PropertyChanged "Caption"
+    
+    'Key shortcut
+    idx = InStr(1, vNewCaption, "&")
+    If idx > 0 Then
+        ascii = Asc(Mid$(vNewCaption, idx + 1, 1))
+        If (ascii >= Asc("a") And ascii <= Asc("z")) Or (ascii >= Asc("A") And ascii <= Asc("Z")) Then
+            m_shortcutKey = LCase(Chr(ascii))
+        Else
+            m_shortcutKey = ""
+        End If
+    Else
+        m_shortcutKey = ""
+    End If
 End Property
 
 Public Property Get Font() As Font
@@ -366,5 +436,4 @@ Public Property Set Font(ByVal vNewFont As Font)
     Call UserControl_Resize
     PropertyChanged "Font"
 End Property
-
 

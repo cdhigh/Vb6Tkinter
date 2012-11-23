@@ -314,6 +314,9 @@ Begin VB.Form FrmMain
       Begin VB.Menu mnuUnicodePrefixU 
          Caption         =   "Unicode字符串增加前缀u(&U)"
       End
+      Begin VB.Menu mnuSeparator4 
+         Caption         =   "-"
+      End
       Begin VB.Menu mnuPythonExe 
          Caption         =   "设置Python.exe位置(&E)..."
       End
@@ -434,6 +437,8 @@ Private Sub Form_Load()
     ReDim m_saTmpFile(0) As String
     
     ResizeInit Me
+    
+    g_DefaultFontName = ""
     
 End Sub
 
@@ -669,7 +674,7 @@ Private Function ResetLstComps(frm As Object) As Boolean
         Else
             MsgBox L_F("l_msgCtlNotSupport", "当前暂不支持'{0}'控件(控件名：{1})\n\n程序将不生成此控件的代码。", Obj.ClassName, Obj.Properties("Name")), vbInformation, App.Title
         End If
-    Next
+    Next  'frm.Designer.VBControls
     
     '生成菜单的树形层次关系，为生成代码建立基础
     '子类储存父类的名字，父类储存所有子类的引用

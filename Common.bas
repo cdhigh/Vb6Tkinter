@@ -21,12 +21,38 @@ End Type
 Public g_bUnicodePrefixU As Boolean
 Public g_PythonExe As String
 
+'注册表API声明
 Public Declare Function RegOpenKey Lib "advapi32.dll" Alias "RegOpenKeyA" (ByVal hKey As Long, ByVal lpSubKey As String, phkResult As Long) As Long
 Public Declare Function RegEnumKeyEx Lib "advapi32.dll" Alias "RegEnumKeyExA" (ByVal hKey As Long, ByVal dwIndex As Long, ByVal lpName As String, lpcbName As Long, ByVal lpReserved As Long, ByVal lpClass As String, lpcbClass As Long, lpftLastWriteTime As Long) As Long
 Public Declare Function RegCloseKey Lib "advapi32.dll" (ByVal hKey As Long) As Long
 Public Declare Function RegQueryValueEx Lib "advapi32.dll" Alias "RegQueryValueExA" (ByVal hKey As Long, ByVal lpValueName As String, ByVal lpReserved As Long, lpType As Long, ByVal lpData As Any, lpcbData As Long) As Long
 Public Const REG_SZ = 1
 Public Const HKEY_LOCAL_MACHINE = &H80000002
+
+'这些用于获取系统默认字体
+Private Declare Function GetStockObject Lib "gdi32" (ByVal nIndex As Long) As Long
+Private Declare Function GetObject Lib "gdi32" Alias "GetObjectA" (ByVal hObject As Long, ByVal nCount As Long, lpObject As Any) As Long
+Private Declare Function DeleteObject Lib "gdi32" (ByVal hObject As Long) As Long
+Private Const DEFAULT_GUI_FONT = 17
+Private Const LF_FACESIZE = 32
+Private Type LOGFONT
+        lfHeight As Long
+        lfWidth As Long
+        lfEscapement As Long
+        lfOrientation As Long
+        lfWeight As Long
+        lfItalic As Byte
+        lfUnderline As Byte
+        lfStrikeOut As Byte
+        lfCharSet As Byte
+        lfOutPrecision As Byte
+        lfClipPrecision As Byte
+        lfQuality As Byte
+        lfPitchAndFamily As Byte
+        lfFaceName(1 To LF_FACESIZE) As Byte
+End Type
+Public g_DefaultFontName As String '暂存系统默认字体名，避免每次查询
+
 
 'PYTHON中UNICODE字符串前缀的处理函数，如果字符串中存在双字节字符，则根据选项增加适当的前缀
 '否则，只是简单的增加单引号，即使空串也增加一对单引号
@@ -278,3 +304,22 @@ Public Function GetAllInstalledPython() As String()
     GetAllInstalledPython = Split(sAllPath, ",")
 End Function
 
+'获取系统默认字体名
+Public Function GetDefaultFontName() As String
+    Dim hFont As Long, lfont As LOGFONT
+    
+    If Len(g_DefaultFontName) Then
+        GetDefaultFontName = g_DefaultFontName
+    Else
+        hFont = GetStockObject(DEFAULT_GUI_FONT)
+        If hFont <> 0 Then
+            GetObject hFont, Len(lfont), lfont
+            DeleteObject hFont
+            GetDefaultFontName = StrConv(lfont.lfFaceName, vbUnicode)
+            If InStr(1, GetDefaultFontName, Chr(0)) > 0 Then
+                GetDefaultFontName = Left$(GetDefaultFontName, InStr(1, GetDefaultFontName, Chr(0)) - 1)
+            End If
+            g_DefaultFontName = GetDefaultFontName  '暂存，下一次就不用API查询了
+        End If
+    End If
+End Function

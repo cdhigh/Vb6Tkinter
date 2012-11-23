@@ -62,7 +62,8 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long)
     m_dicTotal("bd") = "1"
     m_dicTotal("relief") = "SUNKEN"
     m_dicTotal("selectmode") = "SINGLE"
-    m_dicTotal("font") = "size=" & Round(o.Properties("Font")("Size")) & ",weight=" & IIf(o.Properties("Font")("Bold"), "'bold'", "'normal'") & ",slant=" & IIf(o.Properties("Font")("Italic"), "'italic'", "'roman'")
+    m_dicTotal("font") = "family='" & o.Properties("Font")("Name") & "',size=" & Round(o.Properties("Font")("Size")) & _
+                        ",weight=" & IIf(o.Properties("Font")("Bold"), "'bold'", "'normal'") & ",slant=" & IIf(o.Properties("Font")("Italic"), "'italic'", "'roman'")
     m_dicTotal("takefocus") = IIf(o.Properties("TabStop"), 1, 0)
     m_dicTotal("xscrollcommand") = ""
     m_dicTotal("yscrollcommand") = ""
@@ -80,7 +81,7 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long)
     m_Base("listvariable") = m_dicTotal("listvariable")
     If m_dicTotal("fg") <> "" Then m_Base("fg") = m_dicTotal("fg")
     If m_dicTotal("bg") <> "" Then m_Base("bg") = m_dicTotal("bg")
-    If m_dicTotal("font") <> "size=9,weight='normal',slant='roman'" Then m_Base("font") = m_dicTotal("font")
+    If m_dicTotal("font") <> "family='" & GetDefaultFontName() & "',size=9,weight='normal',slant='roman'" Then m_Base("font") = m_dicTotal("font")
     If m_dicTotal("takefocus") = 0 Then m_Base("takefocus") = m_dicTotal("takefocus")
     
 End Sub

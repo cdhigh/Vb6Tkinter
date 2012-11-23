@@ -51,7 +51,8 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long)
     m_dicTotal("wraplength") = 100
     m_dicTotal("justify") = "'left'"
     m_dicTotal("anchor") = IIf(o.Properties("Alignment") = 0, "'w'", IIf(o.Properties("Alignment") = 1, "'e'", "'center'"))
-    m_dicTotal("font") = "size=" & Round(o.Properties("Font")("Size")) & ",weight=" & IIf(o.Properties("Font")("Bold"), "'bold'", "'normal'") & ",slant=" & IIf(o.Properties("Font")("Italic"), "'italic'", "'roman'")
+    m_dicTotal("font") = "family='" & o.Properties("Font")("Name") & "',size=" & Round(o.Properties("Font")("Size")) & _
+                        ",weight=" & IIf(o.Properties("Font")("Bold"), "'bold'", "'normal'") & ",slant=" & IIf(o.Properties("Font")("Italic"), "'italic'", "'roman'")
     m_dicTotal("underline") = IIf(InStr(1, o.Properties("Caption"), "&"), InStr(1, o.Properties("Caption"), "&") - 1, "-1")
     m_dicTotal("textvariable") = o.Properties("Name") & "Var"
     m_dicTotal("bindcommand") = ""
@@ -70,7 +71,7 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long)
     'If m_dicTotal("bg") <> "" Then m_Base("bg") = m_dicTotal("bg")
     If m_dicTotal("relief") <> "FLAT" Then m_Base("relief") = m_dicTotal("relief")
     If m_dicTotal("anchor") <> "w" Then m_Base("anchor") = m_dicTotal("anchor")
-    If m_dicTotal("font") <> "size=9,weight='normal',slant='roman'" Then m_Base("font") = m_dicTotal("font")
+    If m_dicTotal("font") <> "family='" & GetDefaultFontName() & "',size=9,weight='normal',slant='roman'" Then m_Base("font") = m_dicTotal("font")
     If m_dicTotal("underline") <> "-1" Then m_Base("underline") = m_dicTotal("underline")
     
 End Sub

@@ -26,7 +26,32 @@ Private m_Base As clsBaseControl                                                
 'oop:是否使用面向对象编程
 'usettk:是否使用TTK主题扩展
 Public Function toString(ByRef sCmdFunc As cStrBuilder, rel As Boolean, oop As Boolean, usettk As Boolean) As String
-    toString = m_Base.toString(sCmdFunc, rel, oop, usettk)
+    
+    Dim sOut As New cStrBuilder, scrlcmd As String
+    
+    sOut.Append m_Base.toString(sCmdFunc, rel, oop, usettk)
+    
+    ' 增加滚动条的绑定处理
+    scrlcmd = m_Base("xscrollcommand")
+    If Right$(scrlcmd, 4) = ".set" Then
+        If oop Then
+            sOut.Append Space(8) & "self." & Left$(scrlcmd, Len(scrlcmd) - 4) & "['command'] = self." & m_Base.Name & ".xview"
+        Else
+            sOut.Append Space(4) & Left$(scrlcmd, Len(scrlcmd) - 4) & "['command'] = " & m_Base.Name & ".xview"
+        End If
+    End If
+    
+    scrlcmd = m_Base("yscrollcommand")
+    If Right$(scrlcmd, 4) = ".set" Then
+        If oop Then
+            sOut.Append Space(8) & "self." & Left$(scrlcmd, Len(scrlcmd) - 4) & "['command'] = self." & m_Base.Name & ".yview"
+        Else
+            sOut.Append Space(4) & Left$(scrlcmd, Len(scrlcmd) - 4) & "['command'] = " & m_Base.Name & ".yview"
+        End If
+    End If
+    
+    toString = sOut.toString(vbCrLf)
+    
 End Function
 
 '创建对象后要马上调用这个函数初始化各参数
@@ -77,11 +102,30 @@ End Sub
 '返回值：0-没有可选值，1-有一个严格限制的可选值列表，2-除提供的可选值列表外，还可以手动输入其他值
 '输出：sa()可选值列表数组
 Public Function GetAttrValueList(sAttr As String, ByRef sa() As String) As Long
+    Dim aComps() As String, i As Long, satmp() As String, sOut As String
+    
     GetAttrValueList = 1
     If sAttr = "state" Then
         sa = Split("'normal','readonly','disabled'", ",")
     ElseIf sAttr = "wrap" Then
         sa = Split("CHAR,WORD,NONE", ",")
+    ElseIf sAttr = "xscrollcommand" Or sAttr = "yscrollcommand" Then
+        aComps = GetAllComps()
+        If UBound(aComps) >= 0 Then
+            sOut = ""
+            For i = 1 To UBound(aComps) '0为窗体，不需要判断
+                satmp = Split(aComps(i), "|")
+                If UBound(satmp) > 0 Then
+                    If satmp(1) = "clsScrollbar" Then
+                        sOut = sOut & IIf(Len(sOut), ",", "") & satmp(0) & ".set"
+                    End If
+                End If
+            Next
+            sa = Split(sOut, ",")
+            GetAttrValueList = 1
+        Else
+            GetAttrValueList = 0
+        End If
     Else
         GetAttrValueList = m_Base.GetAttrValueList(sAttr, sa)
     End If
@@ -92,9 +136,9 @@ Public Function Tips(sAttr As String) As String
     Tips = sAttr & vbCrLf
     Select Case sAttr:
     Case "state":
-        Tips = Tips & L("l_TipStateHasRO", "控件状态，请使用括号括起来，可选值有：'normal', 'readonly', 'disabled'")
+        Tips = Tips & l("l_TipStateHasRO", "控件状态，请使用括号括起来，可选值有：'normal', 'readonly', 'disabled'")
     Case "wrap":
-        Tips = Tips & L("l_TipWrapMode", "换行模式，CHAR（默认）为可以在任何一个字符后换行，WORD为在单词后换行，NONE为不换行（则需要提供滚动条）。")
+        Tips = Tips & l("l_TipWrapMode", "换行模式，CHAR（默认）为可以在任何一个字符后换行，WORD为在单词后换行，NONE为不换行（则需要提供滚动条）。")
     Case Else:
         Tips = m_Base.Tips(sAttr)
     End Select
@@ -171,11 +215,50 @@ Public Function Deserializer(vSer As clsSerialization)
 End Function
 
 Public Property Get Description() As String
-    Description = L("l_DescText", "多行文本框对象，对应到Tkinter的Text控件。")
+    Description = l("l_DescText", "多行文本框对象，对应到Tkinter的Text控件。")
 End Property
 
 Public Property Let ScaleMode(nV As Long)
     m_Base.ScaleMode = nV
 End Property
+
+'用于模拟比较排序的函数，实际上是判断两个对象的依赖关系
+'用本对象和另一个对象比较，逻辑结果为'本对象-另一个对象'
+'返回值含义：
+'<0：表示本对象需要在另一个对象前输出代码
+'=0：表示两者将没有依赖关系，代码前后顺序无影响
+'>0：另一个对象要先输出代码。
+'整体的逻辑结果类似是重的沉底
+Public Function Compare(ByRef obj As Object) As Long
+    
+    Dim scrlcmd As String, scrl As String
+    
+    '先判断和滚动条的依赖关系
+    scrlcmd = m_Base("xscrollcommand")
+    If Len(scrlcmd) And TypeName(obj) = "clsScrollbar" Then
+        scrl = IIf(Right$(scrlcmd, 4) = ".set", Left$(scrlcmd, Len(scrlcmd) - 4), "")
+        If scrl = obj.Name Then
+            Compare = 1 ' 滚动条先
+            Exit Function
+        End If
+    End If
+    scrlcmd = m_Base("yscrollcommand")
+    If Len(scrlcmd) And TypeName(obj) = "clsScrollbar" Then
+        scrl = IIf(Right$(scrlcmd, 4) = ".set", Left$(scrlcmd, Len(scrlcmd) - 4), "")
+        If scrl = obj.Name Then
+            Compare = 1 ' 滚动条先
+            Exit Function
+        End If
+    End If
+    
+    If Parent = "top" And obj.Parent <> "top" Then '顶层控件先输出
+        Compare = -1
+    ElseIf Parent <> "top" And obj.Parent = "top" Then
+        Compare = 1
+    Else
+        Compare = 0
+    End If
+End Function
+
 
 

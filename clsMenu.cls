@@ -232,4 +232,21 @@ Public Property Let ScaleMode(nV As Long)
     m_Base.ScaleMode = nV
 End Property
 
+'用于模拟比较排序的函数，实际上是判断两个对象的依赖关系
+'用本对象和另一个对象比较，逻辑结果为'本对象-另一个对象'
+'返回值含义：
+'<0：表示本对象需要在另一个对象前输出代码
+'=0：表示两者将没有依赖关系，代码前后顺序无影响
+'>0：另一个对象要先输出代码。
+'整体的逻辑结果类似是重的沉底
+Public Function Compare(ByRef obj As Object) As Long
+    If Parent = "top" And obj.Parent <> "top" Then '顶层控件先输出
+        Compare = -1
+    ElseIf Parent <> "top" And obj.Parent = "top" Then
+        Compare = 1
+    Else
+        Compare = 0
+    End If
+End Function
+
 

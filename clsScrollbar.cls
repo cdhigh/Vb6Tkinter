@@ -64,7 +64,7 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long)
     m_dicTotal("relief") = "SUNKEN"
     m_dicTotal("activerelief") = "SUNKEN"
     m_dicTotal("takefocus") = IIf(o.Properties("TabStop"), 1, 0)
-    m_dicTotal("command") = o.Properties("Name") & "_Cmd"
+    m_dicTotal("command") = "" 'o.Properties("Name") & "_Cmd"
     m_dicTotal("bindcommand") = ""
     
     '这些是默认选择的
@@ -76,7 +76,7 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long)
     m_Base("rely") = m_dicTotal("rely")
     m_Base("relwidth") = m_dicTotal("relwidth")
     m_Base("relheight") = m_dicTotal("relheight")
-    m_Base("command") = m_dicTotal("command")
+    'm_Base("command") = m_dicTotal("command")
     m_Base("orient") = m_dicTotal("orient")
     If m_dicTotal("takefocus") = 0 Then m_Base("takefocus") = m_dicTotal("takefocus")
     
@@ -100,9 +100,9 @@ Public Function Tips(sAttr As String) As String
     Tips = sAttr & vbCrLf
     Select Case sAttr:
     Case "jump"
-        Tips = Tips & L("l_TipJump", "设置为0（默认值）则每次滚动条数值变化就调用一次回调函数，设置为1则等鼠标松开后才调一次回调函数。")
+        Tips = Tips & l("l_TipJump", "设置为0（默认值）则每次滚动条数值变化就调用一次回调函数，设置为1则等鼠标松开后才调一次回调函数。")
     Case "activerelief"
-        Tips = Tips & L("l_TipActiveRelief", "设置鼠标指针移动在滚动条上时的式样，可选值：FLAT, GROOVE, RAISED, RIDGE, SOLID, SUNKEN。")
+        Tips = Tips & l("l_TipActiveRelief", "设置鼠标指针移动在滚动条上时的式样，可选值：FLAT, GROOVE, RAISED, RIDGE, SOLID, SUNKEN。")
     Case Else:
         Tips = m_Base.Tips(sAttr)
     End Select
@@ -179,11 +179,35 @@ Public Function Deserializer(vSer As clsSerialization)
 End Function
 
 Public Property Get Description() As String
-    Description = L("l_DescScrollbar", "滚动条对象，对应到Tkinter的Scrollbar控件。")
+    Description = l("l_DescScrollbar", "滚动条对象，对应到Tkinter的Scrollbar控件。")
 End Property
 
 Public Property Let ScaleMode(nV As Long)
     m_Base.ScaleMode = nV
 End Property
+
+'用于模拟比较排序的函数，实际上是判断两个对象的依赖关系
+'用本对象和另一个对象比较，逻辑结果为'本对象-另一个对象'
+'返回值含义：
+'<0：表示本对象需要在另一个对象前输出代码
+'=0：表示两者将没有依赖关系，代码前后顺序无影响
+'>0：另一个对象要先输出代码。
+'整体的逻辑结果类似是重的沉底
+Public Function Compare(ByRef obj As Object) As Long
+    If TypeName(obj) = "clsListbox" Then '如果是列表框和滚动条相比较，则交给列表框对象来比较
+        Compare = obj.Compare(Me)
+        Compare = Switch(Compare > 0, -1, Compare < 0, 1, Compare = 0, 0)
+        Exit Function
+    End If
+    
+    If Parent = "top" And obj.Parent <> "top" Then '顶层控件先输出
+        Compare = -1
+    ElseIf Parent <> "top" And obj.Parent = "top" Then
+        Compare = 1
+    Else
+        Compare = 0
+    End If
+End Function
+
 
 

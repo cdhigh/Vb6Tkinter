@@ -1,9 +1,9 @@
 Attribute VB_Name = "Common"
 Option Explicit
 
-Private Declare Function GetDC Lib "user32" (ByVal hwnd As Long) As Long
+Private Declare Function GetDC Lib "user32" (ByVal hWnd As Long) As Long
 Private Declare Function GetDeviceCaps Lib "gdi32" (ByVal hdc As Long, ByVal nIndex As Long) As Long
-Private Declare Function ReleaseDC Lib "user32" (ByVal hwnd As Long, ByVal hdc As Long) As Long
+Private Declare Function ReleaseDC Lib "user32" (ByVal hWnd As Long, ByVal hdc As Long) As Long
 Private Declare Function GetTextExtentPoint32 Lib "gdi32" Alias "GetTextExtentPoint32A" (ByVal hdc As Long, ByVal lpsz As String, ByVal cbString As Long, lpSize As Size) As Long
 Private Declare Function lstrlen Lib "kernel32" Alias "lstrlenA" (ByVal lpString As String) As Long
 'Private Declare Function OleTranslateColor Lib "olepro32.dll" (ByVal OLE_COLOR As Long, ByVal hPalette As Long, ByRef pccolorref As Long) As Long
@@ -52,7 +52,7 @@ Private Type LOGFONT
         lfFaceName(1 To LF_FACESIZE) As Byte
 End Type
 Public g_DefaultFontName As String '暂存系统默认字体名，避免每次查询
-
+Public g_Comps() As Object
 
 'PYTHON中UNICODE字符串前缀的处理函数，如果字符串中存在双字节字符，则根据选项增加适当的前缀
 '否则，只是简单的增加单引号，即使空串也增加一对单引号
@@ -322,4 +322,22 @@ Public Function GetDefaultFontName() As String
             g_DefaultFontName = GetDefaultFontName  '暂存，下一次就不用API查询了
         End If
     End If
+End Function
+
+'获取当前窗体的所有控件列表，返回字符为使用|分割的名字和类型名
+Public Function GetAllComps() As String()
+    Dim nCnt As Long, i As Long, sa() As String
+    On Error Resume Next
+    nCnt = UBound(g_Comps)
+    On Error GoTo 0
+    If nCnt <= 0 Then
+        GetAllComps = Split("")
+        Exit Function
+    End If
+    
+    ReDim sa(nCnt) As String
+    For i = 0 To nCnt
+        sa(i) = g_Comps(i).Name & "|" & TypeName(g_Comps(i))
+    Next
+    GetAllComps = sa
 End Function

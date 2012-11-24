@@ -54,6 +54,8 @@
     import modules filedialog, simpledialog, colorchooser.    
 
 3. History
+  v1.2.8
+    1. Add a process for banding of scrollbar and listbox/canvas/text widgets.
   v1.2.7
     1. Add family name of font to properties of widgets. (if need)
     2. improve the apparence of XP-Style button.

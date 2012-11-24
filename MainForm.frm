@@ -375,7 +375,8 @@ Option Explicit
 Public VBE As VBIDE.VBE
 Public Connect As Connect
 
-Private m_Comps() As Object             '和LstComps行数一样多，对应各组件生成的实例
+'2012.11.23，为了滚动条和列表框的绑定方便，将其修改为全局变量g_Comps，放在Common.bas中
+'Private m_Comps() As Object             '和LstComps行数一样多，对应各组件生成的实例
 Private m_MainMenu As clsMenu              '菜单对象
 Private m_PrevCompIdx As Long
 Private m_curFrm As Object
@@ -559,7 +560,7 @@ Private Sub CmdAddUsrProperty_Click()
     
     If LstCfg.ItemCount <= 0 Then Exit Sub
     
-    s = InputBox(L("l_ProForAddAttr", "请输入属性和数值对，使用'属性=值'的形式，比如：x=20 。\n注意Python是大小写敏感的。"), App.Title)
+    s = InputBox(l("l_ProForAddAttr", "请输入属性和数值对，使用'属性=值'的形式，比如：x=20 。\n注意Python是大小写敏感的。"), App.Title)
     s = Trim(s)
     If Len(s) <= 0 Then
         Exit Sub
@@ -598,33 +599,33 @@ End Sub
 '更新各个列表，创建对应的控件类实例, 返回false表示初始化失败
 Private Function ResetLstComps(frm As Object) As Boolean
     
-    Dim Obj As Object, ObjClsModule As Object, i As Long, s As String, j As Long, nScaleWidth As Long, nScaleHeight As Long
+    Dim obj As Object, ObjClsModule As Object, i As Long, s As String, j As Long, nScaleWidth As Long, nScaleHeight As Long
     
     ResetLstComps = False
     If frm Is Nothing Then Exit Function
     
     LstComps.Clear
-    Erase m_Comps
+    Erase g_Comps
     Set m_MainMenu = Nothing
     
     '创建窗体实例做为列表第一项
-    ReDim m_Comps(0) As Object
-    Set m_Comps(0) = New clsForm
+    ReDim g_Comps(0) As Object
+    Set g_Comps(0) = New clsForm
     
     '因为ScaleX/ScaleY为窗体类独有方法，只能先在这里转换窗体大小为像素单位
     nScaleWidth = Round(ScaleX(frm.Properties("ScaleWidth"), frm.Properties("ScaleMode"), vbPixels))
     nScaleHeight = Round(ScaleY(frm.Properties("ScaleHeight"), frm.Properties("ScaleMode"), vbPixels))
-    m_Comps(0).InitConfig frm, nScaleWidth, nScaleHeight
-    m_Comps(0).Name = NAME_TOPWINDOW
-    LstComps.AddItem m_Comps(0).Name & " (Form)"
+    g_Comps(0).InitConfig frm, nScaleWidth, nScaleHeight
+    g_Comps(0).Name = NAME_TOPWINDOW
+    LstComps.AddItem g_Comps(0).Name & " (Form)"
     i = 1
     
     m_HasCommonDialog = False
     
     '将控件添加到列表中
-    For Each Obj In frm.Designer.VBControls
+    For Each obj In frm.Designer.VBControls
         
-        CreateObj Obj, ObjClsModule                                             '生成对应类模块实例
+        CreateObj obj, ObjClsModule                                             '生成对应类模块实例
         
         If Not ObjClsModule Is Nothing Then
             
@@ -632,66 +633,66 @@ Private Function ResetLstComps(frm As Object) As Boolean
             ObjClsModule.ScaleMode = frm.Properties("ScaleMode")
             
             '如果窗体存在菜单控件，则创建主菜单对象，主菜单控件将管理所有的菜单项
-            If Obj.ClassName = "Menu" And m_MainMenu Is Nothing Then
-                ReDim Preserve m_Comps(i) As Object
+            If obj.ClassName = "Menu" And m_MainMenu Is Nothing Then
+                ReDim Preserve g_Comps(i) As Object
                 Set m_MainMenu = New clsMenu
-                Set m_Comps(i) = m_MainMenu
+                Set g_Comps(i) = m_MainMenu
                 LstComps.AddItem m_MainMenu.Name & " (MainMenu)"
                 m_MainMenu.InitConfig
                 i = i + 1
             End If
             
             '添加控件到控件列表
-            ReDim Preserve m_Comps(i) As Object
-            Set m_Comps(i) = ObjClsModule
-            LstComps.AddItem Obj.Properties("Name") & " (" & Obj.ClassName & ")"
+            ReDim Preserve g_Comps(i) As Object
+            Set g_Comps(i) = ObjClsModule
+            LstComps.AddItem obj.Properties("Name") & " (" & obj.ClassName & ")"
             
             '初始化各控件对应的类模块对象
-            If Obj.Container Is frm.Designer Then
-                m_Comps(i).InitConfig Obj, frm.Properties("ScaleWidth"), frm.Properties("ScaleHeight")
-                m_Comps(i).Parent = IIf(Obj.ClassName = "Menu", "MainMenu", NAME_TOPWINDOW)
-            ElseIf Obj.Container.ClassName = "Menu" Then  '子菜单
-                m_Comps(i).InitConfig Obj, 0, 0
-                m_Comps(i).Parent = Obj.Container.Properties("Name")
+            If obj.Container Is frm.Designer Then
+                g_Comps(i).InitConfig obj, frm.Properties("ScaleWidth"), frm.Properties("ScaleHeight")
+                g_Comps(i).Parent = IIf(obj.ClassName = "Menu", "MainMenu", NAME_TOPWINDOW)
+            ElseIf obj.Container.ClassName = "Menu" Then  '子菜单
+                g_Comps(i).InitConfig obj, 0, 0
+                g_Comps(i).Parent = obj.Container.Properties("Name")
             Else
                 On Error Resume Next
-                nScaleWidth = Obj.Container.Properties("ScaleWidth")
-                nScaleHeight = Obj.Container.Properties("ScaleHeight")
+                nScaleWidth = obj.Container.Properties("ScaleWidth")
+                nScaleHeight = obj.Container.Properties("ScaleHeight")
                 If Err.Number Then                                     'Frame和个别其他容器不支持ScaleWidth属性，则使用Width代替
-                    nScaleWidth = Obj.Container.Properties("Width")
-                    nScaleHeight = Obj.Container.Properties("Height")
+                    nScaleWidth = obj.Container.Properties("Width")
+                    nScaleHeight = obj.Container.Properties("Height")
                 End If
                 Err.Clear
                 On Error GoTo 0
-                m_Comps(i).InitConfig Obj, nScaleWidth, nScaleHeight
-                m_Comps(i).Parent = Obj.Container.Properties("Name")
+                g_Comps(i).InitConfig obj, nScaleWidth, nScaleHeight
+                g_Comps(i).Parent = obj.Container.Properties("Name")
             End If
             
             i = i + 1
             ResetLstComps = True
-        ElseIf Obj.ClassName = "CommonDialog" Then
+        ElseIf obj.ClassName = "CommonDialog" Then
             m_HasCommonDialog = True
         Else
-            MsgBox L_F("l_msgCtlNotSupport", "当前暂不支持'{0}'控件(控件名：{1})\n\n程序将不生成此控件的代码。", Obj.ClassName, Obj.Properties("Name")), vbInformation, App.Title
+            MsgBox L_F("l_msgCtlNotSupport", "当前暂不支持'{0}'控件(控件名：{1})\n\n程序将不生成此控件的代码。", obj.ClassName, obj.Properties("Name")), vbInformation, App.Title
         End If
     Next  'frm.Designer.VBControls
     
     '生成菜单的树形层次关系，为生成代码建立基础
     '子类储存父类的名字，父类储存所有子类的引用
     If Not m_MainMenu Is Nothing Then
-        For i = 0 To UBound(m_Comps)
-            If TypeName(m_Comps(i)) = "clsMenu" Then
+        For i = 0 To UBound(g_Comps)
+            If TypeName(g_Comps(i)) = "clsMenu" Then
                 '将所有的顶层菜单做为clsMenu的子控件
-                For j = 0 To UBound(m_Comps)
-                    If TypeName(m_Comps(j)) = "clsMenuItem" And m_Comps(j).Parent = "MainMenu" Then
-                        m_Comps(i).AddChild m_Comps(j)
+                For j = 0 To UBound(g_Comps)
+                    If TypeName(g_Comps(j)) = "clsMenuItem" And g_Comps(j).Parent = "MainMenu" Then
+                        g_Comps(i).AddChild g_Comps(j)
                     End If
                 Next
-            ElseIf TypeName(m_Comps(i)) = "clsMenuItem" Then
+            ElseIf TypeName(g_Comps(i)) = "clsMenuItem" Then
                 '子菜单有可能还有子菜单
-                For j = 0 To UBound(m_Comps)
-                    If TypeName(m_Comps(j)) = "clsMenuItem" And m_Comps(j).Parent = m_Comps(i).Name Then
-                        m_Comps(i).AddChild m_Comps(j)
+                For j = 0 To UBound(g_Comps)
+                    If TypeName(g_Comps(j)) = "clsMenuItem" And g_Comps(j).Parent = g_Comps(i).Name Then
+                        g_Comps(i).AddChild g_Comps(j)
                     End If
                 Next
             End If
@@ -749,17 +750,18 @@ End Function
 
 Private Sub CmdOutput_Click()
     
-    Dim i As Long, o As Object
+    Dim i As Long, cnt As Long, o As Object
     Dim strHead As New cStrBuilder, strOut As New cStrBuilder, strCmd As New cStrBuilder, s As String
     Dim OutOnlyV3 As Boolean, OutOOP As Boolean, OutRelPos As Boolean, usettk As Boolean
     Dim bUnicodePrefix As Boolean  '临时保存UNICODE前缀方式
+    Dim aCompsSorted() As Object '用于排序的代码输出
     
     If LstComps.ListCount = 0 Or LstCfg.ItemCount = 0 Then Exit Sub
     
     On Error Resume Next
     s = m_curFrm.Name
     If Err.Number Then
-        If MsgBox(L("l_msgGetAttrOfFrmFailed", "获取窗体属性失败，对应VB工程已经关闭？\n请重新刷新窗体列表或重新打开工程再试。" & _
+        If MsgBox(l("l_msgGetAttrOfFrmFailed", "获取窗体属性失败，对应VB工程已经关闭？\n请重新刷新窗体列表或重新打开工程再试。" & _
             "\n现在重新刷新窗体列表吗？"), vbInformation + vbYesNo) = vbYes Then
             CmdRefsFormsList_Click
         End If
@@ -778,7 +780,7 @@ Private Sub CmdOutput_Click()
         '如果使用绝对坐标，不支持Frame控件
         For Each o In m_curFrm.Designer.VBControls
             If o.ClassName = "Frame" Then
-                MsgBox L("l_msgFrameNotSupportInAbs", "绝对坐标布局不支持Frame控件，请改用相对坐标或去掉Frame控件。"), vbInformation
+                MsgBox l("l_msgFrameNotSupportInAbs", "绝对坐标布局不支持Frame控件，请改用相对坐标或去掉Frame控件。"), vbInformation
                 Exit Sub
             End If
         Next
@@ -843,9 +845,9 @@ Private Sub CmdOutput_Click()
     End If
     
     '如果存在状态栏控件，则先输出状态栏控件的类定义
-    For i = 1 To UBound(m_Comps)  '0固定为窗体，不用判断
-        If TypeName(m_Comps(i)) = "clsStatusbar" Then
-            strHead.Append m_Comps(i).WidgetCode()
+    For i = 1 To UBound(g_Comps)  '0固定为窗体，不用判断
+        If TypeName(g_Comps(i)) = "clsStatusbar" Then
+            strHead.Append g_Comps(i).WidgetCode()
             Exit For
         End If
     Next
@@ -853,45 +855,63 @@ Private Sub CmdOutput_Click()
     If OutOOP Then
         strCmd.Append vbCrLf
         strCmd.Append "class Application(Application_ui):"
-        strCmd.Append "    " & L("l_cmtClsApp", "#这个类实现具体的事件处理回调函数。界面生成代码在Application_ui中。")
+        strCmd.Append "    " & l("l_cmtClsApp", "#这个类实现具体的事件处理回调函数。界面生成代码在Application_ui中。")
         strCmd.Append "    def __init__(self, master=None):"
         strCmd.Append "        Application_ui.__init__(self, master)" & vbCrLf
         
         strOut.Append "class Application_ui(Frame):"
-        strOut.Append "    " & L("l_cmtClsUi", "#这个类仅实现界面生成功能，具体事件处理代码在子类Application中。")
+        strOut.Append "    " & l("l_cmtClsUi", "#这个类仅实现界面生成功能，具体事件处理代码在子类Application中。")
         strOut.Append "    def __init__(self, master=None):"
         strOut.Append "        Frame.__init__(self, master)"
-        strOut.Append m_Comps(0).toString(strCmd, OutRelPos, OutOOP, usettk)  'm_Comps(0)固定是Form
+        strOut.Append g_Comps(0).toString(strCmd, OutRelPos, OutOOP, usettk)  'g_Comps(0)固定是Form
         strOut.Append "        self.createWidgets()" & vbCrLf
         strOut.Append "    def createWidgets(self):"
         strOut.Append "        self." & NAME_TOPWINDOW & " = self.winfo_toplevel()" & vbCrLf
         If usettk Then strOut.Append "        self.style = Style()" & vbCrLf
     Else
-        strHead.Append L("l_cmtgComps", "#所有控件和控件绑定变量引用字典，使用这个字典是为了方便在其他函数中引用所有控件。")
+        strHead.Append l("l_cmtgComps", "#所有控件和控件绑定变量引用字典，使用这个字典是为了方便在其他函数中引用所有控件。")
         strHead.Append "gComps = {}"
         strHead.Append vbCrLf & vbCrLf
         
         strOut.Append vbCrLf
         strOut.Append "def main(argv):"
-        strOut.Append m_Comps(0).toString(strCmd, OutRelPos, OutOOP, usettk)  'm_Comps(0)固定是Form
+        strOut.Append g_Comps(0).toString(strCmd, OutRelPos, OutOOP, usettk)  'g_Comps(0)固定是Form
         If usettk Then
             strOut.Append "    style = Style()"
             strOut.Append "    gComps['style'] = style" & vbCrLf
         End If
     End If
     
+    '根据依赖关系排序控件的先后顺序
+    cnt = 0
+    For i = 1 To UBound(g_Comps)
+        If TypeName(g_Comps(i)) <> "clsMenuItem" Then 'clsMenuItem由clsMenu处理，这里剔除掉
+            ReDim Preserve aCompsSorted(cnt) As Object
+            Set aCompsSorted(cnt) = g_Comps(i)
+            cnt = cnt + 1
+        End If
+    Next
+    If cnt > 0 Then
+        SortControls aCompsSorted, cnt
+    End If
+    
     '遍历各控件，由各控件自己输出自己的界面生成代码
+    For i = 0 To cnt - 1
+        strOut.Append aCompsSorted(i).toString(strCmd, OutRelPos, OutOOP, usettk) & vbCrLf
+    Next
+    
     '为了保证容器控件先于其内部的控件生成，将容器不是顶层窗口的控件集中放到最后生成
-    For i = 1 To UBound(m_Comps)
-        If m_Comps(i).Parent = NAME_TOPWINDOW And TypeName(m_Comps(i)) <> "clsMenuItem" Then ' clsMenuItem由clsMenu处理
-            strOut.Append m_Comps(i).toString(strCmd, OutRelPos, OutOOP, usettk) & vbCrLf
-        End If
-    Next
-    For i = 1 To UBound(m_Comps)
-        If m_Comps(i).Parent <> NAME_TOPWINDOW And TypeName(m_Comps(i)) <> "clsMenuItem" Then
-            strOut.Append m_Comps(i).toString(strCmd, OutRelPos, OutOOP, usettk) & vbCrLf
-        End If
-    Next
+    'For i = 1 To UBound(g_Comps)
+    '    If g_Comps(i).Parent = NAME_TOPWINDOW And TypeName(g_Comps(i)) <> "clsMenuItem" Then ' clsMenuItem由clsMenu处理
+    '        strOut.Append g_Comps(i).toString(strCmd, OutRelPos, OutOOP, usettk) & vbCrLf
+    '    End If
+    'Next
+    
+    'For i = 1 To UBound(g_Comps)
+    '    If g_Comps(i).Parent <> NAME_TOPWINDOW And TypeName(g_Comps(i)) <> "clsMenuItem" Then
+    '        strOut.Append g_Comps(i).toString(strCmd, OutRelPos, OutOOP, usettk) & vbCrLf
+    '    End If
+    'Next
     
     '输出到文本框
     If OutOOP Then
@@ -918,6 +938,37 @@ Private Sub CmdOutput_Click()
     g_bUnicodePrefixU = bUnicodePrefix    '恢复UNICODE前缀模式
     
 End Sub
+
+'根据依赖关系排序控件，简单的冒泡排序
+Private Sub SortControls(ByRef aCompsSorted() As Object, ByVal cnt As Long)
+    Dim index As Long
+    Dim tmp4exchange As Object
+    Dim cursor As Long
+    
+    cursor = 0
+    Do While (cursor < cnt - 1) '一层循环，从前往后
+        index = cnt - 1 '二层循环，从后往前
+        Do While (index > cursor)
+            If Compare(aCompsSorted(index), aCompsSorted(index - 1)) < 0 Then '重者沉底
+                Set tmp4exchange = aCompsSorted(index)
+                Set aCompsSorted(index) = aCompsSorted(index - 1)
+                Set aCompsSorted(index - 1) = tmp4exchange
+            End If
+            index = index - 1
+        Loop
+        cursor = cursor + 1
+    Loop
+    
+End Sub
+
+Private Function Compare(ByRef l As Object, ByRef r As Object) As Long
+    Compare = 0
+    On Error GoTo FunExit
+    Compare = l.Compare(r)
+FunExit:
+    
+End Function
+
 
 Private Sub CmdRefsFormsList_Click()
     
@@ -1029,7 +1080,7 @@ Private Sub Form_Resize()
 End Sub
 
 Private Sub lblWP_Click()
-    MsgBox L("l_msgCtlsSupported", "支持控件列表：") & vbCrLf & "Menu, Label, TextBox, PictureBox, Frame, CommandButton, CheckBox, OptionButton, " & vbCrLf & _
+    MsgBox l("l_msgCtlsSupported", "支持控件列表：") & vbCrLf & "Menu, Label, TextBox, PictureBox, Frame, CommandButton, CheckBox, OptionButton, " & vbCrLf & _
     "ComboBox, ListBox, HScrollBar, VScrollBar, Slider, ProgressBar, TreeView, StatusBar, CommonDialog"
 End Sub
 
@@ -1059,7 +1110,7 @@ End Sub
 
 Private Sub LstCfg_RowColChanged()
     If LstComps.ListIndex >= 0 Then
-        TxtTips.Text = m_Comps(LstComps.ListIndex).Tips(LstCfg.CellText(LstCfg.Row, 0))
+        TxtTips.Text = g_Comps(LstComps.ListIndex).Tips(LstCfg.CellText(LstCfg.Row, 0))
     End If
 End Sub
 
@@ -1072,7 +1123,7 @@ Private Sub LstComps_Click()
     On Error Resume Next
     s = m_curFrm.Name
     If Err.Number Then
-        If MsgBox(L("l_msgGetAttrOfFrmFailed", "获取窗体属性失败，对应VB工程已经关闭？\n请重新刷新窗体列表或重新打开工程再试。" & _
+        If MsgBox(l("l_msgGetAttrOfFrmFailed", "获取窗体属性失败，对应VB工程已经关闭？\n请重新刷新窗体列表或重新打开工程再试。" & _
             "\n现在重新刷新窗体列表吗？"), vbInformation + vbYesNo) = vbYes Then
             CmdRefsFormsList_Click
         End If
@@ -1089,7 +1140,7 @@ Private Sub LstComps_Click()
     m_PrevCompIdx = LstComps.ListIndex
     
     '显示控件描述
-    TxtTips.Text = m_Comps(LstComps.ListIndex).Description
+    TxtTips.Text = g_Comps(LstComps.ListIndex).Description
     
     '选择对应的控件
     m_curFrm.Designer.SelectedVBControls.Clear
@@ -1107,12 +1158,12 @@ Private Sub FetchCfgFromCls(idx As Long)
     
     Dim nRow As Long, cfg As Variant, cItms As Collection
     
-    If idx < 0 Or idx > UBound(m_Comps) Then Exit Sub
+    If idx < 0 Or idx > UBound(g_Comps) Then Exit Sub
     
     LstCfg.Redraw = False
     If LstCfg.ItemCount > 0 Then LstCfg.TopRow = 0  '这个操作是为了规避GridOcx的滚动条BUG，就是切换控件后有部分项目无法完整显示
     LstCfg.Clear
-    Set cItms = m_Comps(idx).Allitems()
+    Set cItms = g_Comps(idx).Allitems()
     For Each cfg In cItms
         nRow = LstCfg.AddItem(Left(cfg, InStr(1, cfg, "|") - 1))
         LstCfg.CellText(nRow, 1) = Mid(cfg, InStr(1, cfg, "|") + 1, InStrRev(cfg, "|") - InStr(1, cfg, "|") - 1)
@@ -1126,7 +1177,7 @@ End Sub
 Private Sub UpdateCfgtoCls(idx As Long)
     Dim s As String, i As Long
     
-    If idx < 0 Or idx > UBound(m_Comps) Then Exit Sub
+    If idx < 0 Or idx > UBound(g_Comps) Then Exit Sub
     
     s = ""
     For i = 0 To LstCfg.ItemCount - 1
@@ -1135,7 +1186,7 @@ Private Sub UpdateCfgtoCls(idx As Long)
         End If
     Next
     
-    If Len(s) Then m_Comps(idx).SetConfig s
+    If Len(s) Then g_Comps(idx).SetConfig s
     
 End Sub
 
@@ -1156,7 +1207,7 @@ Private Sub mnuClipOutMainOnly_Click()
         Clipboard.Clear
         Clipboard.SetText Mid(s, nm, nf - nm)
     Else
-        MsgBox L("l_msgNoMain", "代码中找不到main()函数！"), vbInformation
+        MsgBox l("l_msgNoMain", "代码中找不到main()函数！"), vbInformation
     End If
     
 End Sub
@@ -1173,7 +1224,7 @@ Private Sub mnuClipOutUiOnly_Click()
         Clipboard.Clear
         Clipboard.SetText Mid(s, nui, napp - nui)
     Else
-        MsgBox L("l_msgNoClsUi", "代码中找不到Application_ui类！"), vbInformation
+        MsgBox l("l_msgNoClsUi", "代码中找不到Application_ui类！"), vbInformation
     End If
     
 End Sub
@@ -1188,7 +1239,7 @@ Private Sub mnuGenCode_Click()
     CmdOutput_Click
 End Sub
 
-Private Sub mnuLng_Click(Index As Integer)
+Private Sub mnuLng_Click(index As Integer)
     
     Dim i As Long
     
@@ -1196,10 +1247,10 @@ Private Sub mnuLng_Click(Index As Integer)
         mnuLng(i).Checked = False
     Next
     
-    mnuLng(Index).Checked = True
-    SaveSetting App.Title, "Settings", "Language", mnuLng(Index).Caption
+    mnuLng(index).Checked = True
+    SaveSetting App.Title, "Settings", "Language", mnuLng(index).Caption
     
-    ChangeLanguage (mnuLng(Index).Caption)
+    ChangeLanguage (mnuLng(index).Caption)
     
 End Sub
 
@@ -1211,7 +1262,7 @@ End Sub
 Private Sub mnuOutAll_Click()
     
     Dim sF As String
-    sF = FileDialog(Me, True, L("l_fdSave", "将Python文件保存到："), "*.py", m_prevsf)
+    sF = FileDialog(Me, True, l("l_fdSave", "将Python文件保存到："), "*.py", m_prevsf)
     
     If Len(sF) Then
         If Len(FileExt(sF)) = 0 Then sF = sF & ".py"  '如果文件名没有扩展名，自动添加.py扩展名
@@ -1232,13 +1283,13 @@ Private Sub mnuOutMainOnly_Click()
     nm = InStr(1, s, "def main(argv):")
     nf = InStr(1, s, "if __name__")
     If nm > 0 And nf > 0 Then
-        sF = FileDialog(Me, True, L("l_fdSave", "将Python文件保存到："), "*.py", m_prevsf)
+        sF = FileDialog(Me, True, l("l_fdSave", "将Python文件保存到："), "*.py", m_prevsf)
         If Len(sF) Then
             If Len(FileExt(sF)) = 0 Then sF = sF & ".py"  '如果文件名没有扩展名，自动添加.py扩展名
             Utf8File_Write_VB sF, Mid(s, nm, nf - nm)
         End If
     Else
-        MsgBox L("l_msgNoMain", "代码中找不到main()函数！"), vbInformation
+        MsgBox l("l_msgNoMain", "代码中找不到main()函数！"), vbInformation
     End If
     
     m_prevsf = sF
@@ -1261,7 +1312,7 @@ Private Sub mnuOutUiOnly_Click()
             Utf8File_Write_VB sF, Mid(s, nui, napp - nui)
         End If
     Else
-        MsgBox L("l_msgNoClsUi", "代码中找不到Application_ui类！"), vbInformation
+        MsgBox l("l_msgNoClsUi", "代码中找不到Application_ui类！"), vbInformation
     End If
     
     m_prevsf = sF
@@ -1297,7 +1348,7 @@ Private Sub mnuPreview_Click()
         Utf8File_Write_VB sTmpFile, TxtCode.Text
         Shell Chr(34) & g_PythonExe & """ """ & sTmpFile & Chr(34)
     Else
-        MsgBox L("l_msgCreateTempFileFailed", "创建临时文件失败！"), vbInformation
+        MsgBox l("l_msgCreateTempFileFailed", "创建临时文件失败！"), vbInformation
     End If
     
 End Sub
@@ -1353,7 +1404,7 @@ Private Sub mnuRelPos_Click()
         '如果使用绝对坐标，不支持Frame控件
         For Each o In m_curFrm.Designer.VBControls
             If o.ClassName = "Frame" Then
-                MsgBox L("l_msgFrameNotSupportInAbs", "绝对坐标布局不支持Frame控件，请改用相对坐标或去掉Frame控件。"), vbInformation
+                MsgBox l("l_msgFrameNotSupportInAbs", "绝对坐标布局不支持Frame控件，请改用相对坐标或去掉Frame控件。"), vbInformation
                 mnuRelPos.Checked = True
                 Exit For
             End If
@@ -1372,7 +1423,7 @@ Private Sub mnuRestoreConfig_Click()
     Dim csa() As String
     
     If Len(cmbFrms.Text) = 0 Or LstComps.ListCount = 0 Or LstCfg.ItemCount = 0 Then
-        MsgBox L("l_msgChooseAForm", "请先选择一个窗体！"), vbInformation
+        MsgBox l("l_msgChooseAForm", "请先选择一个窗体！"), vbInformation
         Exit Sub
     End If
     
@@ -1380,7 +1431,7 @@ Private Sub mnuRestoreConfig_Click()
     On Error Resume Next
     Set re = New RegExp
     If Err.Number <> 0 Then
-        MsgBox L("l_msgNoRegExp", "系统没有注册VBScript.dll正则表达式组件，无法执行此功能！"), vbInformation
+        MsgBox l("l_msgNoRegExp", "系统没有注册VBScript.dll正则表达式组件，无法执行此功能！"), vbInformation
         mnuRestoreConfig.Enabled = False
         mnuSaveConfig.Enabled = False
         Exit Sub
@@ -1392,7 +1443,7 @@ Private Sub mnuRestoreConfig_Click()
     On Error GoTo 0
     
     If sF = "" Or sF = ".save" Then
-        MsgBox L("l_msgFrmNoSaved", "设计窗体尚未保存，请先保存设计窗体。"), vbInformation
+        MsgBox l("l_msgFrmNoSaved", "设计窗体尚未保存，请先保存设计窗体。"), vbInformation
         Exit Sub
     End If
     
@@ -1419,10 +1470,10 @@ Private Sub mnuRestoreConfig_Click()
         csa = Split(Mth, SEP_NAME_FROM_CONTENT)
         csa(0) = Replace(csa(0), REGX_INC_CTL_S, "")
         csa(1) = Replace(csa(1), REGX_INC_CTL_E, "")
-        For i = 0 To UBound(m_Comps)
-            If m_Comps(i).Name = csa(0) Then
+        For i = 0 To UBound(g_Comps)
+            If g_Comps(i).Name = csa(0) Then
                 cSerial.SerialString = csa(1)
-                cSerial.Deserializer m_Comps(i)
+                cSerial.Deserializer g_Comps(i)
                 Exit For
             End If
         Next
@@ -1450,12 +1501,12 @@ Private Sub mnuSaveConfig_Click()
     On Error GoTo 0
     
     If sF = "" Or sF = ".save" Then
-        MsgBox L("l_msgFrmNoSaved", "设计窗体尚未保存，请先保存设计窗体。"), vbInformation
+        MsgBox l("l_msgFrmNoSaved", "设计窗体尚未保存，请先保存设计窗体。"), vbInformation
         Exit Sub
     End If
     
     If Len(cmbFrms.Text) = 0 Or LstComps.ListCount = 0 Or LstCfg.ItemCount = 0 Then
-        MsgBox L("l_msgHasNoCfgToSave", "当前没有可以保存的配置！"), vbInformation
+        MsgBox l("l_msgHasNoCfgToSave", "当前没有可以保存的配置！"), vbInformation
         Exit Sub
     End If
     
@@ -1465,13 +1516,13 @@ Private Sub mnuSaveConfig_Click()
     'sOut.Append cSerial.SerialString()
     'sOut.Append REGX_INC_FRM_E
     
-    For i = 0 To UBound(m_Comps)
+    For i = 0 To UBound(g_Comps)
         sOut.Append REGX_INC_CTL_S
-        sOut.Append m_Comps(i).Name
+        sOut.Append g_Comps(i).Name
         sOut.Append SEP_NAME_FROM_CONTENT
         
         cSerial.Reset
-        cSerial.Serializer m_Comps(i)
+        cSerial.Serializer g_Comps(i)
         
         sOut.Append cSerial.SerialString()
         sOut.Append REGX_INC_CTL_E
@@ -1510,7 +1561,7 @@ Private Sub mnuUseTtk_Click()
             s = Mid(LstComps.List(i), InStr(1, LstComps.List(i), "(") + 1)
             s = Left(s, Len(s) - 1)
             If InStr(1, " ProgressBar, TreeView, TabStrip, ", " " & s & ",") > 0 Then
-                MsgBox L("l_msgCantCancelTTK", "窗体中有部分控件仅在TTK库中存在，不能取消TTK选项。"), vbInformation
+                MsgBox l("l_msgCantCancelTTK", "窗体中有部分控件仅在TTK库中存在，不能取消TTK选项。"), vbInformation
                 mnuUseTtk.Checked = True
                 Exit For
             End If
@@ -1519,9 +1570,9 @@ Private Sub mnuUseTtk_Click()
     
     '切换组合框适配器的TTK属性
     If LstComps.ListCount > 0 Then
-        For i = 0 To UBound(m_Comps)
-            If TypeName(m_Comps(i)) = "clsComboboxAdapter" Then
-                m_Comps(i).TTK = mnuUseTtk.Checked
+        For i = 0 To UBound(g_Comps)
+            If TypeName(g_Comps(i)) = "clsComboboxAdapter" Then
+                g_Comps(i).TTK = mnuUseTtk.Checked
             End If
         Next
         
@@ -1550,7 +1601,7 @@ Private Sub FillcmbEdit(Row As Long, Col As Long)
     If LstComps.ListCount = 0 Or LstComps.ListIndex < 0 Then Exit Sub
     
     '0表示内置文本编辑框，1表示仅限下拉列表，2表示下拉列表加文本输入
-    nEditType = m_Comps(LstComps.ListIndex).GetAttrValueList(LstCfg.CellText(Row, 0), sa)
+    nEditType = g_Comps(LstComps.ListIndex).GetAttrValueList(LstCfg.CellText(Row, 0), sa)
     
     If nEditType = 0 Then
         LstCfg.BindControl 1, Nothing  '使用内置文本编辑框
@@ -1671,47 +1722,47 @@ Private Sub TxtTips_KeyUp(KeyCode As Integer, Shift As Integer)
 End Sub
 
 Private Sub TxtTips_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
-    stabar.SimpleText = L("l_staTips", "属性解析窗口，在有些属性状态下可以双击变大。")
+    stabar.SimpleText = l("l_staTips", "属性解析窗口，在有些属性状态下可以双击变大。")
 End Sub
 
 Private Sub CmdSerializer_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
-    stabar.SimpleText = L("l_staSrl", "注意：仅保存那些被选择（选择框被打勾）的配置项。")
+    stabar.SimpleText = l("l_staSrl", "注意：仅保存那些被选择（选择框被打勾）的配置项。")
 End Sub
 
 Private Sub LstComps_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
-    stabar.SimpleText = L("l_staComps", "控件列表窗口，列出对应窗体上所有控件名和控件类型。")
+    stabar.SimpleText = l("l_staComps", "控件列表窗口，列出对应窗体上所有控件名和控件类型。")
 End Sub
 
 Private Sub cmbFrms_GotFocus()
-    stabar.SimpleText = L("l_staFrms", "窗体列表，程序中支持多个设计窗口。")
+    stabar.SimpleText = l("l_staFrms", "窗体列表，程序中支持多个设计窗口。")
 End Sub
 
 Private Sub CmdAddUsrProperty_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
-    stabar.SimpleText = L("l_staAddAttr", "目前列表中的选项并不完整，仅包括常用属性，如果需要，可以根据手册手工添加其他属性。")
+    stabar.SimpleText = l("l_staAddAttr", "目前列表中的选项并不完整，仅包括常用属性，如果需要，可以根据手册手工添加其他属性。")
 End Sub
 
 Private Sub CmdClip_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
-    stabar.SimpleText = L("l_staCopyCode", "拷贝代码到剪贴板，可以选择拷贝全部还是仅拷贝界面生成部分。")
+    stabar.SimpleText = l("l_staCopyCode", "拷贝代码到剪贴板，可以选择拷贝全部还是仅拷贝界面生成部分。")
 End Sub
 
 Private Sub CmdDeserializer_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
-    stabar.SimpleText = L("l_staRestoreCfg", "仅恢复那些同名保存的控件配置项，新增的控件不受影响。")
+    stabar.SimpleText = l("l_staRestoreCfg", "仅恢复那些同名保存的控件配置项，新增的控件不受影响。")
 End Sub
 
 Private Sub CmdOutput_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
-    stabar.SimpleText = L("l_staCmdGenCode", "全部的控件属性都配置完成后，使用这个按钮生成Python代码。")
+    stabar.SimpleText = l("l_staCmdGenCode", "全部的控件属性都配置完成后，使用这个按钮生成Python代码。")
 End Sub
 
 Private Sub CmdQuit_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
-    stabar.SimpleText = L("l_staQuit", "直接退出！")
+    stabar.SimpleText = l("l_staQuit", "直接退出！")
 End Sub
 
 Private Sub CmdRefsFormsList_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
-    stabar.SimpleText = L("l_staRefsFrms", "刷新窗体和控件，如果插件运行后修改了窗体和控件，请刷新后再重新生成代码。")
+    stabar.SimpleText = l("l_staRefsFrms", "刷新窗体和控件，如果插件运行后修改了窗体和控件，请刷新后再重新生成代码。")
 End Sub
 
 Private Sub CmdSaveFile_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
-    stabar.SimpleText = L("l_staCmdSaveFile", "如果必要，可以选择代码保存到文件(UTF-8带BOM格式)。")
+    stabar.SimpleText = l("l_staCmdSaveFile", "如果必要，可以选择代码保存到文件(UTF-8带BOM格式)。")
 End Sub
 
 Private Sub Form_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
@@ -1719,10 +1770,10 @@ Private Sub Form_MouseMove(Button As Integer, Shift As Integer, x As Single, y A
 End Sub
 
 Private Sub LstCfg_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
-    stabar.SimpleText = L("l_staLstCfg", "属性列表窗口，双击属性值或按F2键可以编辑，程序只生成对应前面打钩的属性的代码。")
+    stabar.SimpleText = l("l_staLstCfg", "属性列表窗口，双击属性值或按F2键可以编辑，程序只生成对应前面打钩的属性的代码。")
 End Sub
 
 Private Sub TxtCode_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
-    stabar.SimpleText = L("l_staTxtCode", "代码预览窗口，双击可以放大。如果需要，也可以直接在这里修改代码。")
+    stabar.SimpleText = l("l_staTxtCode", "代码预览窗口，双击可以放大。如果需要，也可以直接在这里修改代码。")
 End Sub
 

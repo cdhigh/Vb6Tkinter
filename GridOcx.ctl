@@ -5,6 +5,7 @@ Begin VB.UserControl GridOcx
    ClientLeft      =   0
    ClientTop       =   0
    ClientWidth     =   5565
+   ControlContainer=   -1  'True
    KeyPreview      =   -1  'True
    ScaleHeight     =   275
    ScaleMode       =   3  'Pixel
@@ -2732,12 +2733,14 @@ Private Sub MoveEditControl(ByVal MoveControl As lgMoveControlEnum)
                 If mCols(mColPtr(mEditCol)).MoveControl And lgBCWidth Then
                     .Width = ScaleX((r.Right - r.Left), vbPixels, nScaleMode)
                 End If
-                If mCols(mColPtr(mEditCol)).MoveControl And lgBCHeight Then
-'TwipsPerPixel:     返回水平 (TwipsPerPixelX) 或垂直 (TwipsPerPixelY) 度量的对象的每一像素中的缇数。
-                    lHeight = mRowHeight / Screen.TwipsPerPixelX - mGridLineWidth - 4
-                    Call SendMessageAsLong(.hWnd, CB_SETITEMHEIGHT, -1, ByVal lHeight)
-                    Call SendMessageAsLong(.hWnd, CB_SETITEMHEIGHT, 0, ByVal lHeight)
-                End If
+                '2012.11.26, cdhigh commented，设置高度会导致Combo第一次显示时内容显示不全
+                '取而代之就是在窗体Load事件中设置set Combo1.Font = GridOcx.Font
+                'If mCols(mColPtr(mEditCol)).MoveControl And lgBCHeight Then
+                    'TwipsPerPixel:     返回水平 (TwipsPerPixelX) 或垂直 (TwipsPerPixelY) 度量的对象的每一像素中的缇数。
+                    'lHeight = mRowHeight / Screen.TwipsPerPixelX - mGridLineWidth - 4
+                    'Call SendMessageAsLong(.hWnd, CB_SETITEMHEIGHT, -1, ByVal lHeight)
+                    'Call SendMessageAsLong(.hWnd, CB_SETITEMHEIGHT, 0, ByVal lHeight)
+                'End If
             End With
         Else
             With mCols(mColPtr(mEditCol)).EditCtrl

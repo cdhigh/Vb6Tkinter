@@ -48,12 +48,27 @@
     Similar to widget Treeview of TTK library.
   2.15 TabStrip
     Similar to widget Notebook of TTK libray.
+    If you want to design the tabs of Notebook in VB IDE, please use a
+    PictureBox or Frame as container for widgets, you have to name the 
+    PictureBox or Frame following format:
+    'Name of TabStrip' + '__Tab' + sequence number(start in 1)
+    Forexample, if name of TabStrip is 'TabStrip1'(by default), you can
+    Create a PictureBox named 'TabStrip1__Tab1' as container for Tab1 of 
+    Notebook widget.
+
   -----------------------------------------------------
   2.16 CommonDialog
     if the form has this control, then the addin will create code for 
     import modules filedialog, simpledialog, colorchooser.    
 
 3. History
+  v1.3
+    1. Add a feature the allow design all tabs of Notebook widget in VB IDE.
+       refer to description of TabStrip.
+    2. Can add a lambda function in callback field.
+    3. bugfix: add a wrong 'DeletE' event when you set the shortcut is 'Delete'.
+    4. bugfix: substitute Combobox for OptionMenu widget when ttk is disabled.
+    5. bugfix: some text disaperence when first time of display of dropdown.
   v1.2.8
     1. Add a process for banding of scrollbar and listbox/canvas/text widgets.
   v1.2.7

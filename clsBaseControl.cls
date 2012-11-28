@@ -59,7 +59,11 @@ Public Function toStringStructure(ByRef sCmdFunc As cStrBuilder, rel As Boolean,
         sOut.Append Space(4) & Dic("listvariable") & " = StringVar(value=" & U(m_Value) & ")"
     End If
     If Not usettk And Len(Dic("font")) Then
-        sOut.Append Space(4) & m_Name & "Font = Font(" & Dic("font") & ")"
+        If Left$(Dic("font"), 1) = "(" Then
+            sOut.Append Space(4) & m_Name & "Font = Font(font=" & Dic("font") & ")"
+        Else '如果用户忘了加括号，这里加上
+            sOut.Append Space(4) & m_Name & "Font = Font(font=(" & Dic("font") & "))"
+        End If
     End If
     
     If Len(Dic("columns")) Then
@@ -75,7 +79,7 @@ Public Function toStringStructure(ByRef sCmdFunc As cStrBuilder, rel As Boolean,
     End If
     
     If usettk Then                                                              '创建STYLE对象
-        sStyle = GetStyleParams(False)
+        sStyle = GetStyleParams(False, usettk)
         If Len(sStyle) Then
             sOut.Append Space(4) & "style.configure('" & m_Name & "." & m_StyleName & "'," & sStyle & ")"
             sOtherParams = sOtherParams & IIf(Len(sOtherParams), ", ", "") & "style='" & m_Name & "." & m_StyleName & "'"
@@ -99,8 +103,8 @@ Public Function toStringStructure(ByRef sCmdFunc As cStrBuilder, rel As Boolean,
         sOut.Append Space(4) & "gComps['" & Dic("listvariable") & "'] = " & Dic("listvariable")
     End If
     
-    '创建事件处理函数框架（如果有）
-    If Dic("command") <> "top.quit" And Dic("command") <> "top.destroy" Then
+    '创建事件处理函数框架（如果有），事件里面有点号说明是调用系统的函数，不需要生成函数体
+    If InStr(1, Dic("command"), ".") <= 0 And InStr(1, Dic("command"), "lambda ") <= 0 Then
         sCmdFunc.Append CreateFuncDef(Dic("command"), "event=None")
     End If
     If Len(Dic("postcommand")) Then
@@ -112,11 +116,11 @@ Public Function toStringStructure(ByRef sCmdFunc As cStrBuilder, rel As Boolean,
         sTmp = Dic("text")
         If Len(sTmp) = 0 Then sTmp = Dic("label")
         If Len(sTmp) And Len(Dic("underline")) < Len(sTmp) Then
-            sOut.Append Space(4) & "top.bind_all('<Alt-" & Mid(sTmp, CLng(Dic("underline")) + 1, 1) & ">', " & Dic("command") & ")"
+            sOut.Append Space(4) & WTOP & ".bind_all('<Alt-" & Mid(sTmp, CLng(Dic("underline")) + 1, 1) & ">', " & Dic("command") & ")"
             If Mid(sTmp, CLng(Dic("underline")) + 1, 1) >= "a" And Mid(sTmp, CLng(Dic("underline")) + 1, 1) <= "z" Then
-                sOut.Append Space(4) & "top.bind_all('<Alt-" & UCase(Mid(sTmp, CLng(Dic("underline")) + 1, 1)) & ">', " & Dic("command") & ")"
+                sOut.Append Space(4) & WTOP & ".bind_all('<Alt-" & UCase(Mid(sTmp, CLng(Dic("underline")) + 1, 1)) & ">', " & Dic("command") & ")"
             ElseIf Mid(sTmp, CLng(Dic("underline")) + 1, 1) >= "A" And Mid(sTmp, CLng(Dic("underline")) + 1, 1) <= "Z" Then
-                sOut.Append Space(4) & "top.bind_all('<Alt-" & LCase(Mid(sTmp, CLng(Dic("underline")) + 1, 1)) & ">', " & Dic("command") & ")"
+                sOut.Append Space(4) & WTOP & ".bind_all('<Alt-" & LCase(Mid(sTmp, CLng(Dic("underline")) + 1, 1)) & ">', " & Dic("command") & ")"
             End If
         End If
     End If
@@ -177,7 +181,11 @@ Public Function toStringOOP(ByRef sCmdFunc As cStrBuilder, rel As Boolean, usett
         sOut.Append Space(8) & "self." & Dic("listvariable") & " = StringVar(value=" & U(m_Value) & ")"
     End If
     If Not usettk And Len(Dic("font")) Then
-        sOut.Append Space(8) & "self." & m_Name & "Font = Font(" & Dic("font") & ")"
+        If Left$(Dic("font"), 1) = "(" Then
+            sOut.Append Space(8) & "self." & m_Name & "Font = Font(font=" & Dic("font") & ")"
+        Else
+            sOut.Append Space(8) & "self." & m_Name & "Font = Font(font=(" & Dic("font") & "))"
+        End If
     End If
     
     If Len(Dic("columns")) Then
@@ -193,7 +201,7 @@ Public Function toStringOOP(ByRef sCmdFunc As cStrBuilder, rel As Boolean, usett
     End If
     
     If usettk Then                                                              '创建STYLE对象
-        sStyle = GetStyleParams(True)
+        sStyle = GetStyleParams(True, usettk)
         If Len(sStyle) Then
             sOut.Append Space(8) & "self.style.configure('" & m_Name & "." & m_StyleName & "'," & sStyle & ")"
             sOtherParams = sOtherParams & IIf(Len(sOtherParams), ", ", "") & "style='" & m_Name & "." & m_StyleName & "'"
@@ -205,8 +213,8 @@ Public Function toStringOOP(ByRef sCmdFunc As cStrBuilder, rel As Boolean, usett
     sOut.Append Space(8) & "self." & m_Name & " = " & m_Type & "(self." & m_Parent & IIf(Len(extra), ", ", "") & extra & ")"
     sOut.Append Space(8) & "self." & m_Name & ".place(" & GetPositionParams(rel) & ")"
     
-    '创建事件处理函数框架（如果有）
-    If Dic("command") <> "top.quit" And Dic("command") <> "top.destroy" Then
+    '创建事件处理函数框架（如果有），事件里面有点号说明是调用系统的函数，不需要生成函数体
+    If InStr(1, Dic("command"), ".") <= 0 And InStr(1, Dic("command"), "lambda ") <= 0 Then
         sCmdFunc.Append CreateFuncDefOOP(Dic("command"), "event=None")
     End If
     If Len(Dic("postcommand")) Then
@@ -218,11 +226,11 @@ Public Function toStringOOP(ByRef sCmdFunc As cStrBuilder, rel As Boolean, usett
         sTmp = Dic("text")
         If Len(sTmp) = 0 Then sTmp = Dic("label")
         If Len(sTmp) And Len(Dic("underline")) < Len(sTmp) Then
-            sOut.Append Space(8) & "self.top.bind_all('<Alt-" & Mid(sTmp, CLng(Dic("underline")) + 1, 1) & ">', self." & Dic("command") & ")"
+            sOut.Append Space(8) & "self." & WTOP & ".bind_all('<Alt-" & Mid(sTmp, CLng(Dic("underline")) + 1, 1) & ">', self." & Dic("command") & ")"
             If Mid(sTmp, CLng(Dic("underline")) + 1, 1) >= "a" And Mid(sTmp, CLng(Dic("underline")) + 1, 1) <= "z" Then
-                sOut.Append Space(8) & "self.top.bind_all('<Alt-" & UCase(Mid(sTmp, CLng(Dic("underline")) + 1, 1)) & ">', self." & Dic("command") & ")"
+                sOut.Append Space(8) & "self." & WTOP & ".bind_all('<Alt-" & UCase(Mid(sTmp, CLng(Dic("underline")) + 1, 1)) & ">', self." & Dic("command") & ")"
             ElseIf Mid(sTmp, CLng(Dic("underline")) + 1, 1) >= "A" And Mid(sTmp, CLng(Dic("underline")) + 1, 1) <= "Z" Then
-                sOut.Append Space(8) & "self.top.bind_all('<Alt-" & LCase(Mid(sTmp, CLng(Dic("underline")) + 1, 1)) & ">', self." & Dic("command") & ")"
+                sOut.Append Space(8) & "self." & WTOP & ".bind_all('<Alt-" & LCase(Mid(sTmp, CLng(Dic("underline")) + 1, 1)) & ">', self." & Dic("command") & ")"
             End If
         End If
     End If
@@ -306,11 +314,25 @@ Public Function GetExtraParams(oop As Boolean, usettk As Boolean) As String
     If Len(Dic("variable")) Then s.Append "variable=" & IIf(oop, "self.", "") & Dic("variable")
     If Len(Dic("listvariable")) Then s.Append "listvariable=" & IIf(oop, "self.", "") & Dic("listvariable")
     If Len(Dic("values")) Then s.Append "values=" & IIf(oop, "self.", "") & Dic("values")
-    If Len(Dic("command")) Then s.Append "command=" & IIf(oop, "self.", "") & Dic("command")
+    
+    If Len(Dic("command")) Then
+        If InStr(1, Dic("command"), "lambda ") > 0 Then '匿名函数，不用加self.
+            s.Append "command=" & Dic("command")
+        Else
+            s.Append "command=" & IIf(oop, "self.", "") & Dic("command")
+        End If
+    End If
+    
     If Len(Dic("postcommand")) Then s.Append "postcommand=" & IIf(oop, "self.", "") & Dic("postcommand")
     If Len(Dic("xscrollcommand")) Then s.Append "xscrollcommand=" & IIf(oop, "self.", "") & Dic("xscrollcommand")
     If Len(Dic("yscrollcommand")) Then s.Append "yscrollcommand=" & IIf(oop, "self.", "") & Dic("yscrollcommand")
-    If Not usettk And Len(Dic("font")) Then s.Append "font=" & IIf(oop, "self.", "") & m_Name & "Font"
+    If Len(Dic("font")) Then
+        If usettk Then 'Entry的font要写在创建函数中才管用
+            If m_Type = "Entry" Or m_Type = "Combobox" Then s.Append "font=" & IIf(Left$(Dic("font"), 1) = "(", Dic("font"), "(" & Dic("font") & ")")
+        Else
+            s.Append "font=" & IIf(oop, "self.", "") & m_Name & "Font"
+        End If
+    End If
     
     GetExtraParams = s.toString(", ")
     
@@ -330,7 +352,7 @@ Private Function isExtra(ByVal sK As String, usettk As Boolean) As Boolean
 End Function
 
 '如果使用了TTK扩展，使用这个函数获取TTK相关参数并创建合法的字符参数列表
-Private Function GetStyleParams(oop As Boolean) As String
+Private Function GetStyleParams(oop As Boolean, usettk As Boolean) As String
     Dim s As New cStrBuilder
     
     If Len(Dic("relief")) Then s.Append "relief=" & Dic("relief")
@@ -341,7 +363,15 @@ Private Function GetStyleParams(oop As Boolean) As String
     If Len(Dic("bd")) Then s.Append "borderwidth=" & Dic("bd")
     If Len(Dic("jump")) Then s.Append "jump=" & Dic("jump")
     If Len(Dic("indicatoron")) Then s.Append "indicatoron=" & Dic("indicatoron")
-    If Len(Dic("font")) Then s.Append "font=" & Chr(34) & Dic("font") & Chr(34)
+    If Len(Dic("font")) Then
+        If Not usettk Or (m_Type <> "Entry" And m_Type <> "Combobox") Then  'ttk.Entry的font要写在构建函数中才管用
+            If Left$(Dic("font"), 1) = "(" Then
+                s.Append "font=" & Dic("font")
+            Else  '如果用户忘了加括号，这里加上
+                s.Append "font=(" & Dic("font") & ")"
+            End If
+        End If
+    End If
     If Len(Dic("showvalue")) Then s.Append "showvalue=" & Dic("showvalue")
     If Len(Dic("tickinterval")) Then s.Append "tickinterval=" & Dic("tickinterval")
     If Len(Dic("sliderrelief")) Then s.Append "sliderrelief=" & Dic("sliderrelief")
@@ -398,7 +428,7 @@ Public Function GetAttrValueList(sAttr As String, ByRef sa() As String) As Long
     Select Case sAttr
         Case "anchor"
             sa = Split("'w','n','s','e','nw','ne','sw','se','center'", ",")
-        Case "relief"
+        Case "relief", "overrelief"
             sa = Split("FLAT,GROOVE,RAISED,RIDGE,SOLID,SUNKEN", ",")
         Case "takefocus"
             sa = Split("1,0", ",")
@@ -443,6 +473,8 @@ Public Function Tips(sAttr As String) As String
         Tips = Tips & L("l_TipAnchor", "控件内文字的对齐方式，请使用单引号或双引号括起来，可能值为：\n'w'|'n'|'s'|'e'|'nw'|'ne'|'sw'|'se'|'center'.")
     Case "relief":
         Tips = Tips & L("l_TipRelief", "外观效果，可选值有：FLAT, GROOVE, RAISED, RIDGE, SOLID, SUNKEN。")
+    Case "overrelief":
+        Tips = Tips & L("l_TipOverRelief", "鼠标悬停在控件上的外观效果，可选值有：FLAT, GROOVE, RAISED, RIDGE, SOLID, SUNKEN。")
     Case "takefocus":
         Tips = Tips & L("l_TipTakeFocus", "是否允许TAB选择控件。设置为1为允许，设置为0则TAB跳过此控件。")
     Case "state":
@@ -460,11 +492,11 @@ Public Function Tips(sAttr As String) As String
     Case "textvariable":
         Tips = Tips & L("l_TipTextVariable", "将显示文本和一个变量绑定，变量变化时控件的显示文本将改变，反正亦然。\n如果需要这个特性，这个属性设置为变量名。")
     Case "command":
-        Tips = Tips & L("l_TipCommand", "触发事件处理函数。这个事件在控件放置时定义，触发不带参数。如果等于top.quit或top.destroy则直接调用tk的回调函数，不额外生成回调函数框架。")
+        Tips = Tips & L("l_TipCommand", "触发事件处理函数。触发不带参数。也可以设置为top.destroy等tk方法或使用lambda函数。")
     Case "bindcommand":
         Tips = Tips & L("l_TipBindCommand", "使用bind()绑定的事件处理列表，绑定多个则使用逗号分隔(比如：<Control-C>,<F8>,<Alt-A>)。\n双击文本框查看详情。")
     Case "font":
-        Tips = Tips & L("l_TipFont", "文字字体属性。\nsize:字体大小\nweight:粗体bold/normal\nslant: 斜体,italic/roman\nunderline:是否加下划线 1/0\noverstrike:删除线 1/0")
+        Tips = Tips & L("l_TipFont", "文字字体属性。是一个元组。\n元组前两个元素为：字体名,字体大小,之后的几个元素可选：'bold', 'italic', 'nunderline', 'overstrike'")
     Case "xscrollcommand":
         Tips = Tips & L("l_TipXScrlCmd", "水平滚动事件处理，如果需要水平滚动，设置这个值为水平滚动条的set方法。")
     Case "yscrollcommand":
@@ -531,7 +563,7 @@ Private Sub Class_Initialize()
     m_Name = ""
     m_Value = ""
     m_StyleName = ""
-    m_Parent = "top"
+    m_Parent = WTOP
     m_ScaleMode = vbTwips
     Set m_dic = New Dictionary
 End Sub

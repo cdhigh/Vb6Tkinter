@@ -19,6 +19,7 @@ Option Explicit
 
 Private m_dicTotal As Dictionary                                                '保存全部的属性，包括默认值
 Private m_Base As clsBaseControl                                                '基础控件类
+Private m_CanbeOutByMainForm As Boolean
 
 '输出PYTHON代码,
 'sCmdFunc: 输出参数，事件处理回调代码;
@@ -100,9 +101,9 @@ Public Function Tips(sAttr As String) As String
     Tips = sAttr & vbCrLf
     Select Case sAttr:
     Case "jump"
-        Tips = Tips & l("l_TipJump", "设置为0（默认值）则每次滚动条数值变化就调用一次回调函数，设置为1则等鼠标松开后才调一次回调函数。")
+        Tips = Tips & L("l_TipJump", "设置为0（默认值）则每次滚动条数值变化就调用一次回调函数，设置为1则等鼠标松开后才调一次回调函数。")
     Case "activerelief"
-        Tips = Tips & l("l_TipActiveRelief", "设置鼠标指针移动在滚动条上时的式样，可选值：FLAT, GROOVE, RAISED, RIDGE, SOLID, SUNKEN。")
+        Tips = Tips & L("l_TipActiveRelief", "设置鼠标指针移动在滚动条上时的式样，可选值：FLAT, GROOVE, RAISED, RIDGE, SOLID, SUNKEN。")
     Case Else:
         Tips = m_Base.Tips(sAttr)
     End Select
@@ -113,6 +114,7 @@ Private Sub Class_Initialize()
     Set m_Base = New clsBaseControl
     m_Base.ctlType = "Scrollbar"
     m_Base.StyleName = "TScrollbar"
+    m_CanbeOutByMainForm = True
 End Sub
 
 '返回一个集合，每个项目三元对"属性名|值|是否默认选择"
@@ -169,6 +171,20 @@ Public Property Get Name() As String
     Name = m_Base.Name
 End Property
 
+'用于改变其默认对应的widget类型，修改widget类型后注意属性列表的合法性
+Public Function SetWidgetType(sType As String, sStyleName As String)
+    m_Base.ctlType = sType
+    m_Base.StyleName = sStyleName
+End Function
+
+'确定主处理函数能否调用其toString()来产生代码，默认为True，设置为False说明由其他对象来调用处理
+Public Property Get EnableOutByMainForm() As Boolean
+    EnableOutByMainForm = m_CanbeOutByMainForm
+End Property
+Public Property Let EnableOutByMainForm(bEnable As Boolean)
+    m_CanbeOutByMainForm = bEnable
+End Property
+
 '对象序列化函数
 Public Function Serializer(vSer As clsSerialization)
     vSer.Serializer m_Base
@@ -179,7 +195,7 @@ Public Function Deserializer(vSer As clsSerialization)
 End Function
 
 Public Property Get Description() As String
-    Description = l("l_DescScrollbar", "滚动条对象，对应到Tkinter的Scrollbar控件。")
+    Description = L("l_DescScrollbar", "滚动条对象，对应到Tkinter的Scrollbar控件。")
 End Property
 
 Public Property Let ScaleMode(nV As Long)
@@ -193,16 +209,23 @@ End Property
 '=0：表示两者将没有依赖关系，代码前后顺序无影响
 '>0：另一个对象要先输出代码。
 '整体的逻辑结果类似是重的沉底
-Public Function Compare(ByRef obj As Object) As Long
-    If TypeName(obj) = "clsListbox" Then '如果是列表框和滚动条相比较，则交给列表框对象来比较
-        Compare = obj.Compare(Me)
-        Compare = Switch(Compare > 0, -1, Compare < 0, 1, Compare = 0, 0)
+Public Function Compare(ByRef Obj As Object) As Long
+    Dim tObj As String
+    tObj = TypeName(Obj)
+    '如果是可滚动控件和滚动条相比较，则交给可滚动对象来比较
+    If tObj = "clsListbox" Or tObj = "clsText" Or tObj = "clsCanvas" Or tObj = "clsTreeview" Then
+        Compare = Obj.Compare(Me)
+        Compare = Switch(Compare > 0, -1, Compare < 0, 1, Compare = 0, 0) '比较结果要反个个
         Exit Function
     End If
     
-    If Parent = "top" And obj.Parent <> "top" Then '顶层控件先输出
+    If Parent = Obj.Name Then '父控件先输出代码
+        Compare = 1
+    ElseIf Obj.Parent = Name Then
         Compare = -1
-    ElseIf Parent <> "top" And obj.Parent = "top" Then
+    ElseIf Parent = WTOP And Obj.Parent <> WTOP Then '顶层控件先输出
+        Compare = -1
+    ElseIf Parent <> WTOP And Obj.Parent = WTOP Then
         Compare = 1
     Else
         Compare = 0

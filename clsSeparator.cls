@@ -6,16 +6,14 @@ BEGIN
   DataSourceBehavior  = 0  'vbNone
   MTSTransactionMode  = 0  'NotAnMTSObject
 END
-Attribute VB_Name = "clsEntry"
+Attribute VB_Name = "clsSeparator"
 Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = True
+Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
-Attribute VB_Ext_KEY = "SavedWithClassBuilder6" ,"Yes"
-Attribute VB_Ext_KEY = "Top_Level" ,"Yes"
 Option Explicit
 
-'单行文本类，用于设置和保持相应的属性和值，并生成对应PYTHON的TKinter代码
+'分隔条类，用于设置和保持相应的属性和值，并生成对应PYTHON的TKinter代码
 
 Private m_dicTotal As Dictionary                                                '保存全部的属性，包括默认值
 Private m_Base As clsBaseControl                                                '基础控件类
@@ -27,35 +25,55 @@ Private m_CanbeOutByMainForm As Boolean
 'oop:是否使用面向对象编程
 'usettk:是否使用TTK主题扩展
 Public Function toString(ByRef sCmdFunc As cStrBuilder, rel As Boolean, oop As Boolean, usettk As Boolean) As String
+    If Len(m_Base("orient")) = 0 Then m_Base("orient") = "'horizontal'"
     toString = m_Base.toString(sCmdFunc, rel, oop, usettk)
 End Function
+
 
 '创建对象后要马上调用这个函数初始化各参数
 Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long)
     
+    Dim W As Long, H As Long, X1 As Long, X2 As Long, Y1 As Long, Y2 As Long
+    
     m_Base.Name = o.Properties("Name")
     
-    m_dicTotal("x") = m_Base.toPixelX(o.Properties("Left"))
-    m_dicTotal("y") = m_Base.toPixelY(o.Properties("Top"))
-    m_dicTotal("width") = m_Base.toPixelX(o.Properties("Width"))
-    m_dicTotal("height") = m_Base.toPixelY(o.Properties("Height"))
-    m_dicTotal("relx") = Format(o.Properties("Left") / parentWidth, "0.###")
-    m_dicTotal("rely") = Format(o.Properties("Top") / parentHeight, "0.###")
-    m_dicTotal("relwidth") = Format(o.Properties("Width") / parentWidth, "0.###")
-    m_dicTotal("relheight") = Format(o.Properties("Height") / parentHeight, "0.###")
-    m_dicTotal("text") = o.Properties("Text")
-    m_dicTotal("textvariable") = m_Base.Name & "Var"
-    m_dicTotal("fg") = TranslateColor(o.Properties("ForeColor"))
-    m_dicTotal("bg") = TranslateColor(o.Properties("BackColor"))
-    m_dicTotal("bd") = "1"
-    m_dicTotal("relief") = "SUNKEN"
-    m_dicTotal("state") = IIf(o.Properties("Enabled"), IIf(o.Properties("Locked"), "'readonly'", "'normal'"), "'disabled'")
-    m_dicTotal("show") = o.Properties("PasswordChar")
-    m_dicTotal("font") = "(" & U(CStr(o.Properties("Font")("Name"))) & "," & Round(o.Properties("Font")("Size")) & _
-                        IIf(o.Properties("Font")("Bold"), ",'bold'", "") & IIf(o.Properties("Font")("Italic"), ",'italic'", "") & _
-                        IIf(o.Properties("Font")("Underline"), ",'underline'", "") & IIf(o.Properties("Font")("Strikethrough"), ",'overstrike')", ")")
-    m_dicTotal("takefocus") = IIf(o.Properties("TabStop"), 1, 0)
-    m_dicTotal("bindcommand") = ""
+    If o.Properties("X1") <= o.Properties("X2") Then
+        X1 = o.Properties("X1")
+        Y1 = o.Properties("Y1")
+        X2 = o.Properties("X2")
+        Y2 = o.Properties("Y2")
+    Else
+        X1 = o.Properties("X2")
+        Y1 = o.Properties("Y2")
+        X2 = o.Properties("X1")
+        Y2 = o.Properties("Y1")
+    End If
+    
+    m_dicTotal("x") = m_Base.toPixelX(X1)
+    m_dicTotal("y") = m_Base.toPixelY(Y1)
+    
+    '判断是水平还是垂直的，如果LINE控件是斜的，则如果水平投影较长则认为水平，垂直的判断亦然
+    W = Abs(X2 - X1)
+    H = Abs(Y2 - Y1)
+    If W >= H Then
+        m_dicTotal("width") = m_Base.toPixelX(W)
+        m_dicTotal("height") = o.Properties("BorderWidth")
+        m_dicTotal("relx") = Format(X1 / parentWidth, "0.###")
+        m_dicTotal("rely") = Format(Y1 / parentHeight, "0.###")
+        m_dicTotal("relwidth") = Format(W / parentWidth, "0.###")
+        m_dicTotal("relheight") = Format(o.Properties("BorderWidth") / m_Base.toPixelY(parentHeight), "0.####")
+        m_dicTotal("orient") = "'horizontal'"
+    Else
+        m_dicTotal("width") = o.Properties("BorderWidth")
+        m_dicTotal("height") = m_Base.toPixelX(H)
+        m_dicTotal("relx") = Format(X1 / parentWidth, "0.###")
+        m_dicTotal("rely") = Format(Y1 / parentHeight, "0.###")
+        m_dicTotal("relwidth") = Format(o.Properties("BorderWidth") / m_Base.toPixelX(parentWidth), "0.####")
+        m_dicTotal("relheight") = Format(H / parentHeight, "0.###")
+        m_dicTotal("orient") = "'vertical'"
+    End If
+    
+    m_dicTotal("bg") = TranslateColor(o.Properties("BorderColor"))
     
     '这些是默认选择的
     m_Base("x") = m_dicTotal("x")
@@ -66,15 +84,9 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long)
     m_Base("rely") = m_dicTotal("rely")
     m_Base("relwidth") = m_dicTotal("relwidth")
     m_Base("relheight") = m_dicTotal("relheight")
-    m_Base("text") = m_dicTotal("text")
-    m_Base("textvariable") = m_dicTotal("textvariable")
-    If o.Properties("ForeColor") <> vbWindowText Then m_Base("fg") = m_dicTotal("fg")
-    If o.Properties("BackColor") <> vbWindowBackground Then m_Base("bg") = m_dicTotal("bg")
-    If m_dicTotal("state") <> "'normal'" Then m_Base("state") = m_dicTotal("state")
-    If m_dicTotal("show") <> "'normal'" Then m_Base("show") = m_dicTotal("show")
-    If m_dicTotal("font") <> "(" & U(GetDefaultFontName()) & ",9)" Then m_Base("font") = m_dicTotal("font")
-    If m_dicTotal("takefocus") = 0 Then m_Base("takefocus") = m_dicTotal("takefocus")
-    
+    m_Base("orient") = m_dicTotal("orient")
+    'If o.Properties("BorderColor") <> vbWindowText Then
+    m_Base("bg") = m_dicTotal("bg")
     
 End Sub
 
@@ -82,34 +94,21 @@ End Sub
 '返回值：0-没有可选值，1-有一个严格限制的可选值列表，2-除提供的可选值列表外，还可以手动输入其他值
 '输出：sa()可选值列表数组
 Public Function GetAttrValueList(sAttr As String, ByRef sa() As String) As Long
-    If sAttr = "state" Then
-        GetAttrValueList = 1
-        sa = Split("'normal','readonly','disabled'", ",")
-    Else
-        GetAttrValueList = m_Base.GetAttrValueList(sAttr, sa)
-    End If
+    GetAttrValueList = m_Base.GetAttrValueList(sAttr, sa)
 End Function
 
 Public Function Tips(sAttr As String) As String
-    
-    Tips = sAttr & vbCrLf
-    Select Case sAttr:
-    Case "state":
-        Tips = Tips & L("l_TipStateHasRO", "控件状态，请使用括号括起来，可选值有：'normal', 'readonly', 'disabled'")
-    Case "show":
-        Tips = Tips & L("l_TipShow", "设置用来作为代替显示的字符，比如设置为*则为密码输入框，要用单引号或双引号括起来。")
-    Case Else:
-        Tips = m_Base.Tips(sAttr)
-    End Select
-    
+    Tips = m_Base.Tips(sAttr)
 End Function
 
-Private Sub Class_Initialize()
-    Set m_dicTotal = New Dictionary
-    Set m_Base = New clsBaseControl
-    m_Base.ctlType = "Entry"
-    m_Base.StyleName = "TEntry"
-    m_CanbeOutByMainForm = True
+'将用户选择的配置更新到对象中，参数为使用"|"分割的很多对属性/值对
+Public Sub SetConfig(sAttrs As String)
+    m_Base.SetConfig sAttrs
+End Sub
+
+'修改或增加单个配置项，属性/值由"|"分隔
+Public Sub SetSingleConfig(sAttr As String)
+    m_Base.SetSingleConfig sAttr
 End Sub
 
 '返回一个集合，每个项目三元对"属性名|值|是否默认选择"
@@ -141,15 +140,12 @@ Public Function Allitems() As Collection
     
 End Function
 
-
-'将用户选择的配置更新到对象中，参数为使用"|"分割的很多对属性/值对
-Public Sub SetConfig(sAttrs As String)
-    m_Base.SetConfig sAttrs
-End Sub
-
-'修改或增加单个配置项，属性/值由"|"分隔
-Public Sub SetSingleConfig(sAttr As String)
-    m_Base.SetSingleConfig sAttr
+Private Sub Class_Initialize()
+    Set m_dicTotal = New Dictionary
+    Set m_Base = New clsBaseControl
+    m_Base.ctlType = "Separator"
+    m_Base.StyleName = "TSeparator"
+    m_CanbeOutByMainForm = True
 End Sub
 
 Private Sub Class_Terminate()
@@ -193,7 +189,7 @@ Public Function Deserializer(vSer As clsSerialization)
 End Function
 
 Public Property Get Description() As String
-    Description = L("l_DescEntry", "单行文本输入框对象，对应到Tkinter的Entry控件。")
+    Description = L("l_DescSeparator", "分隔条对象，对应到Tkinter.ttk的Separator控件，只支持水平线和垂直线。")
 End Property
 
 Public Property Let ScaleMode(nV As Long)
@@ -221,5 +217,4 @@ Public Function Compare(ByRef Obj As Object) As Long
         Compare = 0
     End If
 End Function
-
 

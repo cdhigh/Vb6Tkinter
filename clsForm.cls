@@ -50,9 +50,9 @@ Public Function toString(ByRef sCmdFunc As cStrBuilder, rel As Boolean, oop As B
                 sOut.Append "        self.master.tk.call('wm', 'iconphoto', self.master._w, self.iconimg)"
             End If
         ElseIf s = "ICO" Then
-            sOut.Append "        self.master.iconbitmap(default=r'" & m_IconFile & "')"
+            sOut.Append "        self.master.iconbitmap(default=r'" & FileFullName(m_IconFile) & "')"
         ElseIf Len(s) Then
-            sOut.Append "        self.iconimg = PhotoImage(file=r'" & m_IconFile & "')"
+            sOut.Append "        self.iconimg = PhotoImage(file=r'" & FileFullName(m_IconFile) & "')"
             sOut.Append "        self.master.tk.call('wm', 'iconphoto', self.master._w, self.iconimg)"
         End If
         
@@ -85,9 +85,9 @@ Public Function toString(ByRef sCmdFunc As cStrBuilder, rel As Boolean, oop As B
                 sOut.Append "    " & m_Name & ".tk.call('wm', 'iconphoto', " & m_Name & "._w, iconimg)"
             End If
         ElseIf s = "ICO" Then
-            sOut.Append "    " & m_Name & ".iconbitmap(default=r'" & m_IconFile & "')"
+            sOut.Append "    " & m_Name & ".iconbitmap(default=r'" & FileFullName(m_IconFile) & "')"
         ElseIf Len(s) Then
-            sOut.Append "    iconimg = PhotoImage(file=r'" & m_IconFile & "')"
+            sOut.Append "    iconimg = PhotoImage(file=r'" & FileFullName(m_IconFile) & "')"
             sOut.Append "    " & m_Name & ".tk.call('wm', 'iconphoto', " & m_Name & "._w, iconimg)"
         End If
         
@@ -183,7 +183,7 @@ Public Function Tips(sAttr As String) As String
         Case "resizable"
             Tips = Tips & L("l_TipFrmResizable", "用户是否可以改变窗体的大小。可选值：1/0。")
         Case "icon"
-            Tips = Tips & L("l_TipFrmIcon", "图标文件名，支持ico,gif,ppm,pgm格式，省略路径名则在当前VB窗体目录下查找。")
+            Tips = Tips & L("l_TipFrmIcon", "图标文件名，支持ico,gif,ppm,pgm格式，省略路径名则在当前VB窗体目录下查找，建议icon文件放在py文件同一目录下。")
         Case "iconembedding"
             Tips = Tips & L("l_TipFrmIconEmbedding", "是否将图标文件转换为base64编码嵌入源代码，仅支持GIF格式嵌入。")
         Case "protocol"
@@ -249,6 +249,20 @@ End Property
 
 Public Property Let Name(s As String)
     m_Name = s
+End Property
+
+'用于改变其默认对应的widget类型，修改widget类型后注意属性列表的合法性
+Public Function SetWidgetType(sType As String, sStyleName As String)
+    'm_Base.ctlType = sType
+    'm_Base.StyleName = sStyleName
+End Function
+
+'确定主处理函数能否调用其toString()来产生代码，默认为True，设置为False说明由其他对象来调用处理
+Public Property Get EnableOutByMainForm() As Boolean
+    EnableOutByMainForm = True
+End Property
+Public Property Let EnableOutByMainForm(bEnable As Boolean)
+    'm_CanbeOutByMainForm = bEnable
 End Property
 
 Public Property Get Description() As String

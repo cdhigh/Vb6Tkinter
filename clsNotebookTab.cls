@@ -6,27 +6,22 @@ BEGIN
   DataSourceBehavior  = 0  'vbNone
   MTSTransactionMode  = 0  'NotAnMTSObject
 END
-Attribute VB_Name = "clsComboboxAdapter"
+Attribute VB_Name = "clsNotebookTab"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
 
-'组合框适配器类
-'因为TK中没有组合框，所以VB的组合框映射到Tk的OptionMenu
-'如果启动了TTK后，则映射到TTK的Combobox
-'VB窗体上一旦有组合框，则OptionMenu和Combobox都创建
-'所以使用了一个中间层做为适配器，选择其中一个
+'选项卡中的单页，用于设置和保持相应的属性和值，并生成对应PYTHON的TKinter代码
 
-Private m_usettk As Boolean
-Private m_OptionMenu As clsOptionMenu
-Private m_Combobox As clsCombobox
+Private m_Comps() As Object  '保存此选项页中所有的控件
 Private m_CanbeOutByMainForm As Boolean
-
-Public Property Let TTK(usettk As Boolean)
-    m_usettk = usettk
-End Property
+Private m_SubWidgets() As Object
+Private m_numSubWidgets As Long
+Private m_Name As String
+Private m_Caption As String
+Private m_Parent  As String
 
 '输出PYTHON代码,
 'sCmdFunc: 输出参数，事件处理回调代码;
@@ -34,99 +29,94 @@ End Property
 'oop:是否使用面向对象编程
 'usettk:是否使用TTK主题扩展
 Public Function toString(ByRef sCmdFunc As cStrBuilder, rel As Boolean, oop As Boolean, usettk As Boolean) As String
-    If usettk Then
-        toString = m_Combobox.toString(sCmdFunc, rel, oop, usettk)
-    Else
-        toString = m_OptionMenu.toString(sCmdFunc, rel, oop, usettk)
-    End If
+    
+    Dim i As Long, sOut As New cStrBuilder
+    
+    '得先按依赖关系进行排序
+    SortWidgets m_SubWidgets, m_numSubWidgets
+    
+    For i = 0 To m_numSubWidgets - 1
+        sOut.Append m_SubWidgets(i).toString(sCmdFunc, rel, oop, usettk)
+    Next
+    
+    toString = sOut.toString(vbCrLf)
+    
 End Function
 
+
 '创建对象后要马上调用这个函数初始化各参数
-Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long)
-    m_Combobox.InitConfig o, parentWidth, parentHeight
-    m_OptionMenu.InitConfig o, parentWidth, parentHeight
+Public Sub InitConfig(ByRef o As Object, parentWidth As Long, parentHeight As Long)
+    
+    m_Name = o.Properties("Name")
+    
+    On Error Resume Next
+    m_Caption = o.Properties("Caption")
+    On Error GoTo 0
+    
+    Erase m_SubWidgets
+    m_numSubWidgets = 0
+    
+End Sub
+
+'增加一个子控件
+Public Sub AddSubWidget(oWidget As Object)
+    ReDim Preserve m_SubWidgets(m_numSubWidgets) As Object
+    Set m_SubWidgets(m_numSubWidgets) = oWidget
+    m_numSubWidgets = m_numSubWidgets + 1
 End Sub
 
 '设置属性值的可能值列表
 '返回值：0-没有可选值，1-有一个严格限制的可选值列表，2-除提供的可选值列表外，还可以手动输入其他值
 '输出：sa()可选值列表数组
 Public Function GetAttrValueList(sAttr As String, ByRef sa() As String) As Long
-    If m_usettk Then
-        GetAttrValueList = m_Combobox.GetAttrValueList(sAttr, sa)
-    Else
-        GetAttrValueList = m_OptionMenu.GetAttrValueList(sAttr, sa)
-    End If
+    GetAttrValueList = 0
 End Function
-
 
 Public Function Tips(sAttr As String) As String
-    If m_usettk Then
-        Tips = m_Combobox.Tips(sAttr)
-    Else
-        Tips = m_OptionMenu.Tips(sAttr)
-    End If
+    Tips = ""
 End Function
 
-Private Sub Class_Initialize()
-    m_usettk = True
-    Set m_OptionMenu = New clsOptionMenu
-    Set m_Combobox = New clsCombobox
-    m_CanbeOutByMainForm = True
+'将用户选择的配置更新到对象中，参数为使用"|"分割的很多对属性/值对
+Public Sub SetConfig(sAttrs As String)
+    '''''
+End Sub
+
+'修改或增加单个配置项，属性/值由"|"分隔
+Public Sub SetSingleConfig(sAttr As String)
+    ''''''
 End Sub
 
 '返回一个集合，每个项目三元对"属性名|值|是否默认选择"
 '这个函数用于主界面填充属性参数列表框
 Public Function Allitems() As Collection
-    If m_usettk Then
-        Set Allitems = m_Combobox.Allitems()
-    Else
-        Set Allitems = m_OptionMenu.Allitems()
-    End If
+    Set Allitems = New Collection
 End Function
 
-'将用户选择的配置更新到对象中，参数为使用"|"分割的很多对属性/值对
-Public Sub SetConfig(sAttrs As String)
-    If m_usettk Then
-        m_Combobox.SetConfig (sAttrs)
-    Else
-        m_OptionMenu.SetConfig (sAttrs)
-    End If
-End Sub
-
-'修改或增加单个配置项，属性/值由"|"分隔
-Public Sub SetSingleConfig(sAttr As String)
-    If m_usettk Then
-        m_Combobox.SetSingleConfig (sAttr)
-    Else
-        m_OptionMenu.SetSingleConfig (sAttr)
-    End If
+Private Sub Class_Initialize()
+    m_numSubWidgets = 0
+    m_CanbeOutByMainForm = True
+    m_Parent = WTOP
 End Sub
 
 Public Property Let Parent(s As String)
-    m_Combobox.Parent = s
-    m_OptionMenu.Parent = s
+    m_Parent = s
 End Property
 
 Public Property Get Parent() As String
-    If m_usettk Then
-        Parent = m_Combobox.Parent
-    Else
-        Parent = m_OptionMenu.Parent
-    End If
+    Parent = m_Parent
 End Property
 
 Public Property Get Name() As String
-    If m_usettk Then
-        Name = m_Combobox.Name
-    Else
-        Name = m_OptionMenu.Name
-    End If
+    Name = m_Name
+End Property
+
+Public Property Get Caption() As String
+    Caption = m_Caption
 End Property
 
 '用于改变其默认对应的widget类型，修改widget类型后注意属性列表的合法性
 Public Function SetWidgetType(sType As String, sStyleName As String)
-    'm_Base.ctlType = sType
-    'm_Base.StyleName = sStyleName
+    ''''
 End Function
 
 '确定主处理函数能否调用其toString()来产生代码，默认为True，设置为False说明由其他对象来调用处理
@@ -139,35 +129,20 @@ End Property
 
 '对象序列化函数
 Public Function Serializer(vSer As clsSerialization)
-    If m_usettk Then
-        m_Combobox.Serializer vSer
-    Else
-        m_OptionMenu.Serializer vSer
-    End If
+    'vSer.Serializer m_Base
 End Function
 
 Public Function Deserializer(vSer As clsSerialization)
-    If m_usettk Then
-        m_Combobox.Deserializer vSer
-    Else
-        m_OptionMenu.Deserializer vSer
-    End If
+    'vSer.Deserializer m_Base
 End Function
 
 Public Property Get Description() As String
-    If m_usettk Then
-        Description = m_Combobox.Description
-    Else
-        Description = m_OptionMenu.Description
-    End If
+    Description = L("l_DescNotebookTab", "选项卡的页对象，对应到Tkinter.ttk的Notebook控件里面的每一页，没有可设置的属性。")
 End Property
-
 
 Public Property Let ScaleMode(nV As Long)
-    m_Combobox.ScaleMode = nV
-    m_OptionMenu.ScaleMode = nV
+    'm_Base.ScaleMode = nV
 End Property
-
 
 '用于模拟比较排序的函数，实际上是判断两个对象的依赖关系
 '用本对象和另一个对象比较，逻辑结果为'本对象-另一个对象'
@@ -177,7 +152,6 @@ End Property
 '>0：另一个对象要先输出代码。
 '整体的逻辑结果类似是重的沉底
 Public Function Compare(ByRef Obj As Object) As Long
-    
     If Parent = Obj.Name Then '父控件先输出代码
         Compare = 1
     ElseIf Obj.Parent = Name Then

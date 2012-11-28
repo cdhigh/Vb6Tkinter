@@ -6,7 +6,7 @@ Private Declare Function GetDeviceCaps Lib "gdi32" (ByVal hdc As Long, ByVal nIn
 Private Declare Function ReleaseDC Lib "user32" (ByVal hWnd As Long, ByVal hdc As Long) As Long
 Private Declare Function GetTextExtentPoint32 Lib "gdi32" Alias "GetTextExtentPoint32A" (ByVal hdc As Long, ByVal lpsz As String, ByVal cbString As Long, lpSize As Size) As Long
 Private Declare Function lstrlen Lib "kernel32" Alias "lstrlenA" (ByVal lpString As String) As Long
-'Private Declare Function OleTranslateColor Lib "olepro32.dll" (ByVal OLE_COLOR As Long, ByVal hPalette As Long, ByRef pccolorref As Long) As Long
+Private Declare Function OleTranslateColor Lib "olepro32.dll" (ByVal OLE_COLOR As Long, ByVal hPalette As Long, ByRef pccolorref As Long) As Long
 
 Private Const HORZRES = 8
 Private Const VERTRES = 10
@@ -17,9 +17,6 @@ Private Type Size
     cx As Long
     cy As Long
 End Type
-
-Public g_bUnicodePrefixU As Boolean
-Public g_PythonExe As String
 
 '注册表API声明
 Public Declare Function RegOpenKey Lib "advapi32.dll" Alias "RegOpenKeyA" (ByVal hKey As Long, ByVal lpSubKey As String, phkResult As Long) As Long
@@ -51,8 +48,14 @@ Private Type LOGFONT
         lfPitchAndFamily As Byte
         lfFaceName(1 To LF_FACESIZE) As Byte
 End Type
+
+Public Const WTOP = "top" '设置tkinter中顶层窗体名字
+
 Public g_DefaultFontName As String '暂存系统默认字体名，避免每次查询
-Public g_Comps() As Object
+Public g_Comps() As Object '当前窗体的控件列表，第一项为窗体对象实例
+
+Public g_bUnicodePrefixU As Boolean '是否在UNICODE字符串前加前缀u
+Public g_PythonExe As String '用于GUI预览，保存python.exe全路径
 
 'PYTHON中UNICODE字符串前缀的处理函数，如果字符串中存在双字节字符，则根据选项增加适当的前缀
 '否则，只是简单的增加单引号，即使空串也增加一对单引号
@@ -242,23 +245,23 @@ End Function
 
 'VB颜色转Python的RGB颜色
 '要使用调色板的颜色才能转换为RGB颜色，使用系统颜色无法转换
-Public Function ColorToRGBStr(ByVal dwColor As Long) As String
-    Dim clrHex As String
-    If dwColor > 0 Then
-        clrHex = Replace(Format(Hex$(dwColor), "@@@@@@"), " ", "0")
-        ColorToRGBStr = "'#" & Mid$(clrHex, 5, 2) & Mid$(clrHex, 3, 2) & Mid$(clrHex, 1, 2) & "'"
-    End If
-End Function
+'Public Function ColorToRGBStr(ByVal dwColor As Long) As String
+'    Dim clrHex As String
+'    If dwColor > 0 Then
+'        clrHex = Replace(Format(Hex$(dwColor), "@@@@@@"), " ", "0")
+'        ColorToRGBStr = "'#" & Mid$(clrHex, 5, 2) & Mid$(clrHex, 3, 2) & Mid$(clrHex, 1, 2) & "'"
+'    End If
+'End Function
 
 'VB颜色转Python的RGB颜色
 '不管使用调色板还是系统颜色，都可以转换为RGB颜色
-'Public Function TranslateColor(ByVal dwColor As OLE_COLOR) As String
-'    Dim nColor As Long, hPalette As Long, clrHex As String
-'    If OleTranslateColor(dwColor, hPalette, nColor) = 0 Then
-'        clrHex = Replace(Format(Hex$(nColor), "@@@@@@"), " ", "0")
-'        TranslateColor = "'#" & Mid$(clrHex, 5, 2) & Mid$(clrHex, 3, 2) & Mid$(clrHex, 1, 2) & "'"
-'    End If
-'End Function
+Public Function TranslateColor(ByVal dwColor As OLE_COLOR) As String
+    Dim nColor As Long, hPalette As Long, clrHex As String
+    If OleTranslateColor(dwColor, hPalette, nColor) = 0 Then
+        clrHex = Replace(Format(Hex$(nColor), "@@@@@@"), " ", "0")
+        TranslateColor = "'#" & Mid$(clrHex, 5, 2) & Mid$(clrHex, 3, 2) & Mid$(clrHex, 1, 2) & "'"
+    End If
+End Function
 
 
 ' 获取系统中所有安装的Python路径
@@ -341,3 +344,27 @@ Public Function GetAllComps() As String()
     Next
     GetAllComps = sa
 End Function
+
+'根据依赖关系排序控件，简单的冒泡排序，这需要在生成代码之前调用
+'基本原理是顶层控件先生成代码，父控件先生成代码，最后是子控件
+Public Sub SortWidgets(ByRef aCompsSorted() As Object, ByVal cnt As Long)
+    Dim Index As Long
+    Dim tmp4exchange As Object
+    Dim cursor As Long
+    
+    cursor = 0
+    Do While (cursor < cnt - 1) '一层循环，从前往后
+        Index = cnt - 1 '二层循环，从后往前
+        Do While (Index > cursor)
+            If aCompsSorted(Index).Compare(aCompsSorted(Index - 1)) < 0 Then '重者沉底
+                Set tmp4exchange = aCompsSorted(Index)
+                Set aCompsSorted(Index) = aCompsSorted(Index - 1)
+                Set aCompsSorted(Index - 1) = tmp4exchange
+            End If
+            Index = Index - 1
+        Loop
+        cursor = cursor + 1
+    Loop
+    
+End Sub
+

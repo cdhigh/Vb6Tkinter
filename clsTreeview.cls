@@ -17,6 +17,7 @@ Option Explicit
 
 Private m_dicTotal As Dictionary                                                '保存全部的属性，包括默认值
 Private m_Base As clsBaseControl                                                '基础控件类
+Private m_CanbeOutByMainForm As Boolean
 
 '输出PYTHON代码,
 'sCmdFunc: 输出参数，事件处理回调代码;
@@ -24,21 +25,43 @@ Private m_Base As clsBaseControl                                                
 'oop:是否使用面向对象编程
 'usettk:是否使用TTK主题扩展
 Public Function toString(ByRef sCmdFunc As cStrBuilder, rel As Boolean, oop As Boolean, usettk As Boolean) As String
+    Dim scrlcmd As String, sOut As New cStrBuilder
     
-    toString = m_Base.toString(sCmdFunc, rel, oop, usettk)
+    sOut.Append m_Base.toString(sCmdFunc, rel, oop, usettk)
+    
+    ' 增加滚动条的绑定处理
+    scrlcmd = m_Base("xscrollcommand")
+    If Right$(scrlcmd, 4) = ".set" Then
+        If oop Then
+            sOut.Append Space(8) & "self." & Left$(scrlcmd, Len(scrlcmd) - 4) & "['command'] = self." & m_Base.Name & ".xview"
+        Else
+            sOut.Append Space(4) & Left$(scrlcmd, Len(scrlcmd) - 4) & "['command'] = " & m_Base.Name & ".xview"
+        End If
+    End If
+    
+    scrlcmd = m_Base("yscrollcommand")
+    If Right$(scrlcmd, 4) = ".set" Then
+        If oop Then
+            sOut.Append Space(8) & "self." & Left$(scrlcmd, Len(scrlcmd) - 4) & "['command'] = self." & m_Base.Name & ".yview"
+        Else
+            sOut.Append Space(4) & Left$(scrlcmd, Len(scrlcmd) - 4) & "['command'] = " & m_Base.Name & ".yview"
+        End If
+    End If
     
     '增加几行示例代码，更形象，生手也可以很快上手使用
     If oop Then
-        toString = toString & vbCrLf & Space(8) & "self." & m_Base.Name & ".insert('', 'end', 'TOP', text='Sample', open=True)  " & L("l_cmtTreeviewSample", "#以下四行为示例代码，请删掉写自己的项目代码") & vbCrLf
-        toString = toString & Space(8) & "self." & m_Base.Name & ".insert('', 'end', 'TOP2', text='TOP2')" & vbCrLf
-        toString = toString & Space(8) & "self." & m_Base.Name & ".insert('TOP', 'end', 'TOP.1', text='Sample.1')" & vbCrLf
-        toString = toString & Space(8) & "self." & m_Base.Name & ".insert('TOP', 'end', 'TOP.2', text='Sample.2')"
+        sOut.Append vbCrLf & Space(8) & "self." & m_Base.Name & ".insert('', 'end', 'TOP', text='Sample', open=True)  " & L("l_cmtTreeviewSample", "#以下四行为示例代码，请删掉写自己的项目代码")
+        sOut.Append Space(8) & "self." & m_Base.Name & ".insert('', 'end', 'TOP2', text='TOP2')"
+        sOut.Append Space(8) & "self." & m_Base.Name & ".insert('TOP', 'end', 'TOP.1', text='Sample.1')"
+        sOut.Append Space(8) & "self." & m_Base.Name & ".insert('TOP', 'end', 'TOP.2', text='Sample.2')"
     Else
-        toString = toString & vbCrLf & Space(4) & m_Base.Name & ".insert('', 'end', 'TOP', text='Sample', open=True)  " & L("l_cmtTreeviewSample", "#以下四行为示例代码，请删掉写自己的项目代码") & vbCrLf
-        toString = toString & Space(4) & m_Base.Name & ".insert('', 'end', 'TOP2', text='TOP2')" & vbCrLf
-        toString = toString & Space(4) & m_Base.Name & ".insert('TOP', 'end', 'TOP.1', text='Sample.1')" & vbCrLf
-        toString = toString & Space(4) & m_Base.Name & ".insert('TOP', 'end', 'TOP.2', text='Sample.2')"
+        sOut.Append vbCrLf & Space(4) & m_Base.Name & ".insert('', 'end', 'TOP', text='Sample', open=True)  " & L("l_cmtTreeviewSample", "#以下四行为示例代码，请删掉写自己的项目代码")
+        sOut.Append Space(4) & m_Base.Name & ".insert('', 'end', 'TOP2', text='TOP2')"
+        sOut.Append Space(4) & m_Base.Name & ".insert('TOP', 'end', 'TOP.1', text='Sample.1')"
+        sOut.Append Space(4) & m_Base.Name & ".insert('TOP', 'end', 'TOP.2', text='Sample.2')"
     End If
+    
+    toString = sOut.toString(vbCrLf)
     
 End Function
 
@@ -61,7 +84,12 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long)
     m_dicTotal("padding") = ""
     m_dicTotal("selectmode") = "'extended'"
     m_dicTotal("show") = "'tree'"
+    m_dicTotal("font") = "(" & U(CStr(o.Properties("Font")("Name"))) & "," & Round(o.Properties("Font")("Size")) & _
+                        IIf(o.Properties("Font")("Bold"), ",'bold'", "") & IIf(o.Properties("Font")("Italic"), ",'italic'", "") & _
+                        IIf(o.Properties("Font")("Underline"), ",'underline'", "") & IIf(o.Properties("Font")("Strikethrough"), ",'overstrike')", ")")
     m_dicTotal("takefocus") = IIf(o.Properties("TabStop"), 1, 0)
+    m_dicTotal("xscrollcommand") = ""
+    m_dicTotal("yscrollcommand") = ""
     
     '这些是默认选择的
     m_Base("x") = m_dicTotal("x")
@@ -73,6 +101,7 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long)
     m_Base("relwidth") = m_dicTotal("relwidth")
     m_Base("relheight") = m_dicTotal("relheight")
     m_Base("show") = m_dicTotal("show")
+    If m_dicTotal("font") <> "(" & U(GetDefaultFontName()) & ",9)" Then m_Base("font") = m_dicTotal("font")
     
 End Sub
 
@@ -80,11 +109,28 @@ End Sub
 '返回值：0-没有可选值，1-有一个严格限制的可选值列表，2-除提供的可选值列表外，还可以手动输入其他值
 '输出：sa()可选值列表数组
 Public Function GetAttrValueList(sAttr As String, ByRef sa() As String) As Long
+    Dim aComps() As String, i As Long, satmp() As String, sOut As String
     GetAttrValueList = 1
     If sAttr = "selectmode" Then
         sa = Split("'extended','browse','none'", ",")
     ElseIf sAttr = "show" Then
         sa = Split("'tree headings','tree'", ",")
+    ElseIf sAttr = "xscrollcommand" Or sAttr = "yscrollcommand" Then
+        aComps = GetAllComps()
+        If UBound(aComps) >= 0 Then
+            sOut = ""
+            For i = 1 To UBound(aComps) '0为窗体，不需要判断
+                satmp = Split(aComps(i), "|")
+                If UBound(satmp) > 0 Then
+                    If satmp(1) = "clsScrollbar" Then
+                        sOut = sOut & IIf(Len(sOut), ",", "") & satmp(0) & ".set"
+                    End If
+                End If
+            Next
+            sa = Split(sOut, ",")
+        Else
+            GetAttrValueList = 0
+        End If
     Else
         GetAttrValueList = m_Base.GetAttrValueList(sAttr, sa)
     End If
@@ -109,12 +155,11 @@ Public Function Tips(sAttr As String) As String
 End Function
 
 Private Sub Class_Initialize()
-    
     Set m_dicTotal = New Dictionary
     Set m_Base = New clsBaseControl
     m_Base.ctlType = "Treeview"
     m_Base.StyleName = "Treeview"
-    
+    m_CanbeOutByMainForm = True
 End Sub
 
 '返回一个集合，每个项目三元对"属性名|值|是否默认选择"
@@ -173,6 +218,20 @@ Public Property Get Name() As String
     Name = m_Base.Name
 End Property
 
+'用于改变其默认对应的widget类型，修改widget类型后注意属性列表的合法性
+Public Function SetWidgetType(sType As String, sStyleName As String)
+    m_Base.ctlType = sType
+    m_Base.StyleName = sStyleName
+End Function
+
+'确定主处理函数能否调用其toString()来产生代码，默认为True，设置为False说明由其他对象来调用处理
+Public Property Get EnableOutByMainForm() As Boolean
+    EnableOutByMainForm = m_CanbeOutByMainForm
+End Property
+Public Property Let EnableOutByMainForm(bEnable As Boolean)
+    m_CanbeOutByMainForm = bEnable
+End Property
+
 '对象序列化函数
 Public Function Serializer(vSer As clsSerialization)
     vSer.Serializer m_Base
@@ -198,10 +257,35 @@ End Property
 '=0：表示两者将没有依赖关系，代码前后顺序无影响
 '>0：另一个对象要先输出代码。
 '整体的逻辑结果类似是重的沉底
-Public Function Compare(ByRef obj As Object) As Long
-    If Parent = "top" And obj.Parent <> "top" Then '顶层控件先输出
+Public Function Compare(ByRef Obj As Object) As Long
+    Dim scrlcmd As String, scrl As String
+    
+    '先判断和滚动条的依赖关系
+    scrlcmd = m_Base("xscrollcommand")
+    If Len(scrlcmd) And TypeName(Obj) = "clsScrollbar" Then
+        scrl = IIf(Right$(scrlcmd, 4) = ".set", Left$(scrlcmd, Len(scrlcmd) - 4), "")
+        If scrl = Obj.Name Then
+            Compare = 1 ' 滚动条先
+            Exit Function
+        End If
+    End If
+    scrlcmd = m_Base("yscrollcommand")
+    If Len(scrlcmd) And TypeName(Obj) = "clsScrollbar" Then
+        scrl = IIf(Right$(scrlcmd, 4) = ".set", Left$(scrlcmd, Len(scrlcmd) - 4), "")
+        If scrl = Obj.Name Then
+            Compare = 1 ' 滚动条先
+            Exit Function
+        End If
+    End If
+    
+    
+    If Parent = Obj.Name Then '父控件先输出代码
+        Compare = 1
+    ElseIf Obj.Parent = Name Then
         Compare = -1
-    ElseIf Parent <> "top" And obj.Parent = "top" Then
+    ElseIf Parent = WTOP And Obj.Parent <> WTOP Then '顶层控件先输出
+        Compare = -1
+    ElseIf Parent <> WTOP And Obj.Parent = WTOP Then
         Compare = 1
     Else
         Compare = 0

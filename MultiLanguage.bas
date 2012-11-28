@@ -90,7 +90,7 @@ Private Function LngFile() As String
     LngFile = App.path & IIf(Right(App.path, 1) = "\", "", "\") & LanguageFile
 End Function
 
-Private Function LngFileExist() As Boolean
+Public Function LngFileExist() As Boolean
     LngFileExist = IIf(Dir(LngFile()) = LanguageFile, True, False)
 End Function
 

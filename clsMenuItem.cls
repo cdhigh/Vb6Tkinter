@@ -47,7 +47,7 @@ End Function
 '输出结构化代码
 Public Sub toStringStructure(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, rel As Boolean)
     
-    Dim i As Long, extra As String, var As String, sTmp As String, s() As String
+    Dim i As Long, extra As String, var As String, sTmp As String, s() As String, sr2 As String, sr3 As String
     
     extra = IIf(Len(m_Base("tearoff")), ", tearoff=" & m_Base("tearoff"), "")
     
@@ -92,16 +92,21 @@ Public Sub toStringStructure(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilde
         s = Split(sTmp, ",")
         For i = 0 To UBound(s)
             s(i) = Trim(s(i))
-            If Left(s(i), 1) = "<" And Right(s(i), 1) = ">" Then
-                sOut.Append Space(4) & "top.bind_all('" & s(i) & "', " & m_Base("command") & ")"
+            If Left$(s(i), 1) = "<" And Right$(s(i), 1) = ">" Then
+                sOut.Append Space(4) & WTOP & ".bind_all('" & s(i) & "', " & m_Base("command") & ")"
+                
+                sr2 = Mid$(s(i), Len(s(i)) - 1, 1)
+                sr3 = Mid$(s(i), Len(s(i)) - 2, 1)
                 
                 'Python是大小写敏感的，对应快捷键也一样，如果设置的快捷键包含字母键，则将对应的大写/小写也一起绑定
-                If Right(s(i), 2) >= "a>" And Right(s(i), 2) <= "z>" Then
-                    s(i) = Left(s(i), Len(s(i)) - 2) & UCase(Mid(s(i), Len(s(i)) - 1, 1)) & ">"
-                    sOut.Append Space(4) & "top.bind_all('" & s(i) & "', " & m_Base("command") & ")"
-                ElseIf Right(s(i), 2) >= "A>" And Right(s(i), 2) <= "Z>" Then
-                    s(i) = Left(s(i), Len(s(i)) - 2) & LCase(Mid(s(i), Len(s(i)) - 1, 1)) & ">"
-                    sOut.Append Space(4) & "top.bind_all('" & s(i) & "', " & m_Base("command") & ")"
+                If sr3 = "-" Then
+                    If sr2 >= "a" And sr2 <= "z" Then
+                        s(i) = Left$(s(i), Len(s(i)) - 2) & UCase(sr2) & ">"
+                        sOut.Append Space(4) & WTOP & ".bind_all('" & s(i) & "', " & m_Base("command") & ")"
+                    ElseIf sr2 >= "A" And sr2 <= "Z" Then
+                        s(i) = Left$(s(i), Len(s(i)) - 2) & LCase(sr2) & ">"
+                        sOut.Append Space(4) & WTOP & ".bind_all('" & s(i) & "', " & m_Base("command") & ")"
+                    End If
                 End If
             End If
         Next
@@ -112,7 +117,7 @@ End Sub
 '输出面向对象代码
 Public Sub toStringOOP(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, rel As Boolean)
     
-    Dim i As Long, extra As String, var As String, sTmp As String, s() As String
+    Dim i As Long, extra As String, var As String, sTmp As String, s() As String, sr2 As String, sr3 As String
     
     extra = IIf(Len(m_Base("tearoff")), ", tearoff=" & m_Base("tearoff"), "")
     
@@ -158,15 +163,20 @@ Public Sub toStringOOP(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, rel
         For i = 0 To UBound(s)
             s(i) = Trim(s(i))
             If Left(s(i), 1) = "<" And Right(s(i), 1) = ">" Then
-                sOut.Append Space(8) & "self.top.bind_all('" & s(i) & "', " & "self." & m_Base("command") & ")"
+                sOut.Append Space(8) & "self." & WTOP & ".bind_all('" & s(i) & "', " & "self." & m_Base("command") & ")"
+                
+                sr2 = Mid$(s(i), Len(s(i)) - 1, 1)
+                sr3 = Mid$(s(i), Len(s(i)) - 2, 1)
                 
                 'Python是大小写敏感的，对应快捷键也一样，如果设置的快捷键包含字母键，则将对应的大写/小写也一起绑定
-                If Right(s(i), 2) >= "a>" And Right(s(i), 2) <= "z>" Then
-                    s(i) = Left(s(i), Len(s(i)) - 2) & UCase(Mid(s(i), Len(s(i)) - 1, 1)) & ">"
-                    sOut.Append Space(8) & "self.top.bind_all('" & s(i) & "', " & "self." & m_Base("command") & ")"
-                ElseIf Right(s(i), 2) >= "A>" And Right(s(i), 2) <= "Z>" Then
-                    s(i) = Left(s(i), Len(s(i)) - 2) & LCase(Mid(s(i), Len(s(i)) - 1, 1)) & ">"
-                    sOut.Append Space(8) & "self.top.bind_all('" & s(i) & "', " & "self." & m_Base("command") & ")"
+                If sr3 = "-" Then
+                    If sr2 >= "a" And sr2 <= "z" Then
+                        s(i) = Left$(s(i), Len(s(i)) - 2) & UCase$(sr2) & ">"
+                        sOut.Append Space(8) & "self." & WTOP & ".bind_all('" & s(i) & "', " & "self." & m_Base("command") & ")"
+                    ElseIf sr2 >= "A" And sr2 <= "Z" Then
+                        s(i) = Left$(s(i), Len(s(i)) - 2) & LCase$(sr2) & ">"
+                        sOut.Append Space(8) & "self." & WTOP & ".bind_all('" & s(i) & "', " & "self." & m_Base("command") & ")"
+                    End If
                 End If
             End If
         Next
@@ -381,6 +391,20 @@ End Property
 
 Public Property Let Name(s As String)
     m_Base.Name = s
+End Property
+
+'用于改变其默认对应的widget类型，修改widget类型后注意属性列表的合法性
+Public Function SetWidgetType(sType As String, sStyleName As String)
+    'm_Base.ctlType = sType
+    'm_Base.StyleName = sStyleName
+End Function
+
+'确定主处理函数能否调用其toString()来产生代码，默认为True，设置为False说明由其他对象来调用处理
+Public Property Get EnableOutByMainForm() As Boolean
+    EnableOutByMainForm = False
+End Property
+Public Property Let EnableOutByMainForm(bEnable As Boolean)
+    'm_CanbeOutByMainForm = bEnable
 End Property
 
 '对象序列化函数

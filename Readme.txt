@@ -2,9 +2,9 @@
 
 0.简介
     这是一个VB6的ADDIN（外接程序），用于使用VB6开发工具直接拖放控件，
-    来完成Python的TKinter的GUI布局和设计，可以在VB界面上设置控件的一些
-    属性，最终自动生成必要的代码（包括回调函数框架），代码生成后仅需要
-    在对应的回调函数中增加相应的逻辑功能代码即可。
+    直接可视化完成Python的TKinter的GUI布局和设计，可以在VB界面上设置
+    控件的一些属性，最终自动生成必要的代码（包括回调函数框架），代码
+    生成后仅需要在对应的回调函数中增加相应的逻辑功能代码即可。
     这个工具支持绝大部分TKiner控件，可应付一般GUI的需求。
    （列表参见下面的控件说明）。
 
@@ -36,11 +36,11 @@
   2.7 确认完成后可以将代码拷贝到剪贴板或保持到文件。
     布局可以使用百分比定位（相对定位）或绝对坐标定位（按像素定位），
     百分比定位为有一个好处，主界面大小变化后，控件也可以相对变化大小。
-    如果不希望控件大小变化，可以选择绝对坐标定位。
+    如果不希望主界面大小变化后控件跟随变化，可以选择绝对坐标定位。
     注：如果修改了以前设计的界面，可以选择仅输出main函数或界面生成类。
     不影响外部已经实现的逻辑代码。
-  2.8 如果程序有多个GUI界面，可以在VB工程中添加窗体，就可以选择输出
-    哪个窗体。
+  2.8 如果程序有多个GUI界面，可以在VB工程中添加窗体，就可以选择产生
+    哪个窗体的对应代码。
   2.9 针对结构化代码，如果要在Python代码中引用和修改其他控件的值，
     可以使用全局字典gComps，这个字典保存了所有的GUI元素和一些对应的
     控件变量，可以直接使用形如gComps["Text1Var"].set("new Text")的代码
@@ -56,23 +56,20 @@
 
 3.目前支持的控件列表
   3.1 Label
-    标签条在VB和Python中基本一样。
+    标签条在VB和Python中基本一样。如果不启用ttk，则在文本中插入\n来换行，
+    如果启用了ttk，则只支持单行文本(多行可以使用Message控件实现)。
   3.2 TextBox
     Python文本框有两种：Entry和Text，如果VB的TextBox的MultiLine=False，则
     生成Entry，否则生成Text。
   3.3 Frame
-    对应Python的LabelFrame控件，一样可以作为其他控件的容器，不过注意的一点
-    是如果使用到了Frame控件，则建议使用坐标相对定位布局控件（代码生成选项），
-    如果要使用绝对坐标，则VB设计窗体的ScaleMode要设置为3(vbPixels)，否则
-    LabelFrame中的控件布局错误。这可能是VB的一个BUG，因为Frame控件能做容器，
-    但不能设置容器内的坐标单位，默认固定为Twips。
-    （相比之下，PictureBox能做容器，并且能设置ScaleMode）
+    对应Python的LabelFrame控件，做为其他控件的容器，或做为界面元素视觉分类。
   3.4 CommandButton
     对应Python的Button，没有太多区别。
     为了代码简洁，窗体的退出按钮可以设置Cancel属性为True，然后程序自动生成
-    对应Tkinter的quit回调，这样就不需要再实现一个回调函数。
+    对应Tkinter的destroy回调，这样就不需要再实现一个回调函数。
     在VB里面字母前增加一个"&"符号可以直接绑定一个快捷键Alt+对应字母，
     VisualTkinter也支持此设置，自动生成对应的事件绑定代码。
+    其他控件比如Checkbox等有"标题"属性的控件一样如此处理。
   3.5 CheckBox
     多选按钮对应Python的Checkbutton。
   3.6 OptionButton
@@ -85,43 +82,97 @@
     一致。
   3.8 ListBox
     列表框对应Python的Listbox，行为也类似，可以在设计阶段设置初始列表。
+    如果需要滚动，则在适当位置创建滚动条，然后在Addin界面选择其xscrollcommand
+    和yscrollcommand属性为对应滚动条的.set方法。
   3.9 HScrollBar, VScrollBar
     滚动条在Python中为Scrollbar，通过设置orient来控制水平还是垂直。
   3.10 Slider
     类似对应Python中的Scale。
   3.11 PictureBox
-    简单对应到Python中的Canvas。
+    简单对应到Python中的Canvas，用做其他控件的容器或画图容器使用。
+    如果需要滚动，则在适当位置创建滚动条，然后在Addin界面选择其xscrollcommand和
+    yscrollcommand属性为对应滚动条的.set方法。
   3.12 Menu
-    这下就可以使用VB的菜单编辑器来设计Python的菜单了。
+    可以使用VB的菜单编辑器来设计Python的菜单。
     在VB中的菜单标题为"-"是分隔条。
-    也可以在正常的菜单标题中增加(&+字母)的方式添加快捷
-    方式。
+    也可以在正常的菜单标题中增加(&+字母)的方式添加快捷键。
+  3.13 Line
+    可以用于组织复杂界面，仅支持水平或垂直线。
   ===================================================
   以下的控件需要在VB的'控件工具箱'中按右键添加'部件'，选择
   'Microsoft Windows Common Controls 6.0'
   ====================================================
-  3.13 ProgressBar
+  3.14 ProgressBar
     对应到Python的Progressbar，需要启用TTK主题扩展（默认）
-  3.14 TreeView
+  3.15 TreeView
     对应到Python的Treeview，树形显示控件，可以选择是否显示标题行,
     需要启用TTK主题扩展（默认）
-  3.15 TabStrip
-    选项卡控件，对应到Python的Notebook，因为VB的IDE限制，无法在设计阶段就
-    放置到每个选项卡内的控件，所以此工具简单生成两个默认选项卡，每个选项卡
-    里面放了一个Label控件，你可以照此添加其他控件。
-    或使用一个新的VB窗体布置好所需要控件，生成代码后手工拷贝到Python的对应
-    选项卡的Frame控件代码下面。
-    需要启用TTK主题扩展（默认）
+    如果需要滚动，则在适当位置创建滚动条，然后在Addin界面选择其xscrollcommand
+    和yscrollcommand属性为对应滚动条的.set方法。
+  3.16 TabStrip
+    选项卡控件，对应到Python的Notebook，需要启用TTK主题扩展（默认）。
+    如果要布局各个页面内的控件，按以下步骤：
+    1.每个选项页对应一个Frame或PictureBox，命名为：TabStrip的名字
+    加'__Tab'(双下划线)，再加一个序号，从1开始，比如TabStrip的名字为TabStrip1，
+    则你可以创建一个PictureBox，命名为'TabStrip1__Tab1'(注意大小写)。
+    2.然后在PictureBox/Frame内摆放你需要的其他控件，生成代码后此容器内自动添加
+    到对应的选项页，VisualTkinter会在后台为您做这一切。
+    标签页对应的PictureBox/Frame可以放置在窗体的可视范围外，也就是说设计好
+    对应的选项页后，缩小IDE中的窗体为你需要的大小。
+    注意：
+    1. 你需要使用相对坐标，PictureBox或Frame容器的大小请和TabStrip内部大小一致或
+    接近，否则选项页内的控件将会通过拉伸或收缩来适配可伸缩来适配可用空间，这样有些
+    控件看起来会比较怪。如果使用绝对坐标，则PictureBox/Frame可以不用和TabStrip
+    一样大，PictureBox/Frame内的控件将以TabStrip的左上角为原点放置，大小和长宽比例
+    会和设计时一致。
+    所以还是建议如果有TabStrip控件的话，使用绝对坐标。
+    2. Frame和PictureBox均可作为容器，如果使用Frame作为容器，则其标题可以作为选项页
+    标题，如果你没有设置选项页标题的话。（选项卡控件的标题设置优先）
   -----------------------------------------------------
-  3.16 CommonDialog
+  3.17 CommonDialog
     这个控件也算支持，如果VB窗体中有这个控件，则在Python代码中导入
     filedialog、simpledialog、colorchooser这三个模块，这三个模块提供简单的
     文件选择、输入框、颜色选择对话框功能。
     需要在控件工具箱增加"Microsoft Common Dialog Control 6.0"
 
-  PS:打开TTK支持后，控件的有些属性设置无效，尽管可以设置，但是外观不变
+4. 其他建议
+  1. 不支持使用控件数组，界面可以显示，但是后面的同名控件名会覆盖前面定义的。
+  2. 窗体的ScaleMode建议保持默认值(vbTwips)，如果要设置为其他值，则Frame控件
+     内就不要再放Frame控件了，否则其内部的控件布局错误。
+  3. 如果仅需要简体汉字界面，则可以删掉Language.lng文件，仅需VisualTkinter.dll
+     一个文件。
 
-4. 版本历史
+5. ttk库额外说明
+  ttk主题扩展看起来很漂亮，在不同操作系统下界面呈现为本地化风格，建议使用，
+  只是要注意以下几个ttk的BUG：
+  1. TTK的Entry和Combobox控件背景色设置无效（可以设置，不报错，但是界面不变）。
+  2. TTK的Label中的文本不能换行，但是tkinter的Label控件可以通过插入'\n'来换行。
+  3. LabelFrame和Notebook控件的字体设置无效。
+  4. Python 2.7.3附带的ttk中的Treeview字体设置无效，但3.2.3的Treeview的字体
+     设置有效。
+
+6. 版本历史
+  v1.3
+    1. 增加对Line控件的支持，可用于组织界面，内部实现为Separator控件，仅支持
+       水平或垂直样式，如果在VB窗体上画了斜线，则使用其在水平方向或垂直方向的
+       投影。需要启用TTK主题库。
+    2. 增加一个重要特性：可以拖放设计Notebook(选项卡控件)的各选项页内控件。
+       方法和步骤参加上面的TabStrip控件说明，简单来说就是使用PictureBox或
+       Frame控件来作为各选项页的容器设计，命名类似：TabStrip1__Tab1等。
+       这个特性让此ADDIN设计复杂界面成为可能，因为很多复杂的GUI用到选项卡
+       控件来整理其他小控件，特别是各种配置页面。
+    3. 控件的命令回调函数可以直接使用匿名函数lambda。
+    4. 完善控件的字体处理，现在除ttk.LabelFrame和Notebook控件因ttk库的BUG外，
+       其余控件均已实现字体的完美处理。
+    5. 增加Treeview的滚动条绑定处理。
+    6. 增加代码处理Frame控件的ScaleMode一直保持为vbTwips的BUG，现在可以允许
+       窗体存在Frame的情况下设置窗体ScaleMode和使用绝对坐标定位。
+    7. 增加系统颜色翻译成tkinter颜色的处理，现在控件颜色可以选择各种系统颜色，
+       或在调色板内直接选择。
+    6. bugfix：将全局菜单快捷键Delete写成DeletE的问题。
+    7. bugfix：如果ADDIN启动时就没有启用TTK，并且在产生代码前没有修改TTK选项，
+       则ADDIN还是使用Combobox代替OptionMenu，而tkinter没有Combobox控件。
+    8. bugfix：解决自定义列表框中'第一次'显示下拉组合框时数据显示不全的问题。
   v1.2.8
     1. 增加滚动条和列表框/多行文本框/图片框的绑定处理，方法是在窗体上对应
        控件的旁边放上滚动条，然后在ADDIN界面的控件属性xscrollcommand和
@@ -164,3 +215,5 @@
   v1.0 第一个版本
     支持控件列表：Label, Entry, LabelFrame, Button, Checkbutton, Radiobutton,
     OptionMenu, Combobox, Listbox, Scrollbar, Scale, Canvas, Menu
+
+  

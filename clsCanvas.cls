@@ -19,6 +19,7 @@ Option Explicit
 
 Private m_dicTotal As Dictionary                                                '保存全部的属性，包括默认值
 Private m_Base As clsBaseControl                                                '基础控件类
+Private m_CanbeOutByMainForm As Boolean
 
 '输出PYTHON代码,
 'sCmdFunc: 输出参数，事件处理回调代码;
@@ -68,7 +69,7 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long)
     m_dicTotal("rely") = Format(o.Properties("Top") / parentHeight, "0.###")
     m_dicTotal("relwidth") = Format(o.Properties("Width") / parentWidth, "0.###")
     m_dicTotal("relheight") = Format(o.Properties("Height") / parentHeight, "0.###")
-    m_dicTotal("bg") = ColorToRGBStr(o.Properties("BackColor"))
+    m_dicTotal("bg") = TranslateColor(o.Properties("BackColor"))
     m_dicTotal("bd") = ""
     m_dicTotal("relief") = "FLAT"
     m_dicTotal("takefocus") = IIf(o.Properties("TabStop"), 1, 0)
@@ -87,7 +88,7 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long)
     m_Base("rely") = m_dicTotal("rely")
     m_Base("relwidth") = m_dicTotal("relwidth")
     m_Base("relheight") = m_dicTotal("relheight")
-    If m_dicTotal("bg") <> "" Then m_Base("bg") = m_dicTotal("bg")
+    If o.Properties("BackColor") <> vbButtonFace Then m_Base("bg") = m_dicTotal("bg")
     If m_dicTotal("takefocus") = 0 Then m_Base("takefocus") = m_dicTotal("takefocus")
     
 End Sub
@@ -168,6 +169,8 @@ Private Sub Class_Initialize()
     Set m_Base = New clsBaseControl
     m_Base.ctlType = "Canvas"
     m_Base.StyleName = ""
+    m_CanbeOutByMainForm = True
+    
 End Sub
 
 Private Sub Class_Terminate()
@@ -187,6 +190,20 @@ Public Property Get Name() As String
     Name = m_Base.Name
 End Property
 
+'用于改变其默认对应的widget类型，修改widget类型后注意属性列表的合法性
+Public Function SetWidgetType(sType As String, sStyleName As String)
+    m_Base.ctlType = sType
+    m_Base.StyleName = sStyleName
+End Function
+
+'确定主处理函数能否调用其toString()来产生代码，默认为True，设置为False说明由其他对象来调用处理
+Public Property Get EnableOutByMainForm() As Boolean
+    EnableOutByMainForm = m_CanbeOutByMainForm
+End Property
+Public Property Let EnableOutByMainForm(bEnable As Boolean)
+    m_CanbeOutByMainForm = bEnable
+End Property
+
 '对象序列化函数
 Public Function Serializer(vSer As clsSerialization)
     vSer.Serializer m_Base
@@ -197,7 +214,7 @@ Public Function Deserializer(vSer As clsSerialization)
 End Function
 
 Public Property Get Description() As String
-    Description = l("l_DescCanvas", "画布对象，对应到Tkinter的Canvas控件。")
+    Description = L("l_DescCanvas", "画布对象，对应到Tkinter的Canvas控件。")
 End Property
 
 Public Property Let ScaleMode(nV As Long)
@@ -211,31 +228,35 @@ End Property
 '=0：表示两者将没有依赖关系，代码前后顺序无影响
 '>0：另一个对象要先输出代码。
 '整体的逻辑结果类似是重的沉底
-Public Function Compare(ByRef obj As Object) As Long
+Public Function Compare(ByRef Obj As Object) As Long
     
     Dim scrlcmd As String, scrl As String
     
     '先判断和滚动条的依赖关系
     scrlcmd = m_Base("xscrollcommand")
-    If Len(scrlcmd) And TypeName(obj) = "clsScrollbar" Then
+    If Len(scrlcmd) And TypeName(Obj) = "clsScrollbar" Then
         scrl = IIf(Right$(scrlcmd, 4) = ".set", Left$(scrlcmd, Len(scrlcmd) - 4), "")
-        If scrl = obj.Name Then
+        If scrl = Obj.Name Then
             Compare = 1 ' 滚动条先
             Exit Function
         End If
     End If
     scrlcmd = m_Base("yscrollcommand")
-    If Len(scrlcmd) And TypeName(obj) = "clsScrollbar" Then
+    If Len(scrlcmd) And TypeName(Obj) = "clsScrollbar" Then
         scrl = IIf(Right$(scrlcmd, 4) = ".set", Left$(scrlcmd, Len(scrlcmd) - 4), "")
-        If scrl = obj.Name Then
+        If scrl = Obj.Name Then
             Compare = 1 ' 滚动条先
             Exit Function
         End If
     End If
     
-    If Parent = "top" And obj.Parent <> "top" Then '顶层控件先输出
+    If Parent = Obj.Name Then '父控件先输出代码
+        Compare = 1
+    ElseIf Obj.Parent = Name Then
         Compare = -1
-    ElseIf Parent <> "top" And obj.Parent = "top" Then
+    ElseIf Parent = WTOP And Obj.Parent <> WTOP Then '顶层控件先输出
+        Compare = -1
+    ElseIf Parent <> WTOP And Obj.Parent = WTOP Then
         Compare = 1
     Else
         Compare = 0

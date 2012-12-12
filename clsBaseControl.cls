@@ -134,7 +134,13 @@ Public Function toStringStructure(ByRef sCmdFunc As cStrBuilder, rel As Boolean,
         s = Split(sTmp, ",")
         For i = 0 To UBound(s)
             s(i) = Trim(s(i))
-            If Left(s(i), 1) = "<" And Right(s(i), 1) = ">" Then
+            If s(i) = "<Change>" Then '专门处理自定义的这个事件，用控件变量监视器模拟
+                If (m_Type = "Combobox" Or m_Type = "Entry" Or m_Type = "Label") And (Len(Dic("textvariable")) > 0) Then
+                    sCmdName = m_Name & "_Change"
+                    sOut.Append Space(4) & Dic("textvariable") & ".trace('w', " & sCmdName & ")"
+                    sCmdFunc.Append CreateFuncDef(sCmdName, "*args")
+                End If
+            ElseIf Left(s(i), 1) = "<" And Right(s(i), 1) = ">" Then
                 
                 sCmdName = m_Name & "_" & Replace(Replace(Replace(s(i), "<", ""), ">", ""), "-", "_")
                 
@@ -244,7 +250,13 @@ Public Function toStringOOP(ByRef sCmdFunc As cStrBuilder, rel As Boolean, usett
         s = Split(sTmp, ",")
         For i = 0 To UBound(s)
             s(i) = Trim(s(i))
-            If Left(s(i), 1) = "<" And Right(s(i), 1) = ">" Then
+            If s(i) = "<Change>" Then '专门处理自定义的这个事件，用控件变量监视器模拟
+                If (m_Type = "Combobox" Or m_Type = "Entry" Or m_Type = "Label") And (Len(Dic("textvariable")) > 0) Then
+                    sCmdName = m_Name & "_Change"
+                    sOut.Append Space(8) & "self." & Dic("textvariable") & ".trace('w', self." & sCmdName & ")"
+                    sCmdFunc.Append CreateFuncDefOOP(sCmdName, "*args")
+                End If
+            ElseIf Left(s(i), 1) = "<" And Right(s(i), 1) = ">" Then
                 
                 sCmdName = m_Name & "_" & Replace(Replace(Replace(s(i), "<", ""), ">", ""), "-", "_")
                 
@@ -382,6 +394,49 @@ Private Function GetStyleParams(oop As Boolean, usettk As Boolean) As String
     
 End Function
 
+'根据代码模块中的函数声明，自动填写bindcommand域
+'dMethods：控件名为键，使用逗号分隔的控件事件处理函数名字符串
+Public Function GetBindCommandStr(dMethods As Dictionary) As String
+    Dim s As String, sOut As cStrBuilder
+    If Not dMethods.Exists(m_Name) Then Exit Function
+    
+    Set sOut = New cStrBuilder
+    s = dMethods.Item(m_Name)
+    
+    '这几个控件的Click事件由command属性设置比较好，不需要bind
+    If m_Type = "Button" Or m_Type = "Checkbutton" Or m_Type = "Radiobutton" Then
+        If InStr(1, s, "," & m_Name & "_MouseDown,") > 0 Then sOut.Append "<Button-1>"
+    Else
+        If InStr(1, s, "," & m_Name & "_Click,") > 0 Or InStr(1, s, "," & m_Name & "_MouseDown,") > 0 Then sOut.Append "<Button-1>"
+    End If
+    
+    If InStr(1, s, "," & m_Name & "_DblClick,") > 0 Then sOut.Append "<Double-Button-1>"
+    If InStr(1, s, "," & m_Name & "_Resize,") > 0 Then sOut.Append "<Configure>"
+    If InStr(1, s, "," & m_Name & "_GotFocus,") > 0 Then sOut.Append "<FocusIn>"
+    If InStr(1, s, "," & m_Name & "_LostFocus,") > 0 Then sOut.Append "<FocusOut>"
+    If InStr(1, s, "," & m_Name & "_KeyPress,") > 0 Or InStr(1, s, "," & m_Name & "_KeyDown,") > 0 Then sOut.Append "<KeyPress>"
+    If InStr(1, s, "," & m_Name & "_KeyUp,") > 0 Then sOut.Append "<KeyRelease>"
+    If InStr(1, s, "," & m_Name & "_MouseUp,") > 0 Then sOut.Append "<ButtonRelease-1>"
+    If InStr(1, s, "," & m_Name & "_Enter,") > 0 Or InStr(1, s, "," & m_Name & "_MouseMove,") > 0 Then sOut.Append "<Enter>"
+    If InStr(1, s, "," & m_Name & "_Leave,") > 0 Then sOut.Append "<Leave>"
+    
+    If InStr(1, s, "," & m_Name & "_Change,") > 0 Then sOut.Append "<Change>"  '这个事件由内部处理，不是标准tk事件
+    
+    If m_Type = "Treeview" Then
+        If InStr(1, s, "," & m_Name & "_NodeClick,") > 0 Then sOut.Append "<<TreeviewSelect>>"
+        If InStr(1, s, "," & m_Name & "_Collapse,") > 0 Then sOut.Append "<<TreeviewClose>>"
+        If InStr(1, s, "," & m_Name & "_Expand,") > 0 Then sOut.Append "<<TreeviewOpen>>"
+    ElseIf m_Type = "Notebook" Then
+        If InStr(1, s, "," & m_Name & "_BeforeClick,") > 0 Then sOut.Append "<<NotebookTabChanged>>"
+    End If
+    
+    GetBindCommandStr = sOut.toString(",")
+End Function
+
+Public Function IsExistCommand(dMethods As Dictionary, sCmd As String) As Boolean
+    If dMethods.Exists(m_Name) Then IsExistCommand = (InStr(1, dMethods.Item(m_Name), "," & m_Name & "_" & sCmd & ",") > 0)
+End Function
+
 '设置/获取字典的值
 Public Property Get Dic(ByVal sKey As String) As String
 Attribute Dic.VB_UserMemId = 0
@@ -496,7 +551,7 @@ Public Function Tips(sAttr As String) As String
     Case "bindcommand":
         Tips = Tips & L("l_TipBindCommand", "使用bind()绑定的事件处理列表，绑定多个则使用逗号分隔(比如：<Control-C>,<F8>,<Alt-A>)。\n双击文本框查看详情。")
     Case "font":
-        Tips = Tips & L("l_TipFont", "文字字体属性。是一个元组。\n元组前两个元素为：字体名,字体大小,之后的几个元素可选：'bold', 'italic', 'nunderline', 'overstrike'")
+        Tips = Tips & L("l_TipFont", "文字字体属性。是一个元组。\n元组前两个元素为：字体名,字体大小,之后的几个元素可选：'bold', 'italic', 'underline', 'overstrike'")
     Case "xscrollcommand":
         Tips = Tips & L("l_TipXScrlCmd", "水平滚动事件处理，如果需要水平滚动，设置这个值为水平滚动条的set方法。")
     Case "yscrollcommand":
@@ -575,8 +630,12 @@ Public Function CreateFuncDef(FuncName As String, Optional sparams As String = "
     If Len(sbody) Then
         CreateFuncDef = CreateFuncDef & sbody & vbCrLf
     Else
+    #If DebugVer Then
+        CreateFuncDef = CreateFuncDef & Space(4) & "showinfo('','" & FuncName & "')" & vbCrLf
+    #Else
         CreateFuncDef = CreateFuncDef & Space(4) & "#TODO, Please finish the function here!" & vbCrLf
         CreateFuncDef = CreateFuncDef & Space(4) & "pass" & vbCrLf
+    #End If
     End If
 End Function
 
@@ -587,8 +646,12 @@ Public Function CreateFuncDefOOP(FuncName As String, Optional sparams As String 
     If Len(sbody) Then
         CreateFuncDefOOP = CreateFuncDefOOP & sbody & vbCrLf
     Else
+    #If DebugVer Then
+        CreateFuncDefOOP = CreateFuncDefOOP & Space(8) & "showinfo('','" & FuncName & "')" & vbCrLf
+    #Else
         CreateFuncDefOOP = CreateFuncDefOOP & Space(8) & "#TODO, Please finish the function here!" & vbCrLf
         CreateFuncDefOOP = CreateFuncDefOOP & Space(8) & "pass" & vbCrLf
+    #End If
     End If
 End Function
 

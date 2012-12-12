@@ -31,7 +31,7 @@ Public Function toString(ByRef sCmdFunc As cStrBuilder, rel As Boolean, oop As B
 End Function
 
 '创建对象后要马上调用这个函数初始化各参数
-Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long)
+Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dMethods As Dictionary)
     
     m_Base.Name = o.Properties("Name")
     

@@ -108,7 +108,7 @@ End Function
 
 
 '创建对象后要马上调用这个函数初始化各参数
-Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long)
+Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dMethods As Dictionary)
     
     Dim i As Long, oiTabs As ITabs
     
@@ -133,7 +133,7 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long)
     m_dicTotal("relheight") = Format(o.Properties("Height") / parentHeight, "0.###")
     m_dicTotal("relief") = "FLAT"
     m_dicTotal("takefocus") = IIf(o.Properties("TabStop"), 1, 0)
-    m_dicTotal("bindcommand") = ""
+    m_dicTotal("bindcommand") = m_Base.GetBindCommandStr(dMethods)
     
     '这些是默认选择的
     m_Base("x") = m_dicTotal("x")
@@ -145,6 +145,7 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long)
     m_Base("relwidth") = m_dicTotal("relwidth")
     m_Base("relheight") = m_dicTotal("relheight")
     If m_dicTotal("takefocus") = 0 Then m_Base("takefocus") = m_dicTotal("takefocus")
+    If m_dicTotal("bindcommand") <> "" Then m_Base("bindcommand") = m_dicTotal("bindcommand")
     
 End Sub
 

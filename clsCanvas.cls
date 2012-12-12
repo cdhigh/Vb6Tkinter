@@ -56,7 +56,7 @@ End Function
 
 
 '创建对象后要马上调用这个函数初始化各参数
-Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long)
+Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dMethods As Dictionary)
     
     m_Base.Name = o.Properties("Name")
     
@@ -77,7 +77,7 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long)
     m_dicTotal("yscrollcommand") = ""
     m_dicTotal("xscrollincrement") = ""
     m_dicTotal("yscrollincrement") = ""
-    m_dicTotal("bindcommand") = ""
+    m_dicTotal("bindcommand") = m_Base.GetBindCommandStr(dMethods)
     
     '这些是默认选择的
     m_Base("x") = m_dicTotal("x")
@@ -90,6 +90,7 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long)
     m_Base("relheight") = m_dicTotal("relheight")
     If o.Properties("BackColor") <> vbButtonFace Then m_Base("bg") = m_dicTotal("bg")
     If m_dicTotal("takefocus") = 0 Then m_Base("takefocus") = m_dicTotal("takefocus")
+    If m_dicTotal("bindcommand") <> "" Then m_Base("bindcommand") = m_dicTotal("bindcommand")
     
 End Sub
 
@@ -111,7 +112,7 @@ Public Function GetAttrValueList(sAttr As String, ByRef sa() As String) As Long
                 End If
             Next
             sa = Split(sOut, ",")
-            GetAttrValueList = 1
+            GetAttrValueList = IIf(Len(sOut) > 0, 1, 0)
         Else
             GetAttrValueList = 0
         End If

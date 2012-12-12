@@ -45,7 +45,7 @@ End Function
 '输出结构化代码
 Private Function toStringStructure(ByRef sCmdFunc As cStrBuilder, rel As Boolean, usettk As Boolean) As String
     
-    Dim sOut As New cStrBuilder, s() As String, i As Long, sList As String, extra As String
+    Dim sOut As New cStrBuilder, s() As String, i As Long, sList As String, extra As String, sConfig As String
     
     '生成列表
     For i = 0 To UBound(m_List)
@@ -53,12 +53,17 @@ Private Function toStringStructure(ByRef sCmdFunc As cStrBuilder, rel As Boolean
     Next
     sList = "(" & sList & ")"
     
+    sConfig = getConfigStr()
+    
     sOut.Append Space(4) & m_Base.Name & "List = " & sList
     sOut.Append Space(4) & m_Base("variable") & " = StringVar(value=" & m_Base.Name & "List[0])"
     
     extra = m_Base("variable") & ", *" & m_Base.Name & "List"
     
     sOut.Append Space(4) & m_Base.Name & " = OptionMenu(" & m_Base.Parent & IIf(Len(extra), ", ", "") & extra & ")"
+    If Len(sConfig) Then
+        sOut.Append Space(4) & m_Base.Name & ".configure(" & sConfig & ")"
+    End If
     sOut.Append Space(4) & m_Base.Name & ".place(" & m_Base.GetPositionParams(rel) & ")"
     sOut.Append Space(4) & "gComps['" & m_Base.Name & "'] = " & m_Base.Name
     sOut.Append Space(4) & "gComps['" & m_Base("variable") & "'] = " & m_Base("variable")
@@ -70,7 +75,10 @@ Private Function toStringStructure(ByRef sCmdFunc As cStrBuilder, rel As Boolean
         s = Split(m_Base("bindcommand"), ",")
         For i = 0 To UBound(s)
             s(i) = Trim(s(i))
-            If Left(s(i), 1) = "<" And Right(s(i), 1) = ">" Then
+            If s(i) = "<Change>" Then '专门处理自定义的这个事件，用控件变量监视器模拟
+                sOut.Append Space(4) & m_Base("variable") & ".trace('w', " & m_Base.Name & "_Change)"
+                sCmdFunc.Append m_Base.CreateFuncDef(m_Base.Name & "_Change", "*args")
+            ElseIf Left(s(i), 1) = "<" And Right(s(i), 1) = ">" Then
                 sOut.Append Space(4) & m_Base.Name & ".bind('" & s(i) & "', " & m_Base.Name & "_" & Replace(Mid(s(i), 2, Len(s(i)) - 2), "-", "_") & ")"
                 sCmdFunc.Append m_Base.CreateFuncDef(m_Base.Name & "_" & Replace(Mid(s(i), 2, Len(s(i)) - 2), "-", "_"), "event")
             End If
@@ -84,7 +92,7 @@ End Function
 '输出面向对象代码
 Private Function toStringOOP(ByRef sCmdFunc As cStrBuilder, rel As Boolean, usettk As Boolean) As String
     
-    Dim sOut As New cStrBuilder, s() As String, i As Long, sList As String, extra As String
+    Dim sOut As New cStrBuilder, s() As String, i As Long, sList As String, extra As String, sConfig As String
     
     '生成列表
     For i = 0 To UBound(m_List)
@@ -92,12 +100,17 @@ Private Function toStringOOP(ByRef sCmdFunc As cStrBuilder, rel As Boolean, uset
     Next
     sList = "(" & sList & ")"
     
+    sConfig = getConfigStr()
+    
     sOut.Append Space(8) & "self." & m_Base.Name & "List = " & sList
     sOut.Append Space(8) & "self." & m_Base("variable") & " = StringVar(value=self." & m_Base.Name & "List[0])"
     
     extra = "self." & m_Base("variable") & ", *self." & m_Base.Name & "List"
     
     sOut.Append Space(8) & "self." & m_Base.Name & " = OptionMenu(self." & m_Base.Parent & IIf(Len(extra), ", ", "") & extra & ")"
+    If Len(sConfig) Then
+        sOut.Append Space(8) & "self." & m_Base.Name & ".configure(" & sConfig & ")"
+    End If
     sOut.Append Space(8) & "self." & m_Base.Name & ".place(" & m_Base.GetPositionParams(rel) & ")"
     
     '创建事件处理函数框架（如果有）
@@ -107,7 +120,10 @@ Private Function toStringOOP(ByRef sCmdFunc As cStrBuilder, rel As Boolean, uset
         s = Split(m_Base("bindcommand"), ",")
         For i = 0 To UBound(s)
             s(i) = Trim(s(i))
-            If Left(s(i), 1) = "<" And Right(s(i), 1) = ">" Then
+            If s(i) = "<Change>" Then '专门处理自定义的这个事件，用控件变量监视器模拟
+                sOut.Append Space(8) & "self." & m_Base("variable") & ".trace('w', self." & m_Base.Name & "_Change)"
+                sCmdFunc.Append m_Base.CreateFuncDefOOP(m_Base.Name & "_Change", "*args")
+            ElseIf Left(s(i), 1) = "<" And Right(s(i), 1) = ">" Then
                 sOut.Append Space(8) & "self." & m_Base.Name & ".bind('" & s(i) & "', self." & m_Base.Name & "_" & Replace(Mid(s(i), 2, Len(s(i)) - 2), "-", "_") & ")"
                 sCmdFunc.Append m_Base.CreateFuncDefOOP(m_Base.Name & "_" & Replace(Mid(s(i), 2, Len(s(i)) - 2), "-", "_"), "event")
             End If
@@ -120,7 +136,7 @@ End Function
 
 
 '创建对象后要马上调用这个函数初始化各参数
-Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long)
+Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dMethods As Dictionary)
     
     Dim i As Long, oList As Object, sList As String, numList As Long
     
@@ -153,7 +169,19 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long)
     m_dicTotal("relwidth") = Format(o.Properties("Width") / parentWidth, "0.###")
     m_dicTotal("relheight") = Format(o.Properties("Height") / parentHeight, "0.###")
     m_dicTotal("variable") = o.Properties("Name") & "Var"
-    m_dicTotal("bindcommand") = ""
+    m_dicTotal("relief") = "RAISED"
+    m_dicTotal("fg") = TranslateColor(o.Properties("ForeColor"))
+    m_dicTotal("bg") = TranslateColor(o.Properties("BackColor"))
+    m_dicTotal("bd") = "1"
+    m_dicTotal("wraplength") = 150
+    m_dicTotal("justify") = "'left'"
+    m_dicTotal("state") = IIf(o.Properties("Enabled"), "'normal'", "'disabled'")
+    m_dicTotal("anchor") = "'center'"
+    m_dicTotal("takefocus") = IIf(o.Properties("TabStop"), 1, 0)
+    m_dicTotal("font") = "(" & U(CStr(o.Properties("Font")("Name"))) & "," & Round(o.Properties("Font")("Size")) & _
+                        IIf(o.Properties("Font")("Bold"), ",'bold'", "") & IIf(o.Properties("Font")("Italic"), ",'italic'", "") & _
+                        IIf(o.Properties("Font")("Underline"), ",'underline'", "") & IIf(o.Properties("Font")("Strikethrough"), ",'overstrike')", ")")
+    m_dicTotal("bindcommand") = m_Base.GetBindCommandStr(dMethods)
     
     '这些是默认选择的
     m_Base("x") = m_dicTotal("x")
@@ -165,6 +193,12 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long)
     m_Base("relwidth") = m_dicTotal("relwidth")
     m_Base("relheight") = m_dicTotal("relheight")
     m_Base("variable") = m_dicTotal("variable")
+    If o.Properties("ForeColor") <> vbWindowText Then m_Base("fg") = m_dicTotal("fg")
+    If o.Properties("BackColor") <> vbWindowBackground Then m_Base("bg") = m_dicTotal("bg")
+    If m_dicTotal("state") <> "'normal'" Then m_Base("state") = m_dicTotal("state")
+    If m_dicTotal("takefocus") = 1 Then m_Base("takefocus") = m_dicTotal("takefocus")
+    If m_dicTotal("font") <> "(" & U(GetDefaultFontName()) & ",9)" Then m_Base("font") = m_dicTotal("font")
+    If m_dicTotal("bindcommand") <> "" Then m_Base("bindcommand") = m_dicTotal("bindcommand")
     
 End Sub
 
@@ -176,7 +210,25 @@ Public Function GetAttrValueList(sAttr As String, ByRef sa() As String) As Long
 End Function
 
 Public Function Tips(sAttr As String) As String
-    Tips = m_Base.Tips(sAttr)
+    Tips = sAttr & vbCrLf
+    If sAttr = "wraplength" Then
+        Tips = Tips & L("l_TipWrapLen", "多少个字符后自动换行。用于多行显示。")
+    Else
+        Tips = m_Base.Tips(sAttr)
+    End If
+End Function
+
+'获取配置字符串
+Private Function getConfigStr() As String
+    Dim sOut As New cStrBuilder, saCfg() As String, i As Long
+    Const csaCfg = "relief,fg,bg,bd,wraplength,justify,state,anchor,takefocus,font"
+    saCfg = Split(csaCfg, ",")
+    
+    For i = 0 To UBound(saCfg)
+        If Len(m_Base(saCfg(i))) Then sOut.Append saCfg(i) & "=" & m_Base(saCfg(i))
+    Next
+    getConfigStr = sOut.toString(", ")
+    
 End Function
 
 Private Sub Class_Initialize()

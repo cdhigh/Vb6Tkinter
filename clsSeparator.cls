@@ -31,7 +31,7 @@ End Function
 
 
 '创建对象后要马上调用这个函数初始化各参数
-Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long)
+Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, Optional dMethods As Dictionary)
     
     Dim W As Long, H As Long, X1 As Long, X2 As Long, Y1 As Long, Y2 As Long
     

@@ -59,7 +59,7 @@ Public Function toString(ByRef sCmdFunc As cStrBuilder, rel As Boolean, oop As B
 End Function
 
 '创建对象后要马上调用这个函数初始化各参数
-Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long)
+Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dMethods As Dictionary)
     
     Dim i As Long, oList As Object, sList As String
     
@@ -99,7 +99,7 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long)
     m_dicTotal("takefocus") = IIf(o.Properties("TabStop"), 1, 0)
     m_dicTotal("exportselection") = ""
     m_dicTotal("postcommand") = ""
-    m_dicTotal("bindcommand") = ""
+    m_dicTotal("bindcommand") = m_Base.GetBindCommandStr(dMethods)
     
     '这些是默认选择的
     m_Base("x") = m_dicTotal("x")
@@ -116,6 +116,8 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long)
     If m_dicTotal("state") <> "'normal'" Then m_Base("state") = m_dicTotal("state")
     If m_dicTotal("font") <> "(" & U(GetDefaultFontName()) & ",9)" Then m_Base("font") = m_dicTotal("font")
     If m_dicTotal("takefocus") = 0 Then m_Base("takefocus") = m_dicTotal("takefocus")
+    If m_Base.IsExistCommand(dMethods, "Change") Then m_Base("textvariable") = m_dicTotal("textvariable")
+    If m_dicTotal("bindcommand") <> "" Then m_Base("bindcommand") = m_dicTotal("bindcommand")
     
 End Sub
 

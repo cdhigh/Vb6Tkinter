@@ -388,6 +388,9 @@ Private Sub Form_Load()
     LstCfg.Redraw = True
     
     m_BriefCaption = "Visual Tkinter of Python - cdhigh@sohu.com - v" & App.Major & "." & App.Minor & IIf(App.Revision > 0, "." & App.Revision, "")
+    #If DebugVer Then
+        m_BriefCaption = m_BriefCaption & " [DEBUG MODE]"
+    #End If
     Me.Caption = m_BriefCaption
     
     mnuOopCode.Checked = GetSetting(App.Title, "Settings", "OopCode", "1") = "1"
@@ -539,8 +542,9 @@ End Sub
 '更新各个列表，创建对应的控件类实例, 返回false表示初始化失败
 Private Function ResetLstComps(frm As Object) As Boolean
     
-    Dim Obj As Object, ObjClsModule As Object, i As Long, s As String, j As Long
+    Dim Obj As Object, ObjClsModule As Object, i As Long, s As String, j As Long, idx As Long
     Dim nScaleMode As Long, nScaleWidth As Long, nScaleHeight As Long
+    Dim CodeMember As Member, CodeMembers As Members, dMethods As New Dictionary
     
     ResetLstComps = False
     If frm Is Nothing Then Exit Function
@@ -556,12 +560,33 @@ Private Function ResetLstComps(frm As Object) As Boolean
     '因为ScaleX/ScaleY为窗体类独有方法，只能先在这里转换窗体大小为像素单位
     nScaleWidth = Round(ScaleX(frm.Properties("ScaleWidth"), frm.Properties("ScaleMode"), vbPixels))
     nScaleHeight = Round(ScaleY(frm.Properties("ScaleHeight"), frm.Properties("ScaleMode"), vbPixels))
-    g_Comps(0).InitConfig frm, nScaleWidth, nScaleHeight
+    g_Comps(0).InitConfig frm, nScaleWidth, nScaleHeight, dMethods
     g_Comps(0).Name = WTOP
     LstComps.AddItem g_Comps(0).Name & " (Form)"
     i = 1
     
     m_HasCommonDialog = False
+    
+    '获取窗体的代码模块中所有的过程函数列表，保存为一个字典对象，传入各类模块，用于自动生成对应的bindcommand
+    If Not frm.CodeModule Is Nothing Then
+        Set CodeMembers = frm.CodeModule.Members
+        If Not CodeMembers Is Nothing Then
+            For Each CodeMember In CodeMembers
+                If CodeMember.Type = vbext_mt_Method Then
+                    idx = InStrRev(CodeMember.Name, "_")
+                    If idx > 1 Then
+                        s = Left$(CodeMember.Name, idx - 1)
+                        If dMethods.Exists(s) Then
+                            dMethods.Item(s) = dMethods.Item(s) & "," & CodeMember.Name & "," '使用逗号做为分隔符方便查找
+                        Else
+                            dMethods.Item(s) = "," & CodeMember.Name & ","
+                        End If
+                    End If
+                End If
+            Next
+        End If
+    End If
+    
     
     '将控件添加到列表中
     For Each Obj In frm.Designer.VBControls
@@ -590,10 +615,10 @@ Private Function ResetLstComps(frm As Object) As Boolean
             
             '初始化各控件对应的类模块对象
             If Obj.Container Is frm.Designer Then
-                g_Comps(i).InitConfig Obj, frm.Properties("ScaleWidth"), frm.Properties("ScaleHeight")
+                g_Comps(i).InitConfig Obj, frm.Properties("ScaleWidth"), frm.Properties("ScaleHeight"), dMethods
                 g_Comps(i).Parent = IIf(Obj.ClassName = "Menu", "MainMenu", WTOP)
             ElseIf Obj.Container.ClassName = "Menu" Then  '子菜单
-                g_Comps(i).InitConfig Obj, 0, 0
+                g_Comps(i).InitConfig Obj, 0, 0, dMethods
                 g_Comps(i).Parent = Obj.Container.Properties("Name")
             Else
                 On Error Resume Next
@@ -608,7 +633,7 @@ Private Function ResetLstComps(frm As Object) As Boolean
                 Err.Clear
                 On Error GoTo 0
                 g_Comps(i).ScaleMode = nScaleMode
-                g_Comps(i).InitConfig Obj, nScaleWidth, nScaleHeight
+                g_Comps(i).InitConfig Obj, nScaleWidth, nScaleHeight, dMethods
                 g_Comps(i).Parent = Obj.Container.Properties("Name")
             End If
             
@@ -1618,7 +1643,7 @@ Private Sub mnuUseTtk_Click()
         For i = 0 To LstComps.ListCount - 1
             s = Mid(LstComps.List(i), InStr(1, LstComps.List(i), "(") + 1)
             s = Left(s, Len(s) - 1)
-            If InStr(1, " ProgressBar, TreeView, TabStrip, ", " " & s & ",") > 0 Then
+            If InStr(1, " ProgressBar, TreeView, TabStrip, Line, ", " " & s & ",") > 0 Then
                 MsgBox L("l_msgCantCancelTTK", "窗体中有部分控件仅在TTK库中存在，不能取消TTK选项。"), vbInformation
                 mnuUseTtk.Checked = True
                 Exit For
@@ -1691,8 +1716,8 @@ Private Sub FillcmbEdit(Row As Long, Col As Long)
 End Sub
 
 Private Sub stabar_DblClick()
-    MsgBox L("l_msgCtlsSupported", "支持控件列表：") & vbCrLf & "Menu, Label, TextBox, PictureBox, Frame, CommandButton, CheckBox, OptionButton, " & vbCrLf & _
-            "ComboBox, ListBox, HScrollBar, VScrollBar, Slider, ProgressBar, TreeView, StatusBar, CommonDialog, Line"
+    MsgBox L("l_msgCtlsSupported", "支持控件列表：") & vbCrLf & "Menu, Label, TextBox, PictureBox, Frame, CommandButton, CheckBox, OptionButton, ComboBox," & vbCrLf & _
+            "ListBox, HScrollBar, VScrollBar, Slider, ProgressBar, TreeView, StatusBar, CommonDialog, Line" & vbCrLf & vbCrLf
 End Sub
 
 Private Sub TxtCode_Change()
@@ -1752,6 +1777,7 @@ Private Sub TxtTips_DblClick()
             "<Triple-Button-n> : 鼠标按钮n三击" & vbCrLf & _
             "<Enter> : 鼠标指针进入组件" & vbCrLf & _
             "<Leave> : 鼠标指针离开组件" & vbCrLf & _
+            "<FocusIn> / <FocusOut> : 组件获得或失去焦点" & vbCrLf & _
             "<KeyPress> : 按下任意键" & vbCrLf & _
             "<KeyRelease> : 松开任意键" & vbCrLf & _
             "<KeyPress-key> : 按下key，比如<KeyPress-H>表示按下H键，可以简化为使用双引号代替尖括号将字符括起来，比如：""H""。" & vbCrLf & _
@@ -1823,5 +1849,9 @@ End Sub
 
 Private Sub TxtCode_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
     stabar.SimpleText = L("l_staTxtCode", "代码预览窗口，双击可以放大。如果需要，也可以直接在这里修改代码。")
+End Sub
+
+Private Sub stabar_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
+    stabar.SimpleText = "https://github.com/cdhigh/Visual-Tkinter-for-Python"
 End Sub
 

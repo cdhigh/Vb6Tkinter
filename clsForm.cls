@@ -23,6 +23,7 @@ Private m_Resizable As Boolean
 Private m_IconFile As String
 Private m_IconEmbedding As Boolean
 Private m_Protocol As String
+Private m_Bindcommand As String
 Private m_FrmPath As String          '保存窗体所在目录
 Private m_ScaleMode As Long
 
@@ -137,7 +138,7 @@ End Function
 
 
 '创建对象后要马上调用这个函数初始化各参数, 窗体大小以像素为单位
-Public Sub InitConfig(o As Object, nWidth As Long, nHeight As Long)
+Public Sub InitConfig(o As Object, nWidth As Long, nHeight As Long, dMethods As Dictionary)
     
     Dim s As String
     

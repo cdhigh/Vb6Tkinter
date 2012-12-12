@@ -66,7 +66,7 @@ Public Function toString(ByRef sCmdFunc As cStrBuilder, rel As Boolean, oop As B
 End Function
 
 '创建对象后要马上调用这个函数初始化各参数
-Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long)
+Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dMethods As Dictionary)
     
     m_Base.Name = o.Properties("Name")
     
@@ -90,6 +90,7 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long)
     m_dicTotal("takefocus") = IIf(o.Properties("TabStop"), 1, 0)
     m_dicTotal("xscrollcommand") = ""
     m_dicTotal("yscrollcommand") = ""
+    m_dicTotal("bindcommand") = m_Base.GetBindCommandStr(dMethods)
     
     '这些是默认选择的
     m_Base("x") = m_dicTotal("x")
@@ -102,6 +103,7 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long)
     m_Base("relheight") = m_dicTotal("relheight")
     m_Base("show") = m_dicTotal("show")
     If m_dicTotal("font") <> "(" & U(GetDefaultFontName()) & ",9)" Then m_Base("font") = m_dicTotal("font")
+    If m_dicTotal("bindcommand") <> "" Then m_Base("bindcommand") = m_dicTotal("bindcommand")
     
 End Sub
 
@@ -128,6 +130,7 @@ Public Function GetAttrValueList(sAttr As String, ByRef sa() As String) As Long
                 End If
             Next
             sa = Split(sOut, ",")
+            GetAttrValueList = IIf(Len(sOut) > 0, 1, 0)
         Else
             GetAttrValueList = 0
         End If

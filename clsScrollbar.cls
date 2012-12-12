@@ -45,7 +45,7 @@ Public Function toString(ByRef sCmdFunc As cStrBuilder, rel As Boolean, oop As B
 End Function
 
 '创建对象后要马上调用这个函数初始化各参数
-Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long)
+Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dMethods As Dictionary)
     
     m_Base.Name = o.Properties("Name")
     m_Base.StyleName = IIf(o.ClassName = "HScrollBar", "Horizontal", "Vertical") & ".TScrollbar"
@@ -66,7 +66,7 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long)
     m_dicTotal("activerelief") = "SUNKEN"
     m_dicTotal("takefocus") = IIf(o.Properties("TabStop"), 1, 0)
     m_dicTotal("command") = "" 'o.Properties("Name") & "_Cmd"
-    m_dicTotal("bindcommand") = ""
+    m_dicTotal("bindcommand") = m_Base.GetBindCommandStr(dMethods)
     
     '这些是默认选择的
     m_Base("x") = m_dicTotal("x")
@@ -80,6 +80,7 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long)
     'm_Base("command") = m_dicTotal("command")
     m_Base("orient") = m_dicTotal("orient")
     If m_dicTotal("takefocus") = 0 Then m_Base("takefocus") = m_dicTotal("takefocus")
+    If m_dicTotal("bindcommand") <> "" Then m_Base("bindcommand") = m_dicTotal("bindcommand")
     
 End Sub
 

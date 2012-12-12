@@ -45,7 +45,7 @@ End Function
 
 
 '创建对象后要马上调用这个函数初始化各参数
-Public Sub InitConfig(ByRef o As Object, parentWidth As Long, parentHeight As Long)
+Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, Optional dMethods As Dictionary)
     
     m_Name = o.Properties("Name")
     

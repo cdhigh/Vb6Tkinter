@@ -62,6 +62,9 @@
     import modules filedialog, simpledialog, colorchooser.    
 
 3. History
+  v1.3.2
+    1. Support icon file without suffix.
+    2. Add property 'cursor'.
   v1.3.1
     1. Bind callback functions via analysing VB code.
     2. Can configure widget OptionMenu now.

@@ -27,7 +27,6 @@ Private mvarStringArray() As String
 Private mvarArrayItems As Long
 
 Public Sub Append(ByVal newStr As String)
-    If Len(newStr) = 0 Then Exit Sub
     ReDim Preserve mvarStringArray(mvarArrayItems) As String
     mvarStringArray(mvarArrayItems) = newStr
     mvarArrayItems = mvarArrayItems + 1
@@ -45,6 +44,7 @@ Public Sub Reset()
     mvarArrayItems = 0
     Erase mvarStringArray
 End Sub
+
 Private Sub Class_Initialize()
     If mvarArrayItems > 0 Then Reset
 End Sub
@@ -53,3 +53,16 @@ Private Sub Class_Terminate()
     Reset
 End Sub
 
+'判断一个字符串是否已经存在，这个是判断每次append进来的整个字符串，而不是判断子字符串
+Public Function ExistString(s As String) As Boolean
+    Dim i As Long, nLen As Long
+    nLen = Len(s)
+    For i = 0 To mvarArrayItems - 1
+        If nLen = Len(mvarStringArray(i)) Then
+            If s = mvarStringArray(i) Then
+                ExistString = True
+                Exit Function
+            End If
+        End If
+    Next
+End Function

@@ -28,20 +28,20 @@ Private m_CanbeOutByMainForm As Boolean
 'rel:是否使用相对坐标,
 'oop:是否使用面向对象编程
 'usettk:是否使用TTK主题扩展
-Public Function toString(ByRef sCmd As cStrBuilder, rel As Boolean, oop As Boolean, usettk As Boolean) As String
+Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, rel As Boolean, oop As Boolean, usettk As Boolean)
     
     If oop Then
-        toString = toStringOOP(sCmd, rel)
+        toStringOOP sOut, sCmd, rel
     Else
-        toString = toStringStructure(sCmd, rel)
+        toStringStructure sOut, sCmd, rel
     End If
     
-End Function
+End Sub
 
 '输出结构化代码
-Private Function toStringStructure(ByRef sCmd As cStrBuilder, rel As Boolean) As String
+Private Sub toStringStructure(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, rel As Boolean)
     
-    Dim sOut As New cStrBuilder, s() As String, i As Long, extra As String
+    Dim s() As String, i As Long, extra As String
     
     extra = IIf(Len(m_Base("tearoff")), ", tearoff=" & m_Base("tearoff"), "")
     
@@ -49,20 +49,18 @@ Private Function toStringStructure(ByRef sCmd As cStrBuilder, rel As Boolean) As
     
     '逐个输出各顶级菜单，各顶级菜单下的子菜单由各顶级菜单负责生成对应的代码
     For i = 0 To m_numChilds - 1
-        sOut.Append m_Childs(i).toString(sCmd, rel, False, False)
+        m_Childs(i).toString sOut, sCmd, rel, False, False
     Next
     
     sOut.Append Space(4) & m_Base.Parent & "['menu'] = " & m_Base.Name
     sOut.Append Space(4) & "gComps['" & m_Base.Name & "'] = " & m_Base.Name
     
-    toStringStructure = sOut.toString(vbCrLf)
-    
-End Function
+End Sub
 
 '输出面向对象代码
-Private Function toStringOOP(ByRef sCmd As cStrBuilder, rel As Boolean) As String
+Private Sub toStringOOP(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, rel As Boolean)
     
-    Dim sOut As New cStrBuilder, s() As String, i As Long, extra As String
+    Dim s() As String, i As Long, extra As String
     
     extra = IIf(Len(m_Base("tearoff")), ", tearoff=" & m_Base("tearoff"), "")
     
@@ -70,14 +68,12 @@ Private Function toStringOOP(ByRef sCmd As cStrBuilder, rel As Boolean) As Strin
     
     '逐个输出各顶级菜单，各顶级菜单下的子菜单由各顶级菜单负责生成对应的代码
     For i = 0 To m_numChilds - 1
-        sOut.Append m_Childs(i).toString(sCmd, rel, True, False)
+        m_Childs(i).toString sOut, sCmd, rel, True, False
     Next
     
     sOut.Append Space(8) & "self." & m_Base.Parent & "['menu'] = self." & m_Base.Name
     
-    toStringOOP = sOut.toString(vbCrLf)
-    
-End Function
+End Sub
 
 '创建对象后要马上调用这个函数初始化各参数
 Public Sub InitConfig(Optional o As Object, Optional parentWidth As Long, Optional parentHeight As Long, Optional dMethods As Dictionary)

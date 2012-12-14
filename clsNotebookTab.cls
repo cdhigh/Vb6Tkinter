@@ -28,20 +28,18 @@ Private m_Parent  As String
 'rel:是否使用相对坐标,
 'oop:是否使用面向对象编程
 'usettk:是否使用TTK主题扩展
-Public Function toString(ByRef sCmdFunc As cStrBuilder, rel As Boolean, oop As Boolean, usettk As Boolean) As String
+Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, rel As Boolean, oop As Boolean, usettk As Boolean)
     
-    Dim i As Long, sOut As New cStrBuilder
+    Dim i As Long
     
     '得先按依赖关系进行排序
     SortWidgets m_SubWidgets, m_numSubWidgets
     
     For i = 0 To m_numSubWidgets - 1
-        sOut.Append m_SubWidgets(i).toString(sCmdFunc, rel, oop, usettk)
+        m_SubWidgets(i).toString sOut, sCmdFunc, rel, oop, usettk
     Next
     
-    toString = sOut.toString(vbCrLf)
-    
-End Function
+End Sub
 
 
 '创建对象后要马上调用这个函数初始化各参数

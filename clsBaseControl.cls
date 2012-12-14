@@ -30,30 +30,34 @@ Private m_ScaleMode As Long
 'rel:是否使用相对坐标,
 'oop:是否使用面向对象编程
 'usettk:是否使用TTK主题扩展
-Public Function toString(ByRef sCmdFunc As cStrBuilder, rel As Boolean, oop As Boolean, usettk As Boolean) As String
+Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, rel As Boolean, oop As Boolean, usettk As Boolean)
     
     If oop Then
-        toString = toStringOOP(sCmdFunc, rel, IIf(Len(m_StyleName), usettk, False))
+        toStringOOP sOut, sCmdFunc, rel, IIf(Len(m_StyleName), usettk, False)
     Else
-        toString = toStringStructure(sCmdFunc, rel, IIf(Len(m_StyleName), usettk, False))
+        toStringStructure sOut, sCmdFunc, rel, IIf(Len(m_StyleName), usettk, False)
     End If
     
-End Function
+End Sub
 
 '输出结构化代码
-Public Function toStringStructure(ByRef sCmdFunc As cStrBuilder, rel As Boolean, usettk As Boolean, Optional sOtherParams As String = "") As String
+Public Sub toStringStructure(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, rel As Boolean, usettk As Boolean, Optional sOtherParams As String = "")
     
-    Dim sOut As New cStrBuilder, s() As String, i As Long, extra As String, sStyle As String
-    Dim sTmp As String, dTmp As Double, sCmdName As String
-    
-    'Debug.Assert m_Type <> "" And m_Name <> ""
+    Dim s() As String, i As Long, extra As String, sStyle As String
+    Dim sTmp As String, dTmp As Double, sCmdName As String, sUnderlineCmd As String
     
     '如果需要变量绑定，则先创建对应的变量
     If Len(Dic("textvariable")) Then
         sOut.Append Space(4) & Dic("textvariable") & " = StringVar(value=" & U(Dic("text")) & ")"
     End If
     If Len(Dic("variable")) Then
-        sOut.Append Space(4) & Dic("variable") & " = StringVar(value=" & U(m_Value) & ")"
+        If m_Type = "Radiobutton" Then  '一组单选按钮的variable都是同一个，不要重复创建
+            If Not sOut.ExistString(Space(4) & Dic("variable") & " = StringVar()") Then
+                sOut.Append Space(4) & Dic("variable") & " = StringVar()"
+            End If
+        Else
+            sOut.Append Space(4) & Dic("variable") & " = StringVar(value=" & U(m_Value) & ")"
+        End If
     End If
     If Len(Dic("listvariable")) Then
         sOut.Append Space(4) & Dic("listvariable") & " = StringVar(value=" & U(m_Value) & ")"
@@ -81,8 +85,8 @@ Public Function toStringStructure(ByRef sCmdFunc As cStrBuilder, rel As Boolean,
     If usettk Then                                                              '创建STYLE对象
         sStyle = GetStyleParams(False, usettk)
         If Len(sStyle) Then
-            sOut.Append Space(4) & "style.configure('" & m_Name & "." & m_StyleName & "'," & sStyle & ")"
-            sOtherParams = sOtherParams & IIf(Len(sOtherParams), ", ", "") & "style='" & m_Name & "." & m_StyleName & "'"
+            sOut.Append Space(4) & "style.configure('T" & m_Name & "." & m_StyleName & "'," & sStyle & ")"
+            sOtherParams = sOtherParams & IIf(Len(sOtherParams), ", ", "") & "style='T" & m_Name & "." & m_StyleName & "'"
         End If
     End If
     
@@ -104,7 +108,7 @@ Public Function toStringStructure(ByRef sCmdFunc As cStrBuilder, rel As Boolean,
     End If
     
     '创建事件处理函数框架（如果有），事件里面有点号说明是调用系统的函数，不需要生成函数体
-    If InStr(1, Dic("command"), ".") <= 0 And InStr(1, Dic("command"), "lambda ") <= 0 Then
+    If Len(Dic("command")) > 0 And InStr(1, Dic("command"), ".") <= 0 And InStr(1, Dic("command"), "lambda ") <= 0 Then
         sCmdFunc.Append CreateFuncDef(Dic("command"), "event=None")
     End If
     If Len(Dic("postcommand")) Then
@@ -112,15 +116,25 @@ Public Function toStringStructure(ByRef sCmdFunc As cStrBuilder, rel As Boolean,
     End If
     
     '处理下划线快捷方式
-    If Len(Dic("underline")) > 0 And Dic("underline") <> "-1" And Len(Dic("command")) > 0 Then
-        sTmp = Dic("text")
-        If Len(sTmp) = 0 Then sTmp = Dic("label")
-        If Len(sTmp) And Len(Dic("underline")) < Len(sTmp) Then
-            sOut.Append Space(4) & WTOP & ".bind_all('<Alt-" & Mid(sTmp, CLng(Dic("underline")) + 1, 1) & ">', " & Dic("command") & ")"
-            If Mid(sTmp, CLng(Dic("underline")) + 1, 1) >= "a" And Mid(sTmp, CLng(Dic("underline")) + 1, 1) <= "z" Then
-                sOut.Append Space(4) & WTOP & ".bind_all('<Alt-" & UCase(Mid(sTmp, CLng(Dic("underline")) + 1, 1)) & ">', " & Dic("command") & ")"
-            ElseIf Mid(sTmp, CLng(Dic("underline")) + 1, 1) >= "A" And Mid(sTmp, CLng(Dic("underline")) + 1, 1) <= "Z" Then
-                sOut.Append Space(4) & WTOP & ".bind_all('<Alt-" & LCase(Mid(sTmp, CLng(Dic("underline")) + 1, 1)) & ">', " & Dic("command") & ")"
+    If Len(Dic("underline")) > 0 And Dic("underline") <> "-1" And IsNumeric(Dic("underline")) Then
+        If m_Type = "Button" Or m_Type = "Checkbutton" Or m_Type = "Radiobutton" Then
+            sUnderlineCmd = "lambda e: " & m_Name & ".focus_set() or " & m_Name & ".invoke()"
+        ElseIf Len(Dic("command")) > 0 Then
+            sUnderlineCmd = Dic("command")
+        Else
+            sUnderlineCmd = "lambda e: " & m_Name & ".focus_set()"
+        End If
+        
+        If Len(sUnderlineCmd) Then
+            sTmp = Dic("text")
+            If Len(sTmp) = 0 Then sTmp = Dic("label")
+            If Len(sTmp) And CLng(Dic("underline")) < Len(sTmp) Then
+                sOut.Append Space(4) & WTOP & ".bind_all('<Alt-" & Mid(sTmp, CLng(Dic("underline")) + 1, 1) & ">', " & sUnderlineCmd & ")"
+                If Mid(sTmp, CLng(Dic("underline")) + 1, 1) >= "a" And Mid(sTmp, CLng(Dic("underline")) + 1, 1) <= "z" Then
+                    sOut.Append Space(4) & WTOP & ".bind_all('<Alt-" & UCase(Mid(sTmp, CLng(Dic("underline")) + 1, 1)) & ">', " & sUnderlineCmd & ")"
+                ElseIf Mid(sTmp, CLng(Dic("underline")) + 1, 1) >= "A" And Mid(sTmp, CLng(Dic("underline")) + 1, 1) <= "Z" Then
+                    sOut.Append Space(4) & WTOP & ".bind_all('<Alt-" & LCase(Mid(sTmp, CLng(Dic("underline")) + 1, 1)) & ">', " & sUnderlineCmd & ")"
+                End If
             End If
         End If
     End If
@@ -164,24 +178,26 @@ Public Function toStringStructure(ByRef sCmdFunc As cStrBuilder, rel As Boolean,
         Next
     End If
     
-    toStringStructure = sOut.toString(vbCrLf)
-    
-End Function
+End Sub
 
 '输出面向对象代码
-Public Function toStringOOP(ByRef sCmdFunc As cStrBuilder, rel As Boolean, usettk As Boolean, Optional sOtherParams As String = "") As String
+Public Sub toStringOOP(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, rel As Boolean, usettk As Boolean, Optional sOtherParams As String = "")
     
-    Dim sOut As New cStrBuilder, s() As String, i As Long, extra As String
-    Dim sTmp As String, sStyle As String, sCmdName As String
-    
-    'Debug.Assert m_Type <> "" And m_Name <> ""
+    Dim s() As String, i As Long, extra As String
+    Dim sTmp As String, sStyle As String, sCmdName As String, sUnderlineCmd As String
     
     '如果需要变量绑定，则先创建对应的变量
     If Len(Dic("textvariable")) Then
         sOut.Append Space(8) & "self." & Dic("textvariable") & " = StringVar(value=" & U(Dic("text")) & ")"
     End If
     If Len(Dic("variable")) Then
-        sOut.Append Space(8) & "self." & Dic("variable") & " = StringVar(value=" & U(m_Value) & ")"
+        If m_Type = "Radiobutton" Then  '一组单选按钮的variable都是同一个，不要重复创建
+            If Not sOut.ExistString(Space(8) & "self." & Dic("variable") & " = StringVar()") Then
+                sOut.Append Space(8) & "self." & Dic("variable") & " = StringVar()"
+            End If
+        Else
+            sOut.Append Space(8) & "self." & Dic("variable") & " = StringVar(value=" & U(m_Value) & ")"
+        End If
     End If
     If Len(Dic("listvariable")) Then
         sOut.Append Space(8) & "self." & Dic("listvariable") & " = StringVar(value=" & U(m_Value) & ")"
@@ -209,8 +225,8 @@ Public Function toStringOOP(ByRef sCmdFunc As cStrBuilder, rel As Boolean, usett
     If usettk Then                                                              '创建STYLE对象
         sStyle = GetStyleParams(True, usettk)
         If Len(sStyle) Then
-            sOut.Append Space(8) & "self.style.configure('" & m_Name & "." & m_StyleName & "'," & sStyle & ")"
-            sOtherParams = sOtherParams & IIf(Len(sOtherParams), ", ", "") & "style='" & m_Name & "." & m_StyleName & "'"
+            sOut.Append Space(8) & "self.style.configure('T" & m_Name & "." & m_StyleName & "', " & sStyle & ")"
+            sOtherParams = sOtherParams & IIf(Len(sOtherParams), ", ", "") & "style='T" & m_Name & "." & m_StyleName & "'"
         End If
     End If
     
@@ -220,7 +236,7 @@ Public Function toStringOOP(ByRef sCmdFunc As cStrBuilder, rel As Boolean, usett
     sOut.Append Space(8) & "self." & m_Name & ".place(" & GetPositionParams(rel) & ")"
     
     '创建事件处理函数框架（如果有），事件里面有点号说明是调用系统的函数，不需要生成函数体
-    If InStr(1, Dic("command"), ".") <= 0 And InStr(1, Dic("command"), "lambda ") <= 0 Then
+    If Len(Dic("command")) > 0 And InStr(1, Dic("command"), ".") <= 0 And InStr(1, Dic("command"), "lambda ") <= 0 Then
         sCmdFunc.Append CreateFuncDefOOP(Dic("command"), "event=None")
     End If
     If Len(Dic("postcommand")) Then
@@ -228,15 +244,25 @@ Public Function toStringOOP(ByRef sCmdFunc As cStrBuilder, rel As Boolean, usett
     End If
     
     '处理下划线快捷方式
-    If Len(Dic("underline")) > 0 And Dic("underline") <> "-1" And Len(Dic("command")) > 0 Then
-        sTmp = Dic("text")
-        If Len(sTmp) = 0 Then sTmp = Dic("label")
-        If Len(sTmp) And Len(Dic("underline")) < Len(sTmp) Then
-            sOut.Append Space(8) & "self." & WTOP & ".bind_all('<Alt-" & Mid(sTmp, CLng(Dic("underline")) + 1, 1) & ">', self." & Dic("command") & ")"
-            If Mid(sTmp, CLng(Dic("underline")) + 1, 1) >= "a" And Mid(sTmp, CLng(Dic("underline")) + 1, 1) <= "z" Then
-                sOut.Append Space(8) & "self." & WTOP & ".bind_all('<Alt-" & UCase(Mid(sTmp, CLng(Dic("underline")) + 1, 1)) & ">', self." & Dic("command") & ")"
-            ElseIf Mid(sTmp, CLng(Dic("underline")) + 1, 1) >= "A" And Mid(sTmp, CLng(Dic("underline")) + 1, 1) <= "Z" Then
-                sOut.Append Space(8) & "self." & WTOP & ".bind_all('<Alt-" & LCase(Mid(sTmp, CLng(Dic("underline")) + 1, 1)) & ">', self." & Dic("command") & ")"
+    If Len(Dic("underline")) > 0 And Dic("underline") <> "-1" And IsNumeric(Dic("underline")) Then
+        If m_Type = "Button" Or m_Type = "Checkbutton" Or m_Type = "Radiobutton" Then
+            sUnderlineCmd = "lambda e: self." & m_Name & ".focus_set() or self." & m_Name & ".invoke()"
+        ElseIf Len(Dic("command")) > 0 Then
+            sUnderlineCmd = "self." & Dic("command")
+        Else
+            sUnderlineCmd = "lambda e: self." & m_Name & ".focus_set()"
+        End If
+        
+        If Len(sUnderlineCmd) Then
+            sTmp = Dic("text")
+            If Len(sTmp) = 0 Then sTmp = Dic("label")
+            If Len(sTmp) And CLng(Dic("underline")) < Len(sTmp) Then
+                sOut.Append Space(8) & "self." & WTOP & ".bind_all('<Alt-" & Mid(sTmp, CLng(Dic("underline")) + 1, 1) & ">', " & sUnderlineCmd & ")"
+                If Mid(sTmp, CLng(Dic("underline")) + 1, 1) >= "a" And Mid(sTmp, CLng(Dic("underline")) + 1, 1) <= "z" Then
+                    sOut.Append Space(8) & "self." & WTOP & ".bind_all('<Alt-" & UCase(Mid(sTmp, CLng(Dic("underline")) + 1, 1)) & ">', " & sUnderlineCmd & ")"
+                ElseIf Mid(sTmp, CLng(Dic("underline")) + 1, 1) >= "A" And Mid(sTmp, CLng(Dic("underline")) + 1, 1) <= "Z" Then
+                    sOut.Append Space(8) & "self." & WTOP & ".bind_all('<Alt-" & LCase(Mid(sTmp, CLng(Dic("underline")) + 1, 1)) & ">', " & sUnderlineCmd & ")"
+                End If
             End If
         End If
     End If
@@ -279,9 +305,7 @@ Public Function toStringOOP(ByRef sCmdFunc As cStrBuilder, rel As Boolean, usett
         Next
     End If
     
-    toStringOOP = sOut.toString(vbCrLf)
-    
-End Function
+End Sub
 
 '根据rel(是否采用相对坐标)，生成对应的控件位置信息
 Public Function GetPositionParams(rel As Boolean) As String
@@ -303,13 +327,21 @@ Public Function GetExtraParams(oop As Boolean, usettk As Boolean) As String
         If isExtra(k, usettk) And Len(Dic(k)) Then
             '需要使用引号括起来的属性，如果用户忘了，则在这里自动添加
             If k = "text" Or k = "label" Then
-                sValue = U(Dic(k))
-            ElseIf InStr(1, " fg, bg, anchor, justify, show, state, activestyle, labelanchor, mode, ", " " & k & ",") Then
+                If m_Type = "Entry" And Len(Dic("textvariable")) > 0 And usettk Then 'ttk模式下Entry使用textvariable显示字符，而不是使用text属性
+                    '忽略text属性
+                    sValue = ""
+                Else
+                    sValue = U(Dic(k))
+                End If
+            ElseIf InStr(1, ",fg,bg,anchor,justify,show,state,activestyle,labelanchor,mode,cursor,", "," & k & ",") Then
                 sValue = Quote(Dic(k))
             Else
                 sValue = Dic(k)
             End If
-            s.Append k & "=" & sValue
+            
+            If Len(sValue) Then
+                s.Append k & "=" & sValue
+            End If
         End If
     Next
     
@@ -339,8 +371,10 @@ Public Function GetExtraParams(oop As Boolean, usettk As Boolean) As String
     If Len(Dic("xscrollcommand")) Then s.Append "xscrollcommand=" & IIf(oop, "self.", "") & Dic("xscrollcommand")
     If Len(Dic("yscrollcommand")) Then s.Append "yscrollcommand=" & IIf(oop, "self.", "") & Dic("yscrollcommand")
     If Len(Dic("font")) Then
-        If usettk Then 'Entry的font要写在创建函数中才管用
-            If m_Type = "Entry" Or m_Type = "Combobox" Then s.Append "font=" & IIf(Left$(Dic("font"), 1) = "(", Dic("font"), "(" & Dic("font") & ")")
+        If usettk Then 'TTK模式的大多数控件的font一般都要写在样式里面，但Entry/Combobox的font要写在创建函数中才管用
+            If m_Type = "Entry" Or m_Type = "Combobox" Then
+                s.Append "font=" & IIf(Left$(Dic("font"), 1) = "(", Dic("font"), "(" & Dic("font") & ")") '自动加括号
+            End If
         Else
             s.Append "font=" & IIf(oop, "self.", "") & m_Name & "Font"
         End If
@@ -352,14 +386,15 @@ End Function
 
 '判断一个属性是否是额外参数，会根据TTK来判断更多的属性
 Private Function isExtra(ByVal sK As String, usettk As Boolean) As Boolean
-    Const EXTRA_STRING As String = " x, y, relx, rely, width, height, relwidth, relheight, command, bindcommand, xscrollcommand, " & _
-    " yscrollcommand, postcommand, font, textvariable, variable, listvariable, values, displayrows, columns, displaycolumns, "
-    Const EXTRA_STRING_TTK As String = EXTRA_STRING & " fg, bg, bd, relief, activerelief, anchor, jump, indicatoron, resolution, "
+    Const EXTRA_STRING As String = ",x,y,relx,rely,width,height,relwidth,relheight,command,bindcommand,xscrollcommand," & _
+        "yscrollcommand,postcommand,font,textvariable,variable,listvariable,values,displayrows,columns,displaycolumns,"
+    Const EXTRA_STRING_TTK As String = EXTRA_STRING & ",fg,bg,bd,relief,activerelief,overrelief,anchor,jump,indicatoron,resolution,digits," & _
+        "sliderlength,sliderrelief,showvalue,tickinterval,"
     
     If usettk Then
-        isExtra = (InStr(1, EXTRA_STRING_TTK, Space(1) & sK & ",") <= 0)
+        isExtra = (InStr(1, EXTRA_STRING_TTK, "," & sK & ",") <= 0)
     Else
-        isExtra = (InStr(1, EXTRA_STRING, Space(1) & sK & ",") <= 0)
+        isExtra = (InStr(1, EXTRA_STRING, "," & sK & ",") <= 0)
     End If
 End Function
 
@@ -369,6 +404,7 @@ Private Function GetStyleParams(oop As Boolean, usettk As Boolean) As String
     
     If Len(Dic("relief")) Then s.Append "relief=" & Dic("relief")
     If Len(Dic("activerelief")) Then s.Append "activerelief=" & Dic("activerelief")
+    If Len(Dic("overrelief")) Then s.Append "overrelief=" & Dic("overrelief")
     If Len(Dic("anchor")) Then s.Append "anchor=" & Quote(Dic("anchor"))
     If Len(Dic("fg")) Then s.Append "foreground=" & Quote(Dic("fg"))
     If Len(Dic("bg")) Then s.Append "background=" & Quote(Dic("bg"))
@@ -493,6 +529,11 @@ Public Function GetAttrValueList(sAttr As String, ByRef sa() As String) As Long
             sa = Split("'left','right','center'", ",")
         Case "orient"
             sa = Split("'horizontal','vertical'", ",")
+        Case "cursor"
+            sa = Split("'arrow','bottom_left_corner','bottom_right_corner','center_ptr','circle','clock','cross'," & _
+                "'crosshair','dot','double_arrow','exchange','fleur','hand1','hand2','icon','left_ptr','plus'," & _
+                "'question_arrow','sb_h_double_arrow','sb_v_double_arrow','sizing','tcross','watch','xterm','X_cursor'", ",")
+            GetAttrValueList = 2
         Case Else
             GetAttrValueList = 0
     End Select
@@ -542,6 +583,8 @@ Public Function Tips(sAttr As String) As String
         Tips = Tips & L("l_TipPadding", "控件内部额外间距，一般不需要设置。如果需要设置，请提供'左 上 右 下'四个值，或三个值'左 上 右'(下=上)，两个值'左 上'(右=左,下=上)，一个值'左'(上=下=右=左)。")
     Case "orient":
         Tips = Tips & L("l_TipOrient", "控件方向类型，全大写不用括号，小写则需要括号括起来，可选值有：'horizontal', 'vertical'。")
+    Case "cursor":
+        Tips = Tips & L("l_TipCursor", "鼠标指针。可以使用tk内置的指针，或在文件名前增加一个@符号使用外部指针，如'@custom.cur'。")
     Case "variable":
         Tips = Tips & L("l_TipVariable", "控件值和一个变量绑定，通过变量可以获取或设置控件的值。\n如果需要这个特性，这个属性设置为变量名。")
     Case "textvariable":
@@ -596,6 +639,13 @@ Public Property Let StyleName(s As String)
     m_StyleName = s
 End Property
 
+Public Property Let ScaleMode(nV As Long)
+    m_ScaleMode = nV
+End Property
+Public Property Get ScaleMode() As Long
+    ScaleMode = m_ScaleMode
+End Property
+
 '对象序列化函数
 Public Function Serializer(vSer As clsSerialization)
     vSer.Serializer m_dic
@@ -631,7 +681,7 @@ Public Function CreateFuncDef(FuncName As String, Optional sparams As String = "
         CreateFuncDef = CreateFuncDef & sbody & vbCrLf
     Else
     #If DebugVer Then
-        CreateFuncDef = CreateFuncDef & Space(4) & "showinfo('','" & FuncName & "')" & vbCrLf
+        CreateFuncDef = CreateFuncDef & Space(4) & "print('" & FuncName & "')" & vbCrLf
     #Else
         CreateFuncDef = CreateFuncDef & Space(4) & "#TODO, Please finish the function here!" & vbCrLf
         CreateFuncDef = CreateFuncDef & Space(4) & "pass" & vbCrLf
@@ -647,7 +697,7 @@ Public Function CreateFuncDefOOP(FuncName As String, Optional sparams As String 
         CreateFuncDefOOP = CreateFuncDefOOP & sbody & vbCrLf
     Else
     #If DebugVer Then
-        CreateFuncDefOOP = CreateFuncDefOOP & Space(8) & "showinfo('','" & FuncName & "')" & vbCrLf
+        CreateFuncDefOOP = CreateFuncDefOOP & Space(8) & "print('" & FuncName & "')" & vbCrLf
     #Else
         CreateFuncDefOOP = CreateFuncDefOOP & Space(8) & "#TODO, Please finish the function here!" & vbCrLf
         CreateFuncDefOOP = CreateFuncDefOOP & Space(8) & "pass" & vbCrLf
@@ -677,12 +727,25 @@ Public Function toPixelY(nY As Long) As Long
     End If
 End Function
 
-Public Property Let ScaleMode(nV As Long)
-    m_ScaleMode = nV
-End Property
-Public Property Get ScaleMode() As Long
-    ScaleMode = m_ScaleMode
-End Property
-
+'将VB的鼠标指针值翻译为tkinter的鼠标指针名
+Public Function GetCursorName(nCursor As Long) As String
+    Select Case nCursor
+        Case vbArrow: GetCursorName = "'arrow'"
+        Case vbCrosshair: GetCursorName = "'cross'"
+        Case vbIbeam: GetCursorName = "'xterm'"
+        Case vbSizePointer: GetCursorName = "'fleur'"
+        Case vbSizeNESW: GetCursorName = "'bottom_left_corner'"
+        Case vbSizeNS: GetCursorName = "'sb_v_double_arrow'"
+        Case vbSizeNWSE: GetCursorName = "'bottom_right_corner'"
+        Case vbSizeWE: GetCursorName = "'sb_h_double_arrow'"
+        Case vbUpArrow: GetCursorName = "'center_ptr'"
+        Case vbHourglass: GetCursorName = "'clock'"
+        Case vbNoDrop: GetCursorName = "'X_cursor'"
+        Case vbArrowHourglass: GetCursorName = "'watch'"
+        Case vbArrowQuestion: GetCursorName = "'question_arrow'"
+        Case vbSizeAll: GetCursorName = "'sizing'"
+        Case Else: GetCursorName = ""
+    End Select
+End Function
 
 

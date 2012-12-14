@@ -30,9 +30,7 @@ Private m_IdxCurChild As Long
 'rel:是否使用相对坐标,
 'oop:是否使用面向对象编程
 'usettk:是否使用TTK主题扩展
-Public Function toString(ByRef sCmd As cStrBuilder, rel As Boolean, oop As Boolean, usettk As Boolean) As String
-    
-    Dim sOut As New cStrBuilder
+Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, rel As Boolean, oop As Boolean, usettk As Boolean)
     
     If oop Then
         toStringOOP sOut, sCmd, rel
@@ -40,9 +38,7 @@ Public Function toString(ByRef sCmd As cStrBuilder, rel As Boolean, oop As Boole
         toStringStructure sOut, sCmd, rel
     End If
     
-    toString = sOut.toString(vbCrLf)
-    
-End Function
+End Sub
 
 '输出结构化代码
 Public Sub toStringStructure(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, rel As Boolean)
@@ -74,7 +70,9 @@ Public Sub toStringStructure(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilde
         If m_Base("command") = "" Then m_Base("command") = m_Base.Name & "_Cmd"
         extra = GetExtraParams(False)
         sOut.Append Space(4) & m_Base.Parent & ".add_checkbutton(" & extra & ")"
-        sCmd.Append m_Base.CreateFuncDef(m_Base("command"), "event=None")
+        If Len(m_Base("command")) Then
+            sCmd.Append m_Base.CreateFuncDef(m_Base("command"), "event=None")
+        End If
     Else                                                                        '子菜单
         var = m_Base("variable")
         m_Base("variable") = ""
@@ -82,7 +80,9 @@ Public Sub toStringStructure(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilde
         extra = GetExtraParams(False)
         m_Base("variable") = var
         sOut.Append Space(4) & m_Base.Parent & ".add_command(" & extra & ")"
-        sCmd.Append m_Base.CreateFuncDef(m_Base("command"), "event=None")
+        If Len(m_Base("command")) Then
+            sCmd.Append m_Base.CreateFuncDef(m_Base("command"), "event=None")
+        End If
     End If
     
     '有需要使用bind语句绑定的其他事件处理
@@ -144,7 +144,9 @@ Public Sub toStringOOP(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, rel
         If m_Base("command") = "" Then m_Base("command") = m_Base.Name & "_Cmd"
         extra = GetExtraParams(True)
         sOut.Append Space(8) & "self." & m_Base.Parent & ".add_checkbutton(" & extra & ")"
-        sCmd.Append m_Base.CreateFuncDefOOP(m_Base("command"), "event=None")
+        If Len(m_Base("command")) Then
+            sCmd.Append m_Base.CreateFuncDefOOP(m_Base("command"), "event=None")
+        End If
     Else
         var = m_Base("variable")
         m_Base("variable") = ""
@@ -152,7 +154,9 @@ Public Sub toStringOOP(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, rel
         extra = GetExtraParams(True)
         m_Base("variable") = var
         sOut.Append Space(8) & "self." & m_Base.Parent & ".add_command(" & extra & ")"
-        sCmd.Append m_Base.CreateFuncDefOOP(m_Base("command"), "event=None")
+        If Len(m_Base("command")) Then
+            sCmd.Append m_Base.CreateFuncDefOOP(m_Base("command"), "event=None")
+        End If
     End If
     
     '有需要使用bind语句绑定的其他事件处理

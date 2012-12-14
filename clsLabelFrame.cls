@@ -26,9 +26,9 @@ Private m_CanbeOutByMainForm As Boolean
 'rel:是否使用相对坐标,
 'oop:是否使用面向对象编程
 'usettk:是否使用TTK主题扩展
-Public Function toString(ByRef sCmdFunc As cStrBuilder, rel As Boolean, oop As Boolean, usettk As Boolean) As String
-    toString = m_Base.toString(sCmdFunc, rel, oop, usettk)
-End Function
+Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, rel As Boolean, oop As Boolean, usettk As Boolean)
+    m_Base.toString sOut, sCmdFunc, rel, oop, usettk
+End Sub
 
 '创建对象后要马上调用这个函数初始化各参数
 Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dMethods As Dictionary)
@@ -51,6 +51,7 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
     m_dicTotal("font") = "(" & U(CStr(o.Properties("Font")("Name"))) & "," & Round(o.Properties("Font")("Size")) & _
                         IIf(o.Properties("Font")("Bold"), ",'bold'", "") & IIf(o.Properties("Font")("Italic"), ",'italic'", "") & _
                         IIf(o.Properties("Font")("Underline"), ",'underline'", "") & IIf(o.Properties("Font")("Strikethrough"), ",'overstrike')", ")")
+    m_dicTotal("cursor") = m_Base.GetCursorName(o.Properties("MousePointer"))
     
     '这些是默认选择的
     m_Base("x") = m_dicTotal("x")
@@ -65,6 +66,7 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
     If o.Properties("ForeColor") <> vbButtonText Then m_Base("fg") = m_dicTotal("fg")
     If o.Properties("BackColor") <> vbButtonFace Then m_Base("bg") = m_dicTotal("bg")
     If m_dicTotal("font") <> "(" & U(GetDefaultFontName()) & ",9)" Then m_Base("font") = m_dicTotal("font")
+    If m_dicTotal("cursor") <> "" Then m_Base("cursor") = m_dicTotal("cursor")
     
 End Sub
 

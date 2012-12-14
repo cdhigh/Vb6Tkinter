@@ -26,7 +26,7 @@ Private m_CanbeOutByMainForm As Boolean
 'rel:是否使用相对坐标,
 'oop:是否使用面向对象编程
 'usettk:是否使用TTK主题扩展
-Public Function toString(ByRef sCmdFunc As cStrBuilder, rel As Boolean, oop As Boolean, usettk As Boolean) As String
+Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, rel As Boolean, oop As Boolean, usettk As Boolean)
     
     Dim s As String
     If usettk And Len(m_Base("label")) Then  'TTK库不支持Scale的label属性
@@ -34,13 +34,13 @@ Public Function toString(ByRef sCmdFunc As cStrBuilder, rel As Boolean, oop As B
         m_Base("label") = ""
     End If
     
-    toString = m_Base.toString(sCmdFunc, rel, oop, usettk)
+    m_Base.toString sOut, sCmdFunc, rel, oop, usettk
     
     If usettk And Len(s) Then
         m_Base("label") = s
     End If
     
-End Function
+End Sub
 
 '创建对象后要马上调用这个函数初始化各参数
 Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dMethods As Dictionary)
@@ -75,6 +75,7 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
     m_dicTotal("tickinterval") = 0
     m_dicTotal("font") = ""
     m_dicTotal("takefocus") = IIf(o.Properties("TabStop"), 1, 0)
+    m_dicTotal("cursor") = m_Base.GetCursorName(o.Properties("MousePointer"))
     m_dicTotal("command") = o.Properties("Name") & "_Cmd"
     m_dicTotal("bindcommand") = m_Base.GetBindCommandStr(dMethods)
     
@@ -94,6 +95,7 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
     m_Base("to") = m_dicTotal("to")
     m_Base("resolution") = m_dicTotal("resolution")
     If m_dicTotal("takefocus") = 0 Then m_Base("takefocus") = m_dicTotal("takefocus")
+    If m_dicTotal("cursor") <> "" Then m_Base("cursor") = m_dicTotal("cursor")
     If m_dicTotal("bindcommand") <> "" Then m_Base("bindcommand") = m_dicTotal("bindcommand")
     
 End Sub

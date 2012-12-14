@@ -26,9 +26,9 @@ Private m_CanbeOutByMainForm As Boolean
 'rel:是否使用相对坐标,
 'oop:是否使用面向对象编程
 'usettk:是否使用TTK主题扩展
-Public Function toString(ByRef sCmdFunc As cStrBuilder, rel As Boolean, oop As Boolean, usettk As Boolean) As String
-    toString = m_Base.toString(sCmdFunc, rel, oop, usettk)
-End Function
+Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, rel As Boolean, oop As Boolean, usettk As Boolean)
+    m_Base.toString sOut, sCmdFunc, rel, oop, usettk
+End Sub
 
 
 '创建对象后要马上调用这个函数初始化各参数
@@ -56,6 +56,7 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
                         IIf(o.Properties("Font")("Bold"), ",'bold'", "") & IIf(o.Properties("Font")("Italic"), ",'italic'", "") & _
                         IIf(o.Properties("Font")("Underline"), ",'underline'", "") & IIf(o.Properties("Font")("Strikethrough"), ",'overstrike')", ")")
     m_dicTotal("underline") = IIf(InStr(1, o.Properties("Caption"), "&"), InStr(1, o.Properties("Caption"), "&") - 1, "-1")
+    m_dicTotal("cursor") = m_Base.GetCursorName(o.Properties("MousePointer"))
     m_dicTotal("textvariable") = o.Properties("Name") & "Var"
     m_dicTotal("bindcommand") = m_Base.GetBindCommandStr(dMethods)
     
@@ -75,6 +76,7 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
     If m_dicTotal("anchor") <> "w" Then m_Base("anchor") = m_dicTotal("anchor")
     If m_dicTotal("font") <> "(" & U(GetDefaultFontName()) & ",9)" Then m_Base("font") = m_dicTotal("font")
     If m_dicTotal("underline") <> "-1" Then m_Base("underline") = m_dicTotal("underline")
+    If m_dicTotal("cursor") <> "" Then m_Base("cursor") = m_dicTotal("cursor")
     If m_Base.IsExistCommand(dMethods, "Change") Then m_Base("textvariable") = m_dicTotal("textvariable")
     If m_dicTotal("bindcommand") <> "" Then m_Base("bindcommand") = m_dicTotal("bindcommand")
     

@@ -19,6 +19,7 @@ Private m_Base As clsBaseControl
 Private m_Name As String
 Private m_Title As String
 Private m_Geometry As String
+Private m_WindowState As String
 Private m_Resizable As Boolean
 Private m_IconFile As String
 Private m_IconEmbedding As Boolean
@@ -26,23 +27,52 @@ Private m_Protocol As String
 Private m_Bindcommand As String
 Private m_FrmPath As String          '保存窗体所在目录
 Private m_ScaleMode As Long
+Private m_IconFilesInPath As String '在窗体所在目录下所有的图标文件，使用逗号分隔
 
 '输出PYTHON代码,
 'sCmdFunc: 输出参数，事件处理回调代码;
 'rel:是否使用相对坐标,
 'oop:是否使用面向对象编程
 'usettk:是否使用TTK主题扩展
-Public Function toString(ByRef sCmdFunc As cStrBuilder, rel As Boolean, oop As Boolean, usettk As Boolean) As String
-    
-    Dim sOut As New cStrBuilder, s As String, sBase64 As String, sa() As String, i As Long
+Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, rel As Boolean, oop As Boolean, usettk As Boolean)
     
     If oop Then
         sOut.Append "        self.master.title(" & U(m_Title) & ")"
         sOut.Append "        self.master.geometry('" & m_Geometry & "')"
         If Not m_Resizable Then sOut.Append "        self.master.resizable(0,0)"
-        
-        '处理窗体图标
-        s = UCase(FileExt(m_IconFile))
+        If Len(m_WindowState) > 0 And m_WindowState <> "'normal'" Then
+            sOut.Append "        self.master.wm_state(" & m_WindowState & ")"
+        End If
+    Else
+        sOut.Append "    " & m_Name & " = Tk()"
+        sOut.Append "    " & m_Name & ".title(" & U(m_Title) & ")"
+        sOut.Append "    " & m_Name & ".geometry('" & m_Geometry & "')"
+        If Not m_Resizable Then sOut.Append "    " & m_Name & ".resizable(0,0)"
+        If Len(m_WindowState) > 0 And m_WindowState <> "'normal'" Then
+            sOut.Append "    " & m_Name & ".wm_state(" & m_WindowState & ")"
+        End If
+    End If
+    
+    ProcessIcon sOut, oop  '处理窗体图标
+    ProcessBindCommand sOut, sCmdFunc, oop ' 处理bindcommand
+    ProcessProtocol sOut, sCmdFunc, oop '窗口消息拦截，如果有的话
+    
+    If Not oop Then
+        sOut.Append "    gComps['" & m_Name & "'] = " & m_Name & vbCrLf
+    End If
+    
+End Sub
+
+Private Sub ProcessIcon(sOut As cStrBuilder, oop As Boolean)
+    
+    Dim s As String, sBase64 As String
+    
+    If Len(m_IconFile) = 0 Then Exit Sub
+    
+    s = UCase(FileExt(m_IconFile))
+    
+    '处理窗体图标
+    If oop Then
         If s = "GIF" And m_IconEmbedding Then
             sBase64 = CreateIconBase64(Space(12)) '使用BASE64将GIF图片嵌入源码
             If Len(sBase64) Then
@@ -50,34 +80,13 @@ Public Function toString(ByRef sCmdFunc As cStrBuilder, rel As Boolean, oop As B
                 sOut.Append "        self.iconimg = PhotoImage(data=self.icondata)"
                 sOut.Append "        self.master.tk.call('wm', 'iconphoto', self.master._w, self.iconimg)"
             End If
-        ElseIf s = "ICO" Then
+        ElseIf Len(s) = 0 Or s = "ICO" Then '如果没有后缀名，则假定为ico格式
             sOut.Append "        self.master.iconbitmap(default=r'" & FileFullName(m_IconFile) & "')"
-        ElseIf Len(s) Then
+        Else
             sOut.Append "        self.iconimg = PhotoImage(file=r'" & FileFullName(m_IconFile) & "')"
             sOut.Append "        self.master.tk.call('wm', 'iconphoto', self.master._w, self.iconimg)"
         End If
-        
-        '窗口消息拦截，如果有的话
-        If Len(m_Protocol) Then
-            sa = Split(m_Protocol, ",")
-            For i = 0 To UBound(sa)
-                sOut.Append "        self.master.protocol('" & sa(i) & "', self.EV_" & sa(i) & ")"
-                If sa(i) = "WM_DELETE_WINDOW" Then
-                    s = "        if askyesno(message='Are you sure to quit?'):" & vbCrLf & Space(12) & "self.master.destroy()"
-                    sCmdFunc.Append m_Base.CreateFuncDefOOP("EV_" & sa(i), "event=None", s)
-                Else
-                    sCmdFunc.Append m_Base.CreateFuncDefOOP("EV_" & sa(i), "event=None")
-                End If
-            Next
-        End If
     Else
-        sOut.Append "    " & m_Name & " = Tk()"
-        sOut.Append "    " & m_Name & ".title(" & U(m_Title) & ")"
-        sOut.Append "    " & m_Name & ".geometry('" & m_Geometry & "')"
-        If Not m_Resizable Then sOut.Append "    " & m_Name & ".resizable(0,0)"
-        
-        '处理窗体图标
-        s = UCase(FileExt(m_IconFile))
         If s = "GIF" And m_IconEmbedding Then
             sBase64 = CreateIconBase64(Space(8))
             If Len(sBase64) Then
@@ -85,33 +94,92 @@ Public Function toString(ByRef sCmdFunc As cStrBuilder, rel As Boolean, oop As B
                 sOut.Append "    iconimg = PhotoImage(data=icondata)"
                 sOut.Append "    " & m_Name & ".tk.call('wm', 'iconphoto', " & m_Name & "._w, iconimg)"
             End If
-        ElseIf s = "ICO" Then
+        ElseIf Len(s) = 0 Or s = "ICO" Then '如果图标没有后缀名，则假定为ico格式
             sOut.Append "    " & m_Name & ".iconbitmap(default=r'" & FileFullName(m_IconFile) & "')"
-        ElseIf Len(s) Then
+        Else
             sOut.Append "    iconimg = PhotoImage(file=r'" & FileFullName(m_IconFile) & "')"
             sOut.Append "    " & m_Name & ".tk.call('wm', 'iconphoto', " & m_Name & "._w, iconimg)"
         End If
-        
-        '窗口消息拦截，如果有的话
-        If Len(m_Protocol) Then
-            sa = Split(m_Protocol, ",")
-            For i = 0 To UBound(sa)
-                sOut.Append "    " & m_Name & ".protocol('" & sa(i) & "', EV_" & sa(i) & ")"
-                If sa(i) = "WM_DELETE_WINDOW" Then
-                    s = "    if askyesno(message='Are you sure to quit?'):" & vbCrLf & "        gComps['" & m_Name & "'].destroy()"
-                    sCmdFunc.Append m_Base.CreateFuncDef("EV_" & sa(i), "event=None", s)
-                Else
-                    sCmdFunc.Append m_Base.CreateFuncDef("EV_" & sa(i), "event=None")
+    End If
+End Sub
+
+Private Sub ProcessBindCommand(sOut As cStrBuilder, sCmdFunc As cStrBuilder, oop As Boolean)
+    
+    Dim i As Long, s() As String, sCmdName As String
+    
+    If Len(m_Bindcommand) = 0 Then Exit Sub
+    
+    s = Split(m_Bindcommand, ",")
+    
+    For i = 0 To UBound(s)
+        s(i) = Trim(s(i))
+        If Left$(s(i), 1) = "<" And Right$(s(i), 1) = ">" Then
+            
+            sCmdName = m_Name & "_" & Replace(Replace(Replace(s(i), "<", ""), ">", ""), "-", "_")
+            
+            If oop Then
+                sOut.Append Space(8) & "self.master.bind('" & s(i) & "', self." & sCmdName & ")"
+                sCmdFunc.Append m_Base.CreateFuncDefOOP(sCmdName, "event")
+                
+                'Python是大小写敏感的，对应快捷键也一样，如果设置的快捷键包含字母键，则将对应的大写/小写也一起绑定
+                If Right$(s(i), 3) >= "-a>" And Right$(s(i), 3) <= "-z>" Then
+                    s(i) = Left(s(i), Len(s(i)) - 2) & UCase(Mid(s(i), Len(s(i)) - 1, 1)) & ">" '变大写
+                    sOut.Append Space(8) & "self.master.bind('" & s(i) & "', self." & sCmdName & ")"
+                ElseIf Right$(s(i), 3) >= "-A>" And Right$(s(i), 3) <= "-Z>" Then
+                    s(i) = Left(s(i), Len(s(i)) - 2) & LCase(Mid(s(i), Len(s(i)) - 1, 1)) & ">" '变小写
+                    sOut.Append Space(8) & "self.master.bind('" & s(i) & "', self." & sCmdName & ")"
                 End If
-            Next
+            Else
+                sOut.Append Space(4) & m_Name & ".bind('" & s(i) & "', " & sCmdName & ")"
+                sCmdFunc.Append m_Base.CreateFuncDef(sCmdName, "event")
+                
+                'Python是大小写敏感的，对应快捷键也一样，如果设置的快捷键包含字母键，则将对应的大写/小写也一起绑定
+                If Right(s(i), 3) >= "-a>" And Right(s(i), 3) <= "-z>" Then
+                    s(i) = Left(s(i), Len(s(i)) - 2) & UCase(Mid(s(i), Len(s(i)) - 1, 1)) & ">" '对应字母变大写
+                    sOut.Append Space(4) & m_Name & ".bind('" & s(i) & "', " & sCmdName & ")"
+                ElseIf Right(s(i), 3) >= "-A>" And Right(s(i), 3) <= "-Z>" Then
+                    s(i) = Left(s(i), Len(s(i)) - 2) & LCase(Mid(s(i), Len(s(i)) - 1, 1)) & ">" '对应字母变小写
+                    sOut.Append Space(4) & m_Name & ".bind('" & s(i) & "', " & sCmdName & ")"
+                End If
+            End If
+            
         End If
-        
-        sOut.Append "    gComps['" & m_Name & "'] = " & m_Name & vbCrLf
+    Next
+    
+End Sub
+
+'窗口消息拦截，如果有的话
+Private Sub ProcessProtocol(sOut As cStrBuilder, sCmdFunc As cStrBuilder, oop As Boolean)
+    
+    Dim sa() As String, i As Long, s As String
+    
+    If Len(m_Protocol) = 0 Then Exit Sub
+    
+    sa = Split(m_Protocol, ",")
+    
+    If oop Then
+        For i = 0 To UBound(sa)
+            sOut.Append "        self.master.protocol('" & sa(i) & "', self.EV_" & sa(i) & ")"
+            If sa(i) = "WM_DELETE_WINDOW" Then
+                s = "        if askyesno(message='Are you sure to quit?'):" & vbCrLf & Space(12) & "self.master.destroy()"
+                sCmdFunc.Append m_Base.CreateFuncDefOOP("EV_" & sa(i), "event=None", s)
+            Else
+                sCmdFunc.Append m_Base.CreateFuncDefOOP("EV_" & sa(i), "event=None")
+            End If
+        Next
+    Else
+        For i = 0 To UBound(sa)
+            sOut.Append "    " & m_Name & ".protocol('" & sa(i) & "', EV_" & sa(i) & ")"
+            If sa(i) = "WM_DELETE_WINDOW" Then
+                s = "    if askyesno(message='Are you sure to quit?'):" & vbCrLf & "        gComps['" & m_Name & "'].destroy()"
+                sCmdFunc.Append m_Base.CreateFuncDef("EV_" & sa(i), "event=None", s)
+            Else
+                sCmdFunc.Append m_Base.CreateFuncDef("EV_" & sa(i), "event=None")
+            End If
+        Next
     End If
     
-    toString = sOut.toString(vbCrLf)
-    
-End Function
+End Sub
 
 Private Function CreateIconBase64(sPrexSpace As String) As String
 
@@ -142,14 +210,7 @@ Public Sub InitConfig(o As Object, nWidth As Long, nHeight As Long, dMethods As 
     
     Dim s As String
     
-    m_Name = o.Properties("Name")
-    m_Title = o.Properties("Caption")
-    m_Geometry = nWidth & "x" & nHeight
-    m_Resizable = IIf(o.Properties("MaxButton"), True, False)
-    m_IconEmbedding = True
-    m_IconFile = ""
-    m_Protocol = ""
-    
+    '获取窗体所在目录
     On Error Resume Next
     s = o.FileNames(1)
     If Err.Number = 0 And Len(s) Then
@@ -160,6 +221,22 @@ Public Sub InitConfig(o As Object, nWidth As Long, nHeight As Long, dMethods As 
     Err.Clear
     On Error GoTo 0
     
+    AutoDetectIconFile
+    
+    m_Name = o.Properties("Name")
+    m_Title = o.Properties("Caption")
+    m_Geometry = nWidth & "x" & nHeight
+    m_WindowState = IIf(o.Properties("WindowState") = vbMaximized, "'zoomed'", IIf(o.Properties("WindowState") = vbMinimized, "'iconic'", "'normal'"))
+    m_Resizable = IIf(o.Properties("MaxButton"), True, False)
+    m_IconEmbedding = True
+    m_Protocol = ""
+    If InStr(1, m_IconFilesInPath, ",") <= 0 Then
+        m_IconFile = m_IconFilesInPath
+    Else
+        m_IconFile = ""
+    End If
+    m_Bindcommand = ""
+    
 End Sub
 
 '设置属性值的可能值列表
@@ -169,6 +246,14 @@ Public Function GetAttrValueList(sAttr As String, ByRef sa() As String) As Long
     GetAttrValueList = 1
     If sAttr = "resizable" Or sAttr = "iconembedding" Then
         sa = Split("1,0", ",")
+    ElseIf sAttr = "windowstate" Then
+        sa = Split("'normal','iconic','zoomed'", ",")
+    ElseIf sAttr = "icon" And Len(m_IconFilesInPath) > 0 Then
+        sa = Split(m_IconFilesInPath, ",")
+        GetAttrValueList = 2
+    ElseIf sAttr = "protocol" Then
+        sa = Split("WM_DELETE_WINDOW", ",")
+        GetAttrValueList = 2
     Else
         GetAttrValueList = 0
     End If
@@ -183,15 +268,30 @@ Public Function Tips(sAttr As String) As String
             Tips = Tips & L("l_TipFrmGeometry", "窗体的大小（宽x高），单位为像素。")
         Case "resizable"
             Tips = Tips & L("l_TipFrmResizable", "用户是否可以改变窗体的大小。可选值：1/0。")
+        Case "windowstate"
+            Tips = Tips & L("l_TipFrmState", "窗体启动时的状态。'iconic'：最小化，'zoomed'：最大化，'normal'：正常状态。")
         Case "icon"
             Tips = Tips & L("l_TipFrmIcon", "图标文件名，支持ico,gif,ppm,pgm格式，省略路径名则在当前VB窗体目录下查找，建议icon文件放在py文件同一目录下。")
         Case "iconembedding"
             Tips = Tips & L("l_TipFrmIconEmbedding", "是否将图标文件转换为base64编码嵌入源代码，仅支持GIF格式嵌入。")
+        Case "bindcommand"
+            Tips = Tips & L("l_TipBindCommand", "使用bind()绑定的事件处理列表，绑定多个则使用逗号分隔(比如：<Control-C>,<F8>,<Alt-A>)。\n双击文本框查看详情。")
         Case "protocol"
             Tips = Tips & L("l_TipFrmProtocol", "处理窗口消息，比如设置为'WM_DELETE_WINDOW'则处理窗口关闭事件，如果要拦截多个消息，请使用逗号分隔，比如'WM_DELETE_WINDOW,WM_SAVE'")
         Case Else:
             Tips = Tips & L("l_TipUnknown", "未知属性")
     End Select
+End Function
+
+'将窗体目录下的所有图标文件存入m_IconFilesInPath，以备后续选择
+Private Function AutoDetectIconFile() As String
+    m_IconFilesInPath = ""
+    If Len(m_FrmPath) Then
+        m_IconFilesInPath = Join(SearchFiles(m_FrmPath, "*.ico"), ",")
+        m_IconFilesInPath = m_IconFilesInPath & Join(SearchFiles(m_FrmPath, "*.gif"), ",")
+        m_IconFilesInPath = m_IconFilesInPath & Join(SearchFiles(m_FrmPath, "*.ppm"), ",")
+        m_IconFilesInPath = m_IconFilesInPath & Join(SearchFiles(m_FrmPath, "*.pgm"), ",")
+    End If
 End Function
 
 '返回一个集合，每个项目三元对"属性名|值|是否默认选择"
@@ -203,9 +303,11 @@ Public Function Allitems() As Collection
     re.Add "geometry|" & m_Geometry & "|1"
     re.Add "title|" & m_Title & "|1"
     re.Add "resizable|" & IIf(m_Resizable, 1, 0) & "|1"
-    re.Add "icon||1"
+    re.Add "windowstate|" & m_WindowState & "|1"
+    re.Add "icon|" & m_IconFile & "|1"
     re.Add "iconembedding|" & IIf(m_IconEmbedding, 1, 0) & "|1"
-    re.Add "protocol||1"
+    re.Add "bindcommand||0"
+    re.Add "protocol||0"
     
     Set Allitems = re
     
@@ -225,10 +327,14 @@ Public Sub SetConfig(sAttrs As String)
                 m_Geometry = UnQuote(Trim(sa(i + 1)))
             Case "resizable"
                 m_Resizable = IIf(Trim(sa(i + 1)) = "0", False, True)
+            Case "windowstate"
+                m_WindowState = Trim(sa(i + 1))
             Case "icon"
                 m_IconFile = UnQuote(Trim(sa(i + 1)))
             Case "iconembedding"
                 m_IconEmbedding = IIf(Trim(sa(i + 1)) = "0", False, True)
+            Case "bindcommand"
+                m_Bindcommand = Trim(Replace(Replace(Replace(sa(i + 1), Chr(34), ""), "'", ""), " ", ""))
             Case "protocol"
                 m_Protocol = Trim(Replace(Replace(Replace(sa(i + 1), Chr(34), ""), "'", ""), " ", ""))
         End Select

@@ -26,9 +26,9 @@ Private m_CanbeOutByMainForm As Boolean
 'rel:是否使用相对坐标,
 'oop:是否使用面向对象编程
 'usettk:是否使用TTK主题扩展
-Public Function toString(ByRef sCmdFunc As cStrBuilder, rel As Boolean, oop As Boolean, usettk As Boolean) As String
-    toString = m_Base.toString(sCmdFunc, rel, oop, usettk)
-End Function
+Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, rel As Boolean, oop As Boolean, usettk As Boolean)
+    m_Base.toString sOut, sCmdFunc, rel, oop, usettk
+End Sub
 
 '创建对象后要马上调用这个函数初始化各参数
 Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dMethods As Dictionary)
@@ -59,6 +59,7 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
                         IIf(o.Properties("Font")("Underline"), ",'underline'", "") & IIf(o.Properties("Font")("Strikethrough"), ",'overstrike')", ")")
     m_dicTotal("underline") = IIf(InStr(1, o.Properties("Caption"), "&"), InStr(1, o.Properties("Caption"), "&") - 1, "-1")
     m_dicTotal("takefocus") = IIf(o.Properties("TabStop"), 1, 0)
+    m_dicTotal("cursor") = m_Base.GetCursorName(o.Properties("MousePointer"))
     m_dicTotal("command") = o.Properties("Name") & "_Cmd"
     m_dicTotal("bindcommand") = m_Base.GetBindCommandStr(dMethods)
     
@@ -73,11 +74,13 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
     m_Base("relheight") = m_dicTotal("relheight")
     m_Base("text") = m_dicTotal("text")
     m_Base("value") = m_dicTotal("value")
+    m_Base("variable") = m_dicTotal("variable")
     If o.Properties("ForeColor") <> vbButtonText Then m_Base("fg") = m_dicTotal("fg")
     If o.Properties("BackColor") <> vbButtonFace Then m_Base("bg") = m_dicTotal("bg")
     If m_dicTotal("font") <> "(" & U(GetDefaultFontName()) & ",9)" Then m_Base("font") = m_dicTotal("font")
     If m_dicTotal("takefocus") = 0 Then m_Base("takefocus") = m_dicTotal("takefocus")
     If m_dicTotal("underline") <> "-1" Then m_Base("underline") = m_dicTotal("underline")
+    If m_dicTotal("cursor") <> "" Then m_Base("cursor") = m_dicTotal("cursor")
     If m_Base.IsExistCommand(dMethods, "Click") Then m_Base("command") = m_dicTotal("command")
     If m_dicTotal("bindcommand") <> "" Then m_Base("bindcommand") = m_dicTotal("bindcommand")
     
@@ -98,13 +101,15 @@ End Function
 Public Function Tips(sAttr As String) As String
     Tips = sAttr & vbCrLf
     Select Case sAttr:
-    Case "indicatoron":
-        Tips = Tips & L("l_TipIndicatorOn", "是否显示文本坐标的标识，可选值有：0,1")
-    Case "variable":
-        Tips = Tips & L("l_TipVariableRadio", "相同一组单选框则设置为同一个variable变量，每个控件的value设置为不同值，通过设置variable变量的实际值来选择哪个单选框选中" & _
-        "或通过variable变量的实际值可以知道用户选择了哪个单选框。")
-    Case Else:
-        Tips = m_Base.Tips(sAttr)
+        Case "indicatoron"
+            Tips = Tips & L("l_TipIndicatorOn", "是否显示文本坐标的标识，可选值有：0,1")
+        Case "value"
+            Tips = Tips & L("l_TipValue", "控件的表示值，一组控件的每一个控件的值不能相同。")
+        Case "variable"
+            Tips = Tips & L("l_TipVariableRadio", "相同一组单选框则设置为同一个variable变量，每个控件的value设置为不同值，通过设置variable变量的实际值来选择哪个单选框选中" & _
+            "或通过variable变量的实际值可以知道用户选择了哪个单选框。")
+        Case Else
+            Tips = m_Base.Tips(sAttr)
     End Select
 End Function
 

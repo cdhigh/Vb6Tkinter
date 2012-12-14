@@ -27,15 +27,14 @@ Private m_CanbeOutByMainForm As Boolean
 'rel:是否使用相对坐标,
 'oop:是否使用面向对象编程
 'usettk:是否使用TTK主题扩展
-Public Function toString(ByRef sCmdFunc As cStrBuilder, rel As Boolean, oop As Boolean, usettk As Boolean) As String
-    
-    toString = m_Base.toString(sCmdFunc, rel, oop, usettk) & vbCrLf & CreateTabWidgets(sCmdFunc, rel, oop, usettk)
-    
-End Function
+Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, rel As Boolean, oop As Boolean, usettk As Boolean)
+    m_Base.toString sOut, sCmdFunc, rel, oop, usettk
+    CreateTabWidgets sOut, sCmdFunc, rel, oop, usettk
+End Sub
 
-Private Function CreateTabWidgets(ByRef sCmdFunc As cStrBuilder, rel As Boolean, oop As Boolean, usettk As Boolean) As String
+Private Sub CreateTabWidgets(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, rel As Boolean, oop As Boolean, usettk As Boolean)
     
-    Dim sOut As New cStrBuilder, i As Long, nTabs As Long, s As String
+    Dim i As Long, nTabs As Long, s As String
     Dim bTabExisted As Boolean, sCaption As String
     
     nTabs = IIf(m_nTabs > UBound(m_Tabs), m_nTabs, UBound(m_Tabs))
@@ -63,22 +62,20 @@ Private Function CreateTabWidgets(ByRef sCmdFunc As cStrBuilder, rel As Boolean,
         End If
         If Len(sCaption) = 0 Then sCaption = "Tab" & i
         
-        sOut.Append CreateSingleTabWidget(sCmdFunc, rel, oop, usettk, i, bTabExisted, sCaption)
+        CreateSingleTabWidget sOut, sCmdFunc, rel, oop, usettk, i, bTabExisted, sCaption
     Next
     
-    CreateTabWidgets = sOut.toString(vbCrLf)
-    
-End Function
+End Sub
 
-Private Function CreateSingleTabWidget(ByRef sCmdFunc As cStrBuilder, rel As Boolean, oop As Boolean, usettk As Boolean, _
-                                        nTabIdx As Long, bUseTabObj As Boolean, sCaption As String) As String
-    Dim s As String, sOut As New cStrBuilder
+Private Sub CreateSingleTabWidget(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, rel As Boolean, oop As Boolean, usettk As Boolean, _
+                                        nTabIdx As Long, bUseTabObj As Boolean, sCaption As String)
+    Dim s As String
     
     If oop Then
         If bUseTabObj Then
             s = "self." & m_Tabs(nTabIdx).Name
             sOut.Append vbCrLf & Space(8) & s & " = Frame(self." & m_Base.Name & ")"
-            sOut.Append m_Tabs(nTabIdx).toString(sCmdFunc, rel, oop, usettk)
+            m_Tabs(nTabIdx).toString sOut, sCmdFunc, rel, oop, usettk
         Else
             s = "self." & m_Base.Name & "__Tab" & nTabIdx
             sOut.Append vbCrLf & Space(8) & s & " = Frame(self." & m_Base.Name & ")"
@@ -91,7 +88,7 @@ Private Function CreateSingleTabWidget(ByRef sCmdFunc As cStrBuilder, rel As Boo
         If bUseTabObj Then
             s = m_Tabs(nTabIdx).Name
             sOut.Append vbCrLf & Space(4) & s & " = Frame(" & m_Base.Name & ")"
-            sOut.Append m_Tabs(nTabIdx).toString(sCmdFunc, rel, oop, usettk)
+            m_Tabs(nTabIdx).toString sOut, sCmdFunc, rel, oop, usettk
         Else
             s = m_Base.Name & "__Tab" & nTabIdx
             sOut.Append vbCrLf & Space(4) & s & " = Frame(" & m_Base.Name & ")"
@@ -102,9 +99,7 @@ Private Function CreateSingleTabWidget(ByRef sCmdFunc As cStrBuilder, rel As Boo
         sOut.Append Space(4) & m_Base.Name & ".add(" & s & ", text=" & U(sCaption) & ")"
     End If
     
-    CreateSingleTabWidget = sOut.toString(vbCrLf)
-    
-End Function
+End Sub
 
 
 '创建对象后要马上调用这个函数初始化各参数
@@ -133,6 +128,7 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
     m_dicTotal("relheight") = Format(o.Properties("Height") / parentHeight, "0.###")
     m_dicTotal("relief") = "FLAT"
     m_dicTotal("takefocus") = IIf(o.Properties("TabStop"), 1, 0)
+    m_dicTotal("cursor") = m_Base.GetCursorName(o.Properties("MousePointer"))
     m_dicTotal("bindcommand") = m_Base.GetBindCommandStr(dMethods)
     
     '这些是默认选择的
@@ -145,6 +141,7 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
     m_Base("relwidth") = m_dicTotal("relwidth")
     m_Base("relheight") = m_dicTotal("relheight")
     If m_dicTotal("takefocus") = 0 Then m_Base("takefocus") = m_dicTotal("takefocus")
+    If m_dicTotal("cursor") <> "" Then m_Base("cursor") = m_dicTotal("cursor")
     If m_dicTotal("bindcommand") <> "" Then m_Base("bindcommand") = m_dicTotal("bindcommand")
     
 End Sub

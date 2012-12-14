@@ -69,11 +69,20 @@
     对应Tkinter的destroy回调，这样就不需要再实现一个回调函数。
     在VB里面字母前增加一个"&"符号可以直接绑定一个快捷键Alt+对应字母，
     VisualTkinter也支持此设置，自动生成对应的事件绑定代码。
-    其他控件比如Checkbox等有"标题"属性的控件一样如此处理。
+    其他控件比如CheckBox等有"标题"属性的控件一样如此处理。
   3.5 CheckBox
     多选按钮对应Python的Checkbutton。
   3.6 OptionButton
     单选按钮对应Python的Radiobutton。
+    tkinter中Radiobutton的分组方法和VB有些不一样（分组意味着组内的单选按钮自动
+    互斥，用户选择一个则其他的自动取消）。在VB中，如果你使用Frame将几个
+    OptionButton圈起来，则这几个OptionButton自动成为一组。
+    但是在tkinter中，你要将需要分成一组的Radiobutton的variable属性设置为同一个
+    变量，然后各个Radiobutton的value值要不一样，具体是什么值你可以随便设置，
+    反正不一样就行，最简单的就是1/2/3等，或者一个设置为man，另一个设置为woman，
+    在对应的Radiobutton被选择后，variable变量自动设置为对应的value值，读取即可
+    知道哪个Radiobutton被选中了，反之设置variable变量会导致对应的Radiobutton
+    被选中。
   3.7 ComboBox
     组合框在Tkinter中没有对应的控件，比较类似的只有OptionMenu，类似ComboBox
     的Style=2 (Dropdown List)时的表现，一个下拉列表，只能在列表中选择一个值，
@@ -95,7 +104,9 @@
   3.12 Menu
     可以使用VB的菜单编辑器来设计Python的菜单。
     在VB中的菜单标题为"-"是分隔条。
-    也可以在正常的菜单标题中增加(&+字母)的方式添加快捷键。
+    也可以在正常的菜单标题中增加(&+字母)的方式添加Alt快捷键。
+    除Alt快捷快捷键外，在VB菜单编辑器中选择菜单对应的快捷键则会直接显示快捷键
+    信息在菜单标题后面，并自动注册对应的bind命令。
   3.13 Line
     可以用于组织复杂界面，仅支持水平或垂直线。
   ===================================================
@@ -135,6 +146,7 @@
     文件选择、输入框、颜色选择对话框功能。
     需要在控件工具箱增加"Microsoft Common Dialog Control 6.0"
 
+
 4. 其他建议
   1. 不支持使用控件数组，界面可以显示，但是后面的同名控件名会覆盖前面定义的。
   2. 窗体的ScaleMode建议保持默认值(vbTwips)，如果要设置为其他值，则Frame控件
@@ -146,12 +158,23 @@
   ttk主题扩展看起来很漂亮，在不同操作系统下界面呈现为本地化风格，建议使用，
   只是要注意以下几个ttk的BUG：
   1. TTK的Entry和Combobox控件背景色设置无效（可以设置，不报错，但是界面不变）。
-  2. TTK的Label中的文本不能换行，但是tkinter的Label控件可以通过插入'\n'来换行。
+  2. tkinter的Label控件可以通过插入'\n'来换行，但是ttk的Label只能通过wraplength
+     属性来换行。
   3. LabelFrame和Notebook控件的字体设置无效。
   4. Python 2.7.3附带的ttk中的Treeview字体设置无效，但3.2.3的Treeview的字体
      设置有效。
 
 6. 版本历史
+  v1.3.2
+    1. 如果VB窗体目录下有一个ico/gif文件，则自动将其作为窗体图标。
+       （注意：如果目录有多个图标文件，则你要自己在下拉列表中选择一个。）
+    2. 支持没有后缀名的主窗体图标（需要手动填写图标文件名）。
+    3. 增加cursor属性，用于设置控件的鼠标指针。
+    4. Form增加bindcommand和windowstate的处理。
+    5. 按钮类控件的下划线回调函数使用tk内置的invoke()代替外部实现的xxx_Cmd()，
+       使用invoke()为模拟用户点击，有更好的视觉反馈效果。
+    6. bugfix: 修正Radiobutton分组时variable变量重复创建的BUG。
+    7. bugfix: 修改Scale的digits等几个属性在ttk样式和创建函数中重复出现的问题。
   v1.3.1
     1. 增加对VB代码的简单分析，代码中有对应控件的一些事件处理函数则自动生成
        tkinter对应的事件注册和回调框架，比如如果VB代码存在Text1_Change函数，则

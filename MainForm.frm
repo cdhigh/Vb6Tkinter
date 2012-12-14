@@ -15,7 +15,9 @@ Begin VB.Form FrmMain
    Begin VB.ComboBox cmbEditCombo 
       CausesValidation=   0   'False
       Height          =   300
+      ItemData        =   "MainForm.frx":058A
       Left            =   7560
+      List            =   "MainForm.frx":058C
       TabIndex        =   11
       Text            =   "Combo1"
       Top             =   720
@@ -24,9 +26,9 @@ Begin VB.Form FrmMain
    End
    Begin VB.ComboBox cmbEditList 
       Height          =   300
-      ItemData        =   "MainForm.frx":058A
+      ItemData        =   "MainForm.frx":058E
       Left            =   6360
-      List            =   "MainForm.frx":05AC
+      List            =   "MainForm.frx":0590
       Style           =   2  'Dropdown List
       TabIndex        =   12
       Top             =   720
@@ -71,9 +73,9 @@ Begin VB.Form FrmMain
    End
    Begin VB.ComboBox cmbFrms 
       Height          =   300
-      ItemData        =   "MainForm.frx":05CF
+      ItemData        =   "MainForm.frx":0592
       Left            =   120
-      List            =   "MainForm.frx":05D1
+      List            =   "MainForm.frx":0594
       Style           =   2  'Dropdown List
       TabIndex        =   5
       Top             =   840
@@ -389,7 +391,7 @@ Private Sub Form_Load()
     
     m_BriefCaption = "Visual Tkinter of Python - cdhigh@sohu.com - v" & App.Major & "." & App.Minor & IIf(App.Revision > 0, "." & App.Revision, "")
     #If DebugVer Then
-        m_BriefCaption = m_BriefCaption & " [DEBUG MODE]"
+        m_BriefCaption = m_BriefCaption & " [Debug Mode] "
     #End If
     Me.Caption = m_BriefCaption
     
@@ -937,7 +939,7 @@ Private Sub CmdGenCode_Click()
         strOut.Append "    " & L("l_cmtClsUi", "#这个类仅实现界面生成功能，具体事件处理代码在子类Application中。")
         strOut.Append "    def __init__(self, master=None):"
         strOut.Append "        Frame.__init__(self, master)"
-        strOut.Append g_Comps(0).toString(strCmd, OutRelPos, OutOOP, usettk)  'g_Comps(0)固定是Form
+        g_Comps(0).toString strOut, strCmd, OutRelPos, OutOOP, usettk  'g_Comps(0)固定是Form
         strOut.Append "        self.createWidgets()" & vbCrLf
         strOut.Append "    def createWidgets(self):"
         strOut.Append "        self." & WTOP & " = self.winfo_toplevel()" & vbCrLf
@@ -949,7 +951,7 @@ Private Sub CmdGenCode_Click()
         
         strOut.Append vbCrLf
         strOut.Append "def main(argv):"
-        strOut.Append g_Comps(0).toString(strCmd, OutRelPos, OutOOP, usettk)  'g_Comps(0)固定是Form
+        g_Comps(0).toString strOut, strCmd, OutRelPos, OutOOP, usettk  'g_Comps(0)固定是Form
         If usettk Then
             strOut.Append "    style = Style()"
             strOut.Append "    gComps['style'] = style" & vbCrLf
@@ -971,7 +973,8 @@ Private Sub CmdGenCode_Click()
     
     '遍历各控件，由各控件自己输出自己的界面生成代码
     For i = 0 To cnt - 1
-        strOut.Append aCompsSorted(i).toString(strCmd, OutRelPos, OutOOP, usettk) & vbCrLf
+        aCompsSorted(i).toString strOut, strCmd, OutRelPos, OutOOP, usettk
+        strOut.Append ""  '两个控件之间使用一个空行隔开
     Next
     
     '输出到文本框
@@ -1118,13 +1121,23 @@ Private Sub LstCfg_ItemChecked(Row As Long)
                 If LstCfg.CellText(Row, 0) = "textvariable" Then LstCfg.ItemChecked(Row) = True
             Case "(Line)"
                 If LstCfg.CellText(Row, 0) = "orient" Then LstCfg.ItemChecked(Row) = True
-            Case Else
         End Select
     End If
     
     '更新列表中的数值到实例对象和数组
     UpdateCfgtoCls m_PrevCompIdx
     
+End Sub
+
+Private Sub LstCfg_KeyDown(KeyCode As Integer, Shift As Integer)
+    If (KeyCode = &H41 Or KeyCode = &H61) And Shift = vbCtrlMask Then 'Ctrl+a:全选，主要用于测试目的
+        Dim i As Long
+        LstCfg.Redraw = False
+        For i = 0 To LstCfg.ItemCount - 1
+            LstCfg.ItemChecked(i) = True
+        Next
+        LstCfg.Redraw = True
+    End If
 End Sub
 
 Private Sub LstCfg_RequestEdit(ByVal Row As Long, ByVal Col As Long, Cancel As Boolean)
@@ -1399,6 +1412,7 @@ End Sub
 Private Sub mnuPreview_Click()
     
     Dim bExeExisted As Boolean, sTmpFile As String
+    Dim nIdxIcon1 As Long, nIdxIcon2 As Long, s As String, sCode As String, sFrmFile As String
     
     '首先判断PYTHONEXE是否存在
     If Len(g_PythonExe) = 0 Then
@@ -1422,7 +1436,32 @@ Private Sub mnuPreview_Click()
         ReDim Preserve m_saTmpFile(UBound(m_saTmpFile) + 1) As String
         m_saTmpFile(UBound(m_saTmpFile)) = sTmpFile
         
-        Utf8File_Write_VB sTmpFile, TxtCode.Text
+        sCode = TxtCode.Text
+        
+        '为了体验更好，如果设置了图标的话，则将图标也拷贝到临时文件夹[假定图标在窗体文件同一个目录]
+        nIdxIcon1 = InStr(1, sCode, ".iconbitmap(default=r'")
+        If nIdxIcon1 > 0 Then
+            nIdxIcon1 = nIdxIcon1 + Len(".iconbitmap(default=r'")
+            nIdxIcon2 = InStr(nIdxIcon1 + 1, sCode, "'")
+            If nIdxIcon2 > 0 And (nIdxIcon2 - nIdxIcon1 < 256) Then
+                s = Mid$(sCode, nIdxIcon1, nIdxIcon2 - nIdxIcon1)
+                On Error Resume Next
+                sFrmFile = m_curFrm.FileNames(1)
+                On Error GoTo 0
+                If Len(sFrmFile) Then
+                    On Error Resume Next
+                    FileCopy AddSlash(PathName(sFrmFile)) & s, AddSlash(PathName(sTmpFile)) & s
+                    If Err.Number = 0 Then
+                        ReDim Preserve m_saTmpFile(UBound(m_saTmpFile) + 1) As String
+                        m_saTmpFile(UBound(m_saTmpFile)) = AddSlash(PathName(sTmpFile)) & s
+                        sCode = Left$(sCode, nIdxIcon1 - 1) & m_saTmpFile(UBound(m_saTmpFile)) & Mid$(sCode, nIdxIcon2)
+                    End If
+                    On Error GoTo 0
+                End If
+            End If
+        End If
+        
+        Utf8File_Write_VB sTmpFile, sCode
         Shell Chr(34) & g_PythonExe & """ """ & sTmpFile & Chr(34)
     Else
         MsgBox L("l_msgCreateTempFileFailed", "创建临时文件失败！"), vbInformation
@@ -1793,6 +1832,8 @@ Private Sub TxtTips_DblClick()
             "Sift_L , Shift_R, Control_L, Control_R, Alt_L, Alt_R, Pause" & vbCrLf & _
             "Caps_Loack,Escape,Prior(PageUp),Next(PageDown),End,Home,Left,Up,Right,Down,Print," & vbCrLf & _
             "Insert,Delete,F1-12,Num_Lock,Scroll_Lock,space,less"
+            TxtTips.SelStart = 1
+            TxtTips.SelLength = 0
         ElseIf Left(s, Len("<再次双击返回>")) = "<再次双击返回>" Then
             TxtTips.Move s_l, s_t, s_w, s_h
             TxtTips.Text = s_txt

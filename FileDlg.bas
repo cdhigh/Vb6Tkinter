@@ -108,7 +108,7 @@ Private Const BIF_NEWDIALOGSTYLE = &H40                                         
 Private Const BIF_NONEWFOLDERBUTTON = &H200                                     '新样式中，没有新建按钮（只调大小）
 
 
-Public Function FileDialog(FormObject As Form, SaveDialog As Boolean, ByVal Title As String, ByVal Filter As String, Optional ByVal FileName As String, Optional ByVal Extention As String, Optional ByVal InitDir As String) As String
+Public Function FileDialog(FormObject As Form, SaveDialog As Boolean, ByVal Title As String, ByVal Filter As String, Optional ByVal FileName As String, Optional ByVal Extention As String, Optional ByVal InitDir As String, Optional bModal As Boolean = True) As String
     Dim OFN   As OPENFILENAME
     Dim r     As Long
     
@@ -117,7 +117,7 @@ Public Function FileDialog(FormObject As Form, SaveDialog As Boolean, ByVal Titl
     
     With OFN
         .lStructSize = Len(OFN)
-        .hwndOwner = 0
+        .hwndOwner = IIf(bModal, FormObject.hWnd, 0)
         .hInstance = App.hInstance
         .lpstrFilter = Replace(Filter, "|", vbNullChar)
         .lpstrFile = FileName
@@ -143,20 +143,20 @@ Public Function FileDialog(FormObject As Form, SaveDialog As Boolean, ByVal Titl
     If r = 1 Then FileDialog = Left$(OFN.lpstrFile, InStr(1, OFN.lpstrFile + vbNullChar, vbNullChar) - 1)
 End Function
 Public Function BrowseFolders(FormObject As Form, sMessage As String) As String
-    Dim B As BROWSEINFO
+    Dim b As BROWSEINFO
     Dim r As Long
     Dim L As Long
     Dim f As String
     
     FormObject.Enabled = False
-    With B
+    With b
         .hwndOwner = FormObject.hWnd
         .lpszTitle = lstrcat(sMessage, "")
         .ulFlags = BrowseForFolders
     End With
     
-    SHGetSpecialFolderLocation FormObject.hWnd, CSIDL_DRIVES, B.pidlRoot
-    r = SHBrowseForFolder(B)
+    SHGetSpecialFolderLocation FormObject.hWnd, CSIDL_DRIVES, b.pidlRoot
+    r = SHBrowseForFolder(b)
     
     If r <> 0 Then
         f = String(MAX_PATH, vbNullChar)
@@ -255,9 +255,12 @@ Public Function FileTitleOnly(FileName As String, Optional ReturnDirectory As Bo
         FileTitleOnly = Right$(FileName, Len(FileName) - InStrRev(FileName, "\"))
     End If
 End Function
-Public Sub AddSlash(Directory As String)
-    If InStrRev(Directory, "\") <> Len(Directory) Then Directory = Directory + "\"
-End Sub
+Public Function AddSlash(Directory As String) As String
+    If InStrRev(Directory, "\") <> Len(Directory) Then
+        Directory = Directory + "\"
+    End If
+    AddSlash = Directory
+End Function
 Public Sub RemoveSlash(Directory As String)
     If Len(Directory) > 3 And InStrRev(Directory, "\") = Len(Directory) Then Directory = Left$(Directory, Len(Directory) - 1)
 End Sub
@@ -284,24 +287,24 @@ Public Function CreateTempFile(Optional ByVal Prefix As String, Optional Directo
     Length = InStr(1, Buffer, vbNullChar) - 1
     If Length > 0 Then CreateTempFile = Left$(Buffer, Length)
 End Function
-Public Function CreatePath(ByVal path As String) As Boolean
+Public Function CreatePath(ByVal Path As String) As Boolean
     On Error GoTo Fail
     Dim i As Integer
     Dim s As String
-    AddSlash path
+    AddSlash Path
     Do
-        i = InStr(i + 1, path, "\")
+        i = InStr(i + 1, Path, "\")
         If i = 0 Then Exit Do
-        s = Left$(path, i - 1)
+        s = Left$(Path, i - 1)
         If Not DirectoryExists(s) Then MkDir s
-    Loop Until i = Len(path)
+    Loop Until i = Len(Path)
     
-    If DirectoryExists(path) Then
+    If DirectoryExists(Path) Then
         CreatePath = True
         Exit Function
     End If
 Fail:
-    Call MsgBox(IIf(Err.Number = 0, "", "Error " + CStr(Err.Number) + ": " + Err.Description + vbCrLf) + "Could Not Create/Access Directory:" + vbCrLf + vbCrLf + Chr$(34) + path + Chr$(34), vbExclamation, App.Title + " - CreatePath Function")
+    Call MsgBox(IIf(Err.Number = 0, "", "Error " + CStr(Err.Number) + ": " + Err.Description + vbCrLf) + "Could Not Create/Access Directory:" + vbCrLf + vbCrLf + Chr$(34) + Path + Chr$(34), vbExclamation, App.Title + " - CreatePath Function")
     
 End Function
 
@@ -309,7 +312,7 @@ End Function
 Public Function GetFolderName(hWnd As Long, Text As String) As String
     Dim bi As BROWSEINFO
     Dim pidl As Long
-    Dim path As String
+    Dim Path As String
     With bi
         .hwndOwner = hWnd
         .pidlRoot = 0&                                                          '根目录，一般不需要改
@@ -317,8 +320,37 @@ Public Function GetFolderName(hWnd As Long, Text As String) As String
         .ulFlags = BIF_RETURNONLYFSDIRS                                         '根据需要调整
     End With
     pidl = SHBrowseForFolder(bi)
-    path = Space$(512)
-    If SHGetPathFromIDList(ByVal pidl, ByVal path) Then
-        GetFolderName = Left(path, InStr(path, Chr(0)) - 1)
+    Path = Space$(512)
+    If SHGetPathFromIDList(ByVal pidl, ByVal Path) Then
+        GetFolderName = Left(Path, InStr(Path, Chr(0)) - 1)
+    End If
+End Function
+
+'查找指定目录下的所有文件，不支持子文件夹递归
+'调用示例
+'  SearchFiles "C:\Program Files\WinRAR\", "*" '查找所有文件
+'  SearchFiles "C:\Program Files\WinRAR\", "*.exe" '查找所有exe文件
+'  SearchFiles "C:\Program Files\WinRAR\", "*in*.exe" '查找文件名中包含有 in 的exe文件
+Public Function SearchFiles(Path As String, FileType As String) As String()
+    Dim sPath As String, numFiles As Long
+    Dim saFiles() As String
+    
+    If Right$(Path, 1) <> "\" Then Path = Path & "\"
+    
+    sPath = Dir(Path & FileType) '查找第一个文件
+    
+    numFiles = 0
+    Do While Len(sPath) '循环到没有文件为止
+        ReDim Preserve saFiles(numFiles) As String
+        saFiles(numFiles) = Path & sPath
+        numFiles = numFiles + 1
+        sPath = Dir '查找下一个文件
+        'DoEvents '让出控制权
+    Loop
+    
+    If numFiles Then
+        SearchFiles = saFiles
+    Else
+        SearchFiles = Split("")
     End If
 End Function

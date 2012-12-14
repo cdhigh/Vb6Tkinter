@@ -72,39 +72,35 @@ End Property
 'rel:是否使用相对坐标,
 'oop:是否使用面向对象编程
 'usettk:是否使用TTK主题扩展
-Public Function toString(ByRef sCmdFunc As cStrBuilder, rel As Boolean, oop As Boolean, usettk As Boolean) As String
-    
-    Dim sOut As New cStrBuilder
+Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, rel As Boolean, oop As Boolean, usettk As Boolean)
     
     If oop Then
-        sOut.Append Space(8) & "self." & m_Base.Name & " = Statusbar(self." & m_Base.Parent
-        sOut.Append IIf(Len(m_Base("panelwidths")), ", panelwidths=" & m_Base("panelwidths"), "") & ")" & vbCrLf
+        sOut.Append Space(8) & "self." & m_Base.Name & " = Statusbar(self." & m_Base.Parent & _
+            IIf(Len(m_Base("panelwidths")), ", panelwidths=" & m_Base("panelwidths"), "") & ")"
         If Len(m_Base("side")) Then
             sOut.Append Space(8) & "self." & m_Base.Name & ".pack(side=" & m_Base("side") & ", fill=X)"
         ElseIf rel Then
-            sOut.Append Space(8) & "self." & m_Base.Name & ".place(relx=" & m_Base("relx") & ", rely=" & m_Base("rely")
-            sOut.Append ", relwidth=" & m_Base("relwidth") & ", relheight=" & m_Base("relheight") & ")"
+            sOut.Append Space(8) & "self." & m_Base.Name & ".place(relx=" & m_Base("relx") & ", rely=" & _
+                m_Base("rely") & ", relwidth=" & m_Base("relwidth") & ", relheight=" & m_Base("relheight") & ")"
         Else
-            sOut.Append Space(8) & "self." & m_Base.Name & ".place(x=" & m_Base("x") & ", y=" & m_Base("y")
-            sOut.Append ", width=" & m_Base("width") & ", height=" & m_Base("height") & ")"
+            sOut.Append Space(8) & "self." & m_Base.Name & ".place(x=" & m_Base("x") & ", y=" & m_Base("y") & _
+                ", width=" & m_Base("width") & ", height=" & m_Base("height") & ")"
         End If
     Else
-        sOut.Append Space(4) & m_Base.Name & " = Statusbar(" & m_Base.Parent
-        sOut.Append IIf(Len(m_Base("panelwidths")), ", panelwidths=" & m_Base("panelwidths"), "") & ")" & vbCrLf
+        sOut.Append Space(4) & m_Base.Name & " = Statusbar(" & m_Base.Parent & _
+            IIf(Len(m_Base("panelwidths")), ", panelwidths=" & m_Base("panelwidths"), "") & ")"
         If Len(m_Base("side")) Then
             sOut.Append Space(4) & m_Base.Name & ".pack(side=" & m_Base("side") & ", fill=X)"
         ElseIf rel Then
-            sOut.Append Space(4) & m_Base.Name & ".place(relx=" & m_Base("relx") & ", rely=" & m_Base("rely")
-            sOut.Append ", relwidth=" & m_Base("relwidth") & ", relheight=" & m_Base("relheight") & ")"
+            sOut.Append Space(4) & m_Base.Name & ".place(relx=" & m_Base("relx") & ", rely=" & m_Base("rely") & _
+                ", relwidth=" & m_Base("relwidth") & ", relheight=" & m_Base("relheight") & ")"
         Else
-            sOut.Append Space(4) & m_Base.Name & ".place(x=" & m_Base("x") & ", y=" & m_Base("y")
-            sOut.Append ", width=" & m_Base("width") & ", height=" & m_Base("height") & ")"
+            sOut.Append Space(4) & m_Base.Name & ".place(x=" & m_Base("x") & ", y=" & m_Base("y") & ", width=" & _
+                m_Base("width") & ", height=" & m_Base("height") & ")"
         End If
     End If
     
-    toString = sOut.toString("")
-    
-End Function
+End Sub
 
 '创建对象后要马上调用这个函数初始化各参数
 Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dMethods As Dictionary)

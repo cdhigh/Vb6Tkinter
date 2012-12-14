@@ -33,13 +33,13 @@ End Property
 'rel:是否使用相对坐标,
 'oop:是否使用面向对象编程
 'usettk:是否使用TTK主题扩展
-Public Function toString(ByRef sCmdFunc As cStrBuilder, rel As Boolean, oop As Boolean, usettk As Boolean) As String
+Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, rel As Boolean, oop As Boolean, usettk As Boolean)
     If usettk Then
-        toString = m_Combobox.toString(sCmdFunc, rel, oop, usettk)
+        m_Combobox.toString sOut, sCmdFunc, rel, oop, usettk
     Else
-        toString = m_OptionMenu.toString(sCmdFunc, rel, oop, usettk)
+        m_OptionMenu.toString sOut, sCmdFunc, rel, oop, usettk
     End If
-End Function
+End Sub
 
 '创建对象后要马上调用这个函数初始化各参数
 Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dMethods As Dictionary)

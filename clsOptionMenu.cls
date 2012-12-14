@@ -27,25 +27,25 @@ Private m_CanbeOutByMainForm As Boolean
 'rel:是否使用相对坐标,
 'oop:是否使用面向对象编程
 'usettk:是否使用TTK主题扩展(如果使用TTK，则VB的组合框对应到TTK的组合框，不会生出这个控件)
-Public Function toString(ByRef sCmdFunc As cStrBuilder, rel As Boolean, oop As Boolean, usettk As Boolean) As String
+Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, rel As Boolean, oop As Boolean, usettk As Boolean)
     
     If Len(m_Base("variable")) = 0 Then
         MsgBox L_F("l_msgMusthasVar", "OptionMenu(ComboBox)必须要选择variable属性，现在将不生成OptionMenu({0})的代码。", m_Base.Name), vbInformation
-        Exit Function
+        Exit Sub
     End If
     
     If oop Then
-        toString = toStringOOP(sCmdFunc, rel, usettk)
+        toStringOOP sOut, sCmdFunc, rel, usettk
     Else
-        toString = toStringStructure(sCmdFunc, rel, usettk)
+        toStringStructure sOut, sCmdFunc, rel, usettk
     End If
     
-End Function
+End Sub
 
 '输出结构化代码
-Private Function toStringStructure(ByRef sCmdFunc As cStrBuilder, rel As Boolean, usettk As Boolean) As String
+Private Sub toStringStructure(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, rel As Boolean, usettk As Boolean)
     
-    Dim sOut As New cStrBuilder, s() As String, i As Long, sList As String, extra As String, sConfig As String
+    Dim s() As String, i As Long, sList As String, extra As String, sConfig As String
     
     '生成列表
     For i = 0 To UBound(m_List)
@@ -69,7 +69,9 @@ Private Function toStringStructure(ByRef sCmdFunc As cStrBuilder, rel As Boolean
     sOut.Append Space(4) & "gComps['" & m_Base("variable") & "'] = " & m_Base("variable")
     
     '创建事件处理函数框架（如果有）
-    sCmdFunc.Append m_Base.CreateFuncDef(m_Base("command"))
+    If Len(m_Base("command")) Then
+        sCmdFunc.Append m_Base.CreateFuncDef(m_Base("command"))
+    End If
     
     If Len(m_Base("bindcommand")) Then                                          '有需要使用bind语句绑定的其他事件处理
         s = Split(m_Base("bindcommand"), ",")
@@ -85,14 +87,12 @@ Private Function toStringStructure(ByRef sCmdFunc As cStrBuilder, rel As Boolean
         Next
     End If
     
-    toStringStructure = sOut.toString(vbCrLf)
-    
-End Function
+End Sub
 
 '输出面向对象代码
-Private Function toStringOOP(ByRef sCmdFunc As cStrBuilder, rel As Boolean, usettk As Boolean) As String
+Private Sub toStringOOP(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, rel As Boolean, usettk As Boolean)
     
-    Dim sOut As New cStrBuilder, s() As String, i As Long, sList As String, extra As String, sConfig As String
+    Dim s() As String, i As Long, sList As String, extra As String, sConfig As String
     
     '生成列表
     For i = 0 To UBound(m_List)
@@ -114,7 +114,9 @@ Private Function toStringOOP(ByRef sCmdFunc As cStrBuilder, rel As Boolean, uset
     sOut.Append Space(8) & "self." & m_Base.Name & ".place(" & m_Base.GetPositionParams(rel) & ")"
     
     '创建事件处理函数框架（如果有）
-    sCmdFunc.Append m_Base.CreateFuncDefOOP(m_Base("command"))
+    If Len(m_Base("command")) Then
+        sCmdFunc.Append m_Base.CreateFuncDefOOP(m_Base("command"))
+    End If
     
     If Len(m_Base("bindcommand")) Then                                          '有需要使用bind语句绑定的其他事件处理
         s = Split(m_Base("bindcommand"), ",")
@@ -130,9 +132,7 @@ Private Function toStringOOP(ByRef sCmdFunc As cStrBuilder, rel As Boolean, uset
         Next
     End If
     
-    toStringOOP = sOut.toString(vbCrLf)
-    
-End Function
+End Sub
 
 
 '创建对象后要马上调用这个函数初始化各参数
@@ -181,6 +181,7 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
     m_dicTotal("font") = "(" & U(CStr(o.Properties("Font")("Name"))) & "," & Round(o.Properties("Font")("Size")) & _
                         IIf(o.Properties("Font")("Bold"), ",'bold'", "") & IIf(o.Properties("Font")("Italic"), ",'italic'", "") & _
                         IIf(o.Properties("Font")("Underline"), ",'underline'", "") & IIf(o.Properties("Font")("Strikethrough"), ",'overstrike')", ")")
+    m_dicTotal("cursor") = m_Base.GetCursorName(o.Properties("MousePointer"))
     m_dicTotal("bindcommand") = m_Base.GetBindCommandStr(dMethods)
     
     '这些是默认选择的
@@ -198,6 +199,7 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
     If m_dicTotal("state") <> "'normal'" Then m_Base("state") = m_dicTotal("state")
     If m_dicTotal("takefocus") = 1 Then m_Base("takefocus") = m_dicTotal("takefocus")
     If m_dicTotal("font") <> "(" & U(GetDefaultFontName()) & ",9)" Then m_Base("font") = m_dicTotal("font")
+    If m_dicTotal("cursor") <> "" Then m_Base("cursor") = m_dicTotal("cursor")
     If m_dicTotal("bindcommand") <> "" Then m_Base("bindcommand") = m_dicTotal("bindcommand")
     
 End Sub

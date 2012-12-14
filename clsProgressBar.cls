@@ -24,9 +24,9 @@ Private m_CanbeOutByMainForm As Boolean
 'rel:是否使用相对坐标,
 'oop:是否使用面向对象编程
 'usettk:是否使用TTK主题扩展
-Public Function toString(ByRef sCmdFunc As cStrBuilder, rel As Boolean, oop As Boolean, usettk As Boolean) As String
-    toString = m_Base.toString(sCmdFunc, rel, oop, usettk)
-End Function
+Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, rel As Boolean, oop As Boolean, usettk As Boolean)
+    m_Base.toString sOut, sCmdFunc, rel, oop, usettk
+End Sub
 
 '创建对象后要马上调用这个函数初始化各参数
 Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dMethods As Dictionary)
@@ -48,6 +48,7 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
     m_dicTotal("value") = 0
     m_dicTotal("variable") = m_Base.Name & "Var"
     m_dicTotal("takefocus") = 0
+    m_dicTotal("cursor") = m_Base.GetCursorName(o.Properties("MousePointer"))
     
     '这些是默认选择的
     m_Base("x") = m_dicTotal("x")
@@ -61,6 +62,7 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
     m_Base("orient") = m_dicTotal("orient")
     m_Base("maximum") = m_dicTotal("maximum")
     m_Base("variable") = m_dicTotal("variable")
+    If m_dicTotal("cursor") <> "" Then m_Base("cursor") = m_dicTotal("cursor")
     
 End Sub
 

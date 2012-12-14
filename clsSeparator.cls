@@ -24,11 +24,10 @@ Private m_CanbeOutByMainForm As Boolean
 'rel:是否使用相对坐标,
 'oop:是否使用面向对象编程
 'usettk:是否使用TTK主题扩展
-Public Function toString(ByRef sCmdFunc As cStrBuilder, rel As Boolean, oop As Boolean, usettk As Boolean) As String
+Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, rel As Boolean, oop As Boolean, usettk As Boolean)
     If Len(m_Base("orient")) = 0 Then m_Base("orient") = "'horizontal'"
-    toString = m_Base.toString(sCmdFunc, rel, oop, usettk)
-End Function
-
+    m_Base.toString sOut, sCmdFunc, rel, oop, usettk
+End Sub
 
 '创建对象后要马上调用这个函数初始化各参数
 Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, Optional dMethods As Dictionary)

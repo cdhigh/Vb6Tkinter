@@ -20,6 +20,8 @@ Private m_Name As String
 Private m_Title As String
 Private m_Geometry As String
 Private m_WindowState As String
+Private m_Topmost As Boolean
+Private m_Alpha As String
 Private m_Resizable As Boolean
 Private m_IconFile As String
 Private m_IconEmbedding As Boolean
@@ -43,6 +45,15 @@ Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, re
         If Len(m_WindowState) > 0 And m_WindowState <> "'normal'" Then
             sOut.Append "        self.master.wm_state(" & m_WindowState & ")"
         End If
+        If m_Topmost Then
+            '增加wait函数是因为http://code.activestate.com/lists/python-list/385778/，有网友反馈偶尔会出现窗体不显示的情况，
+            'wait函数可以规避这个问题
+            sOut.Append "        self.master.wait_visibility(self.master)"
+            sOut.Append "        self.master.wm_attributes('-topmost', 1)"
+        End If
+        If Len(m_Alpha) Then
+            sOut.Append "        self.master.wm_attributes('-alpha', " & m_Alpha & ")"
+        End If
     Else
         sOut.Append "    " & m_Name & " = Tk()"
         sOut.Append "    " & m_Name & ".title(" & U(m_Title) & ")"
@@ -50,6 +61,13 @@ Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, re
         If Not m_Resizable Then sOut.Append "    " & m_Name & ".resizable(0,0)"
         If Len(m_WindowState) > 0 And m_WindowState <> "'normal'" Then
             sOut.Append "    " & m_Name & ".wm_state(" & m_WindowState & ")"
+        End If
+        If m_Topmost Then
+            sOut.Append "    " & m_Name & ".wait_visibility(" & m_Name & ")"
+            sOut.Append "    " & m_Name & ".wm_attributes('-topmost', 1)"
+        End If
+        If Len(m_Alpha) Then
+            sOut.Append "    " & m_Name & ".wm_attributes('-alpha', " & m_Alpha & ")"
         End If
     End If
     
@@ -236,6 +254,8 @@ Public Sub InitConfig(o As Object, nWidth As Long, nHeight As Long, dMethods As 
         m_IconFile = ""
     End If
     m_Bindcommand = ""
+    m_Topmost = False
+    m_Alpha = ""
     
 End Sub
 
@@ -244,7 +264,7 @@ End Sub
 '输出：sa()可选值列表数组
 Public Function GetAttrValueList(sAttr As String, ByRef sa() As String) As Long
     GetAttrValueList = 1
-    If sAttr = "resizable" Or sAttr = "iconembedding" Then
+    If sAttr = "resizable" Or sAttr = "iconembedding" Or sAttr = "topmost" Then
         sa = Split("1,0", ",")
     ElseIf sAttr = "windowstate" Then
         sa = Split("'normal','iconic','zoomed'", ",")
@@ -253,6 +273,9 @@ Public Function GetAttrValueList(sAttr As String, ByRef sa() As String) As Long
         GetAttrValueList = 2
     ElseIf sAttr = "protocol" Then
         sa = Split("WM_DELETE_WINDOW", ",")
+        GetAttrValueList = 2
+    ElseIf sAttr = "alpha" Then
+        sa = Split("0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0", ",")
         GetAttrValueList = 2
     Else
         GetAttrValueList = 0
@@ -270,6 +293,10 @@ Public Function Tips(sAttr As String) As String
             Tips = Tips & L("l_TipFrmResizable", "用户是否可以改变窗体的大小。可选值：1/0。")
         Case "windowstate"
             Tips = Tips & L("l_TipFrmState", "窗体启动时的状态。'iconic'：最小化，'zoomed'：最大化，'normal'：正常状态。")
+        Case "topmost"
+            Tips = Tips & L("l_TipFrmTopmost", "窗体是否置顶。")
+        Case "alpha"
+            Tips = Tips & L("l_TipFrmAlpha", "窗体透明度。取值范围为0-1，0为全透明，1为不透明。")
         Case "icon"
             Tips = Tips & L("l_TipFrmIcon", "图标文件名，支持ico,gif,ppm,pgm格式，省略路径名则在当前VB窗体目录下查找，建议icon文件放在py文件同一目录下。")
         Case "iconembedding"
@@ -304,6 +331,8 @@ Public Function Allitems() As Collection
     re.Add "title|" & m_Title & "|1"
     re.Add "resizable|" & IIf(m_Resizable, 1, 0) & "|1"
     re.Add "windowstate|" & m_WindowState & "|1"
+    re.Add "topmost|0|0"
+    re.Add "alpha||0"
     re.Add "icon|" & m_IconFile & "|1"
     re.Add "iconembedding|" & IIf(m_IconEmbedding, 1, 0) & "|1"
     re.Add "bindcommand||0"
@@ -316,34 +345,54 @@ End Function
 Public Sub SetConfig(sAttrs As String)
     Dim sa() As String, i As Long
     
+    m_Title = ""
+    m_Resizable = True
+    m_WindowState = ""
+    m_Topmost = False
+    m_Alpha = ""
+    m_IconFile = ""
+    m_IconEmbedding = False
+    m_Bindcommand = ""
+    m_Protocol = ""
+    
     sa = Split(sAttrs, "|")
-    Debug.Assert (UBound(sa) Mod 1 = 0)
     
     For i = 0 To UBound(sa) - 1 Step 2
-        Select Case sa(i)
-            Case "title"
-                m_Title = UnQuote(Trim(sa(i + 1)))
-            Case "geometry"
-                m_Geometry = UnQuote(Trim(sa(i + 1)))
-            Case "resizable"
-                m_Resizable = IIf(Trim(sa(i + 1)) = "0", False, True)
-            Case "windowstate"
-                m_WindowState = Trim(sa(i + 1))
-            Case "icon"
-                m_IconFile = UnQuote(Trim(sa(i + 1)))
-            Case "iconembedding"
-                m_IconEmbedding = IIf(Trim(sa(i + 1)) = "0", False, True)
-            Case "bindcommand"
-                m_Bindcommand = Trim(Replace(Replace(Replace(sa(i + 1), Chr(34), ""), "'", ""), " ", ""))
-            Case "protocol"
-                m_Protocol = Trim(Replace(Replace(Replace(sa(i + 1), Chr(34), ""), "'", ""), " ", ""))
-        End Select
+        SetSingleConfig sa(i) & "|" & sa(i + 1)
     Next
     
 End Sub
 
 Public Sub SetSingleConfig(sAttr As String)
-    SetConfig sAttr
+    Dim sa() As String
+    
+    sa = Split(sAttr, "|")
+    'Debug.Assert (UBound(sa) Mod 1 = 0)
+    
+    If UBound(sa) >= 1 Then
+        Select Case sa(0)
+            Case "title"
+                m_Title = UnQuote(Trim(sa(1)))
+            Case "geometry"
+                m_Geometry = UnQuote(Trim(sa(1)))
+            Case "resizable"
+                m_Resizable = IIf(Trim(sa(1)) = "1", True, False)
+            Case "windowstate"
+                m_WindowState = Trim(sa(1))
+            Case "topmost"
+                m_Topmost = IIf(Trim(sa(1)) = "1", True, False)
+            Case "alpha"
+                m_Alpha = Trim(sa(1))
+            Case "icon"
+                m_IconFile = UnQuote(Trim(sa(1)))
+            Case "iconembedding"
+                m_IconEmbedding = IIf(Trim(sa(1)) = "1", True, False)
+            Case "bindcommand"
+                m_Bindcommand = Trim(Replace(Replace(Replace(sa(1), Chr(34), ""), "'", ""), " ", ""))
+            Case "protocol"
+                m_Protocol = Trim(Replace(Replace(Replace(sa(1), Chr(34), ""), "'", ""), " ", ""))
+        End Select
+    End If
 End Sub
 
 Public Property Get Parent() As String

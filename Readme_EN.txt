@@ -62,6 +62,8 @@
     import modules filedialog, simpledialog, colorchooser.    
 
 3. History
+  v1.4
+    1. Can used in VB6 green and compact version.
   v1.3.3
     1. Add properties 'Topmost' and 'Alpha' for Form.
   v1.3.2

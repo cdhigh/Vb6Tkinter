@@ -336,8 +336,7 @@ Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 Option Explicit
 
-Public VBE As VBIDE.VBE
-Public Connect As Connect
+Public mConnect As Connect
 
 '2012.11.23，为了滚动条和列表框的绑定方便，将其修改为全局变量g_Comps，放在Common.bas中
 'Private m_Comps() As Object             '和LstComps行数一样多，对应各组件生成的实例
@@ -483,7 +482,7 @@ Private Sub InitMultiLanguage()
 End Sub
 
 Private Sub CmdQuit_Click()
-    Connect.Hide
+    mConnect.Hide
 End Sub
 
 Private Sub cmbFrms_Click()
@@ -1502,7 +1501,7 @@ Private Sub mnuPythonExe_Click()
 End Sub
 
 Private Sub mnuQuit_Click()
-    Connect.Hide
+    mConnect.Hide
 End Sub
 
 Private Sub mnuRefreshForms_Click()

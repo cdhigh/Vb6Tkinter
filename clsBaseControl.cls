@@ -55,6 +55,8 @@ Public Sub toStringStructure(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBu
             If Not sOut.ExistString(Space(4) & Dic("variable") & " = StringVar()") Then
                 sOut.Append Space(4) & Dic("variable") & " = StringVar()"
             End If
+        ElseIf m_Type = "Checkbutton" Then '单选按钮的variable使用IntVar比较好
+            sOut.Append Space(4) & Dic("variable") & " = IntVar(value=" & m_Value & ")"
         Else
             sOut.Append Space(4) & Dic("variable") & " = StringVar(value=" & U(m_Value) & ")"
         End If
@@ -195,6 +197,8 @@ Public Sub toStringOOP(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder,
             If Not sOut.ExistString(Space(8) & "self." & Dic("variable") & " = StringVar()") Then
                 sOut.Append Space(8) & "self." & Dic("variable") & " = StringVar()"
             End If
+        ElseIf m_Type = "Checkbutton" Then '单选按钮的variable使用IntVar比较好
+            sOut.Append Space(8) & "self." & Dic("variable") & " = IntVar(value=" & m_Value & ")"
         Else
             sOut.Append Space(8) & "self." & Dic("variable") & " = StringVar(value=" & U(m_Value) & ")"
         End If

@@ -62,6 +62,10 @@
     import modules filedialog, simpledialog, colorchooser.    
 
 3. History
+  v1.4.1
+    1. Support scrollbar bind with widgets automatic.
+    2. Control-Variable of Checkbutton changed to IntVar.
+    3. textvariable of Combobox selected defaultly.
   v1.4
     1. Can used in VB6 green and compact version.
   v1.3.3

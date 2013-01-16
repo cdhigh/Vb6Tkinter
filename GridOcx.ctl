@@ -1,15 +1,15 @@
 VERSION 5.00
 Begin VB.UserControl GridOcx 
    AutoRedraw      =   -1  'True
-   ClientHeight    =   4125
+   ClientHeight    =   4130
    ClientLeft      =   0
    ClientTop       =   0
-   ClientWidth     =   5565
+   ClientWidth     =   5572
    ControlContainer=   -1  'True
    KeyPreview      =   -1  'True
-   ScaleHeight     =   275
+   ScaleHeight     =   295
    ScaleMode       =   3  'Pixel
-   ScaleWidth      =   371
+   ScaleWidth      =   398
    ToolboxBitmap   =   "GridOcx.ctx":0000
 End
 Attribute VB_Name = "GridOcx"

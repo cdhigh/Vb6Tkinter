@@ -307,6 +307,9 @@ Public Function GetAttrValueList(sAttr As String, ByRef sa() As String) As Long
     If sAttr = "tearoff" Then
         GetAttrValueList = 1
         sa = Split("1,0", ",")
+    ElseIf sAttr = "bindcommand" Then
+        GetAttrValueList = 2
+        sa = Split("<<MenuSelect>>", ",")
     Else
         GetAttrValueList = m_Base.GetAttrValueList(sAttr, sa)
     End If

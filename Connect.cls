@@ -44,15 +44,8 @@ Private Sub IDTExtensibility_OnConnection(ByVal VBInst As Object, ByVal ConnectM
     Set Common.VBE = VBInst
     
     If ConnectMode = vbext_cm_Startup Or ConnectMode = vbext_cm_AfterStartup Then
-        Set mcbMenuItem = AddToMenu(App.Title & "(&T)")
-        If Not (mcbMenuItem Is Nothing) Then
-            Set MenuHandler = VBE.Events.CommandBarEvents(mcbMenuItem)
-        End If
-        
-        Set mcbToolBoxItem = AddToToolBox(App.Title)
-        If Not (mcbToolBoxItem Is Nothing) Then
-            Set ToolBoxHandler = VBE.Events.CommandBarEvents(mcbToolBoxItem)
-        End If
+        AddToMenu (App.Title & "(&T)")
+        AddToToolBox (App.Title)
     ElseIf ConnectMode = vbext_cm_External Then
         Show
     End If
@@ -89,7 +82,7 @@ Public Sub Show()
 End Sub
 
 '在外接程序菜单下增加一个菜单项
-Function AddToMenu(sCaption As String) As Office.CommandBarControl
+Private Sub AddToMenu(sCaption As String)
     Dim cbMenuCommandBar As Office.CommandBarControl
     Dim cbMenu
     
@@ -97,32 +90,33 @@ Function AddToMenu(sCaption As String) As Office.CommandBarControl
     
     '察看能否找到外接程序菜单
     Set cbMenu = VBE.CommandBars("Add-Ins")
-    If cbMenu Is Nothing Then Exit Function
+    If cbMenu Is Nothing Then Exit Sub
     
     '添加它到命令栏
     Set cbMenuCommandBar = cbMenu.Controls.Add(msoControlButton)
-    If cbMenuCommandBar Is Nothing Then Exit Function
+    If cbMenuCommandBar Is Nothing Then Exit Sub
     
     cbMenuCommandBar.BeginGroup = True
     
     '设置标题
     cbMenuCommandBar.Caption = sCaption
     
-    Set AddToMenu = cbMenuCommandBar
-    
-End Function
+    Set mcbMenuItem = cbMenuCommandBar
+    Set MenuHandler = VBE.Events.CommandBarEvents(mcbMenuItem)
+        
+End Sub
 
 '在工具栏增加一个图标
-Function AddToToolBox(sCaption As String) As Office.CommandBarControl
+Private Sub AddToToolBox(sCaption As String)
     Dim cbToolboxCommandBar As Office.CommandBarControl
-    Dim cbStandard As commandbar
+    Dim cbStandard As CommandBar
     
     '察看能否找到标准工具栏
     On Error Resume Next
     Set cbStandard = VBE.CommandBars("标准")
     If Err.Number <> 0 Then Set cbStandard = VBE.CommandBars("Standard")
     
-    If cbStandard Is Nothing Then Exit Function
+    If cbStandard Is Nothing Then Exit Sub
     
     Err.Clear
     On Error GoTo AddToAddInToolboxErr
@@ -131,16 +125,15 @@ Function AddToToolBox(sCaption As String) As Office.CommandBarControl
     Set cbToolboxCommandBar = cbStandard.Controls.Add(msoControlButton, , , cbStandard.Controls.Count)
     cbToolboxCommandBar.BeginGroup = True
     cbToolboxCommandBar.Caption = sCaption
+    Set mcbToolBoxItem = cbToolboxCommandBar
     Clipboard.SetData LoadResPicture(101, vbResBitmap)
     cbToolboxCommandBar.PasteFace
     
-    Set AddToToolBox = cbToolboxCommandBar
-    
-    Exit Function
-    
+    Set ToolBoxHandler = VBE.Events.CommandBarEvents(mcbToolBoxItem)
+        
 AddToAddInToolboxErr:
     
-End Function
+End Sub
 
 Private Sub MenuHandler_Click(ByVal CommandBarControl As Object, handled As Boolean, CancelDefault As Boolean)
     Show

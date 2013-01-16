@@ -92,16 +92,20 @@
     一致。
   3.8 ListBox
     列表框对应Python的Listbox，行为也类似，可以在设计阶段设置初始列表。
-    如果需要滚动，则在适当位置创建滚动条，然后在Addin界面选择其xscrollcommand
-    和yscrollcommand属性为对应滚动条的.set方法。
+    如果需要滚动，则在适当位置创建滚动条，如果滚动条紧靠着列表框的右边或下边，
+    并且长度(水平滚动条)或高度(垂直滚动条)差不多，则滚动条和列表框自动绑定，
+    如果没有自动绑定，则可以在Addin界面选择其xscrollcommand或yscrollcommand
+    属性为对应滚动条的.set方法。
   3.9 HScrollBar, VScrollBar
     滚动条在Python中为Scrollbar，通过设置orient来控制水平还是垂直。
   3.10 Slider
     类似对应Python中的Scale。
   3.11 PictureBox
     简单对应到Python中的Canvas，用做其他控件的容器或画图容器使用。
-    如果需要滚动，则在适当位置创建滚动条，然后在Addin界面选择其xscrollcommand和
-    yscrollcommand属性为对应滚动条的.set方法。
+    如果需要滚动，则在适当位置创建滚动条，如果滚动条紧靠着图像框的右边或下边，
+    并且长度(水平滚动条)或高度(垂直滚动条)差不多，则滚动条和图像框自动绑定，
+    如果没有自动绑定，可以在Addin界面选择其xscrollcommand和yscrollcommand
+    属性为对应滚动条的.set方法。
   3.12 Menu
     可以使用VB的菜单编辑器来设计Python的菜单。
     在VB中的菜单标题为"-"是分隔条。
@@ -110,6 +114,7 @@
     信息在菜单标题后面，并自动注册对应的bind命令。
   3.13 Line
     可以用于组织复杂界面，仅支持水平或垂直线。
+
   ===================================================
   以下的控件需要在VB的'控件工具箱'中按右键添加'部件'，选择
   'Microsoft Windows Common Controls 6.0'
@@ -119,8 +124,10 @@
   3.15 TreeView
     对应到Python的Treeview，树形显示控件，可以选择是否显示标题行,
     需要启用TTK主题扩展（默认）
-    如果需要滚动，则在适当位置创建滚动条，然后在Addin界面选择其xscrollcommand
-    和yscrollcommand属性为对应滚动条的.set方法。
+    如果需要滚动，则在适当位置创建滚动条，如果滚动条紧靠着TreeView的右边或下边，
+    并且长度(水平滚动条)或高度(垂直滚动条)差不多，则滚动条和TreeView自动绑定，
+    如果没有自动绑定，可以在Addin界面选择其xscrollcommand和yscrollcommand
+    属性为对应滚动条的.set方法。
   3.16 TabStrip
     选项卡控件，对应到Python的Notebook，需要启用TTK主题扩展（默认）。
     如果要布局各个页面内的控件，按以下步骤：
@@ -166,6 +173,11 @@
      设置有效。
 
 6. 版本历史
+  v1.4.1
+    1. 支持自动绑定滚动条到对应控件，只需要在需要滚动的控件右边或下边紧靠着放置合适
+       长度的滚动条，则滚动条自动绑定之对应控件，不需要再手工选择配置。
+    2. Checkbutton的控件变量由StringVar类型改变为IntVar类型（Tkinter默认）。
+    3. ComboBox的textvariable变量默认选择。
   v1.4
     1. 支持VB绿色精简版。
   v1.3.3

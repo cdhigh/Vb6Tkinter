@@ -108,6 +108,7 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
     m_Base("relwidth") = m_dicTotal("relwidth")
     m_Base("relheight") = m_dicTotal("relheight")
     m_Base("values") = m_dicTotal("values")
+    m_Base("textvariable") = m_dicTotal("textvariable")
     If o.Properties("ForeColor") <> vbWindowText Then m_Base("fg") = m_dicTotal("fg")
     If o.Properties("BackColor") <> vbWindowBackground Then m_Base("bg") = m_dicTotal("bg")
     If m_dicTotal("state") <> "'normal'" Then m_Base("state") = m_dicTotal("state")
@@ -130,6 +131,9 @@ Public Function GetAttrValueList(sAttr As String, ByRef sa() As String) As Long
             sa = Split("'normal','readonly','disabled'", ",")
         Case "exportselection"
             sa = Split("False,True", ",")
+        Case "bindcommand"
+            GetAttrValueList = 2
+            sa = Split("<<ComboboxSelected>>", ",")
         Case Else
             GetAttrValueList = m_Base.GetAttrValueList(sAttr, sa)
     End Select

@@ -2,15 +2,15 @@ VERSION 5.00
 Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.0#0"; "MSCOMCTL.OCX"
 Begin VB.Form FrmMain 
    Caption         =   "Visual Tkinter of Python - cdhigh@sohu.com"
-   ClientHeight    =   8130
-   ClientLeft      =   60
-   ClientTop       =   675
-   ClientWidth     =   12960
+   ClientHeight    =   8134
+   ClientLeft      =   56
+   ClientTop       =   672
+   ClientWidth     =   12964
    Icon            =   "MainForm.frx":0000
    LinkTopic       =   "Form1"
-   ScaleHeight     =   542
+   ScaleHeight     =   581
    ScaleMode       =   3  'Pixel
-   ScaleWidth      =   864
+   ScaleWidth      =   926
    StartUpPosition =   2  '屏幕中心
    Begin VB.ComboBox cmbEditCombo 
       CausesValidation=   0   'False
@@ -41,12 +41,12 @@ Begin VB.Form FrmMain
       TabIndex        =   0
       Top             =   120
       Width           =   2295
-      _ExtentX        =   4048
-      _ExtentY        =   873
+      _ExtentX        =   4039
+      _ExtentY        =   864
       Caption         =   "刷新窗体列表(&R)"
       BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
          Name            =   "宋体"
-         Size            =   9
+         Size            =   9.36
          Charset         =   134
          Weight          =   400
          Underline       =   0   'False
@@ -62,7 +62,7 @@ Begin VB.Form FrmMain
       Top             =   7755
       Width           =   12960
       _ExtentX        =   22860
-      _ExtentY        =   661
+      _ExtentY        =   660
       Style           =   1
       _Version        =   393216
       BeginProperty Panels {8E3867A5-8586-11D1-B16A-00C0F0283628} 
@@ -84,7 +84,7 @@ Begin VB.Form FrmMain
    Begin VB.TextBox TxtTips 
       BeginProperty Font 
          Name            =   "宋体"
-         Size            =   10.5
+         Size            =   10.8
          Charset         =   134
          Weight          =   400
          Underline       =   0   'False
@@ -101,7 +101,7 @@ Begin VB.Form FrmMain
       Width           =   2415
    End
    Begin VB.ListBox LstComps 
-      Height          =   3660
+      Height          =   3514
       Left            =   120
       TabIndex        =   6
       Top             =   1200
@@ -113,11 +113,11 @@ Begin VB.Form FrmMain
       TabIndex        =   8
       Top             =   840
       Width           =   6015
-      _ExtentX        =   10610
-      _ExtentY        =   12091
+      _ExtentX        =   10617
+      _ExtentY        =   12090
       BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
          Name            =   "宋体"
-         Size            =   9
+         Size            =   9.36
          Charset         =   134
          Weight          =   400
          Underline       =   0   'False
@@ -128,7 +128,7 @@ Begin VB.Form FrmMain
    Begin VB.TextBox TxtCode 
       BeginProperty Font 
          Name            =   "Courier New"
-         Size            =   10.5
+         Size            =   10.8
          Charset         =   0
          Weight          =   400
          Underline       =   0   'False
@@ -149,12 +149,12 @@ Begin VB.Form FrmMain
       TabIndex        =   1
       Top             =   120
       Width           =   2295
-      _ExtentX        =   4048
-      _ExtentY        =   873
+      _ExtentX        =   4039
+      _ExtentY        =   864
       Caption         =   "生成代码(&G)"
       BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
          Name            =   "宋体"
-         Size            =   9
+         Size            =   9.36
          Charset         =   134
          Weight          =   400
          Underline       =   0   'False
@@ -168,12 +168,12 @@ Begin VB.Form FrmMain
       TabIndex        =   2
       Top             =   120
       Width           =   2295
-      _ExtentX        =   4048
-      _ExtentY        =   873
+      _ExtentX        =   4039
+      _ExtentY        =   864
       Caption         =   "拷贝到剪贴板(&C)"
       BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
          Name            =   "宋体"
-         Size            =   9
+         Size            =   9.36
          Charset         =   134
          Weight          =   400
          Underline       =   0   'False
@@ -187,12 +187,12 @@ Begin VB.Form FrmMain
       TabIndex        =   3
       Top             =   120
       Width           =   2295
-      _ExtentX        =   4048
-      _ExtentY        =   873
+      _ExtentX        =   4039
+      _ExtentY        =   864
       Caption         =   "保存到文件(&F)"
       BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
          Name            =   "宋体"
-         Size            =   9
+         Size            =   9.36
          Charset         =   134
          Weight          =   400
          Underline       =   0   'False
@@ -206,12 +206,12 @@ Begin VB.Form FrmMain
       TabIndex        =   4
       Top             =   120
       Width           =   2295
-      _ExtentX        =   4048
-      _ExtentY        =   873
+      _ExtentX        =   4039
+      _ExtentY        =   864
       Caption         =   "退出(&Q)"
       BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
          Name            =   "宋体"
-         Size            =   9
+         Size            =   9.36
          Charset         =   134
          Weight          =   400
          Underline       =   0   'False
@@ -506,6 +506,7 @@ Private Sub cmbFrms_Click()
     If Not ResetLstComps(m_curFrm) Then
         LstComps.Clear
         LstCfg.Clear
+        TxtTips.Text = L("l_TipHasNoControl", "目前窗体上没有任何控件，请先在窗体上添加控件。")
         m_PrevCompIdx = -1
     Else
         LstComps.ListIndex = 0
@@ -519,8 +520,8 @@ Private Sub cmbFrms_Click()
         mnuSaveToFile.Enabled = True
         mnuCopyToClipboard.Enabled = True
         mnuAddProperty.Enabled = True
-        mnuSaveConfig.Enabled = True
-        mnuRestoreConfig.Enabled = True
+        'mnuSaveConfig.Enabled = True
+        'mnuRestoreConfig.Enabled = True
         mnuGenCode.Enabled = True
     Else
         CmdGenCode.Enabled = False
@@ -652,6 +653,9 @@ Private Function ResetLstComps(frm As Object) As Boolean
     
     '整理Notebook和其各页签内控件的父子关系
     ArrangeNotebookAndSubWidgets
+    
+    '尝试自动将滚动条绑定到对应的控件
+    TryAssignScrollbar2Widgets
     
     '正确设置ComboboxAdapter的TTK属性
     For i = 1 To UBound(g_Comps)
@@ -821,6 +825,121 @@ Private Sub ArrangeNotebookAndSubWidgets()
 
 End Sub
 
+'进行一些分析，尝试将滚动条自动绑定到合适的控件，不一定成功，而且可能误判，只算是尽力而为
+Private Sub TryAssignScrollbar2Widgets()
+    
+    Dim i As Long, ctlNum As Long, Obj As Object, o As Object, oName As String
+    Dim vX1 As Long, vY1 As Long, vX2 As Long, vY2 As Long
+    Dim oX1 As Long, oY1 As Long, oX2 As Long, oY2 As Long
+    Dim thresholdX1 As Long, thresholdY1 As Long
+    Dim thresholdX2 As Long, thresholdY2 As Long
+    Dim isWidgetScrl As Boolean, Assigned As Boolean
+    
+    If UBound(g_Comps) <= 0 Or m_curFrm Is Nothing Then  ' 0固定为顶层窗体
+        Exit Sub
+    End If
+    
+    '水平方向和垂直方向都使用20个像素做为查找控件的门限
+    thresholdX1 = Round(ScaleX(20, vbPixels, m_curFrm.Properties("ScaleMode")))
+    thresholdY1 = Round(ScaleY(20, vbPixels, m_curFrm.Properties("ScaleMode")))
+    thresholdX2 = Round(ScaleX(5, vbPixels, m_curFrm.Properties("ScaleMode"))) '5个像素是允许控件和滚动条重叠的部分
+    thresholdY2 = Round(ScaleY(5, vbPixels, m_curFrm.Properties("ScaleMode")))
+    
+    ctlNum = UBound(g_Comps)
+    For Each Obj In m_curFrm.Designer.VBControls
+        If Obj.ClassName = "HScrollBar" Then
+            '水平滚动条，则判断其上方有没有需要设置滚动条的控件
+            'vX1,vY1,vX2,vY2构成一个矩形，如果其他控件的左下角和右下角落在这个矩形内，则认为滚动条对应
+            vX1 = Obj.Properties("Left") - thresholdX1
+            If vX1 < 0 Then vX1 = 0
+            vY1 = Obj.Properties("Top") - thresholdY1
+            If vY1 < 0 Then vY1 = 0
+            vX2 = Obj.Properties("Left") + Obj.Properties("Width") + thresholdX1
+            vY2 = Obj.Properties("Top") + thresholdY2
+            Assigned = False
+            For Each o In m_curFrm.Designer.VBControls
+                If InStr(1, "PictureBox,ListBox,TreeView,TextBox,", o.ClassName & ",") > 0 Then '只有这些控件可能需要滚动条
+                    isWidgetScrl = True
+                    If o.ClassName = "TextBox" Then '只有多行文本框才支持滚动
+                        If Not o.Properties("MultiLine") Then
+                            isWidgetScrl = False
+                        End If
+                    End If
+                    If isWidgetScrl Then
+                        oX1 = o.Properties("Left")
+                        oY1 = o.Properties("Top") + o.Properties("Height")
+                        oX2 = oX1 + o.Properties("Width")
+                        oY2 = oY1
+                        
+                        '第一行为左下角判断，第二行为右下角判断
+                        If (oX1 >= vX1 And oX1 <= vX2 And oY1 >= vY1 And oY1 <= vY2) _
+                            And (oX2 >= vX1 And oX2 <= vX2 And oY2 >= vY1 And oY2 <= vY2) Then
+                            '设置控件的xscrollcommand属性
+                            oName = o.Properties("Name")
+                            For i = 1 To ctlNum
+                                If g_Comps(i).Name = oName Then
+                                    g_Comps(i).SetSingleConfig ("xscrollcommand|" & Obj.Properties("Name") & ".set")
+                                    Assigned = True
+                                    Debug.Print oName & " assigned to " & Obj.Properties("name")
+                                    Exit For
+                                End If
+                            Next
+                        End If
+                    End If
+                End If
+                If Assigned Then
+                    Exit For
+                End If
+            Next
+        ElseIf Obj.ClassName = "VScrollBar" Then
+            '垂直滚动条，则判断其左方有没有需要设置滚动条的控件
+            'vX1,vY1,vX2,vY2构成一个矩形，如果其他控件的右上角和右下角落在这个矩形内，则认为滚动条对应
+            vX1 = Obj.Properties("Left") - thresholdX1
+            If vX1 < 0 Then vX1 = 0
+            vY1 = Obj.Properties("Top") - thresholdY1
+            If vY1 < 0 Then vY1 = 0
+            vX2 = Obj.Properties("Left") + thresholdX2
+            vY2 = Obj.Properties("Top") + Obj.Properties("Height") + thresholdY1
+            Assigned = False
+            For Each o In m_curFrm.Designer.VBControls
+                If InStr(1, "PictureBox,ListBox,TreeView,TextBox,", o.ClassName & ",") > 0 Then '只有这些控件可能需要滚动条
+                    isWidgetScrl = True
+                    If o.ClassName = "TextBox" Then '只有多行文本框才支持滚动
+                        If Not o.Properties("MultiLine") Then
+                            isWidgetScrl = False
+                        End If
+                    End If
+                    If isWidgetScrl Then
+                        oX1 = o.Properties("Left") + o.Properties("Width")
+                        oY1 = o.Properties("Top")
+                        oX2 = oX1
+                        oY2 = oY1 + o.Properties("Height")
+                        
+                        '第一行为右上角判断，第二行为右下角判断
+                        If (oX1 >= vX1 And oX1 <= vX2 And oY1 >= vY1 And oY1 <= vY2) _
+                            And (oX2 >= vX1 And oX2 <= vX2 And oY2 >= vY1 And oY2 <= vY2) Then
+                            '设置控件的yscrollcommand属性
+                            oName = o.Properties("Name")
+                            For i = 1 To ctlNum
+                                If g_Comps(i).Name = oName Then
+                                    g_Comps(i).SetSingleConfig ("yscrollcommand|" & Obj.Properties("Name") & ".set")
+                                    Debug.Print oName & " assigned to " & Obj.Properties("name")
+                                    Assigned = True
+                                    Exit For
+                                End If
+                            Next
+                        End If
+                    End If
+                End If
+                If Assigned Then
+                    Exit For
+                End If
+            Next
+        End If
+    Next
+    
+End Sub
+
 Private Sub CmdGenCode_Click()
     
     Dim i As Long, cnt As Long, o As Object
@@ -981,13 +1100,14 @@ Private Sub CmdGenCode_Click()
         strCmd.Append "if __name__ == ""__main__"":"
         strCmd.Append "    " & WTOP & " = Tk()"
         strCmd.Append "    Application(" & WTOP & ").mainloop()"
-        strCmd.Append "    try: " & WTOP & ".destroy()"
-        strCmd.Append "    except: pass" & vbCrLf
+        strCmd.Append vbCrLf
+        'strCmd.Append "    try: " & WTOP & ".destroy()"
+        'strCmd.Append "    except: pass" & vbCrLf
         TxtCode.Text = strHead.toString(vbCrLf) & strOut.toString(vbCrLf) & strCmd.toString(vbCrLf)
     Else
         strOut.Append "    " & WTOP & ".mainloop()"
-        strOut.Append "    try: " & WTOP & ".destroy()"
-        strOut.Append "    except: pass"
+        'strOut.Append "    try: " & WTOP & ".destroy()"
+        'strOut.Append "    except: pass"
         strOut.Append vbCrLf & vbCrLf
         strOut.Append "if __name__ == ""__main__"":"
         strOut.Append "    main(sys.argv)" & vbCrLf
@@ -1227,6 +1347,8 @@ Private Sub UpdateCfgtoCls(idx As Long)
     
     If idx < 0 Or idx > UBound(g_Comps) Then Exit Sub
     
+    LstCfg.Refresh
+    
     s = ""
     For i = 0 To LstCfg.ItemCount - 1
         If LstCfg.ItemChecked(i) Then
@@ -1313,8 +1435,8 @@ Private Sub mnuCopyToClipUiOnly_Click()
 End Sub
 
 Private Sub mnuFile_Click()
-    mnuSaveConfig.Enabled = LstComps.ListCount > 0
-    mnuRestoreConfig.Enabled = LstComps.ListCount > 0
+    'mnuSaveConfig.Enabled = LstComps.ListCount > 0
+    'mnuRestoreConfig.Enabled = LstComps.ListCount > 0
     mnuGenCode.Enabled = LstComps.ListCount > 0
 End Sub
 
@@ -1758,6 +1880,13 @@ Private Sub stabar_DblClick()
             "ListBox, HScrollBar, VScrollBar, Slider, ProgressBar, TreeView, StatusBar, CommonDialog, Line" & vbCrLf & vbCrLf
 End Sub
 
+Private Sub stabar_MouseUp(Button As Integer, Shift As Integer, x As Single, y As Single)
+    If Shift = vbCtrlMask Then
+        Clipboard.Clear
+        Clipboard.SetText "https://github.com/cdhigh/Visual-Tkinter-for-Python"
+    End If
+End Sub
+
 Private Sub TxtCode_Change()
     mnuPreview.Enabled = (Len(TxtCode.Text) > 0)
 End Sub
@@ -1892,6 +2021,6 @@ Private Sub TxtCode_MouseMove(Button As Integer, Shift As Integer, x As Single, 
 End Sub
 
 Private Sub stabar_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
-    stabar.SimpleText = "https://github.com/cdhigh/Visual-Tkinter-for-Python"
+    stabar.SimpleText = "https://github.com/cdhigh/Visual-Tkinter-for-Python  ['Ctrl+Click' copy url to clipboard]"
 End Sub
 

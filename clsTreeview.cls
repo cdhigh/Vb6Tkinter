@@ -117,6 +117,9 @@ Public Function GetAttrValueList(sAttr As String, ByRef sa() As String) As Long
         sa = Split("'extended','browse','none'", ",")
     ElseIf sAttr = "show" Then
         sa = Split("'tree headings','tree'", ",")
+    ElseIf sAttr = "bindcommand" Then
+        GetAttrValueList = 2
+        sa = Split("<<TreeviewOpen>>,<<TreeviewClose>>", ",")
     ElseIf sAttr = "xscrollcommand" Or sAttr = "yscrollcommand" Then
         aComps = GetAllComps()
         If UBound(aComps) >= 0 Then

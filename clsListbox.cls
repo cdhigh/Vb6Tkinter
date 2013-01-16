@@ -123,6 +123,9 @@ Public Function GetAttrValueList(sAttr As String, ByRef sa() As String) As Long
         sa = Split("'underline','dotbox','none'", ",")
     ElseIf sAttr = "selectmode" Then
         sa = Split("SINGLE,BROWSE,EXTENDED,MULTIPLE", ",")
+    ElseIf sAttr = "bindcommand" Then
+        sa = Split("<<ListboxSelect>>", ",")
+        GetAttrValueList = 2
     ElseIf sAttr = "xscrollcommand" Or sAttr = "yscrollcommand" Then
         aComps = GetAllComps()
         If UBound(aComps) >= 0 Then

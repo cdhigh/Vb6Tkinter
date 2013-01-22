@@ -2118,6 +2118,13 @@ Public Property Let Editable(ByVal NewValue As Boolean)
     PropertyChanged "Editable"
 End Property
 
+'2013-01-19,added by cdhigh, bugfix for refreshing after change of content
+Public Sub UpdateIfPending()
+    If mEditPending Then
+        UpdateCell
+    End If
+End Sub
+
 Public Sub EditCell(ByVal Row As Long, ByVal Col As Long)
     '#############################################################################################################################
 'Purpose: Used to start an Edit. Note the RequestEdit event. This event allows

@@ -20,6 +20,7 @@ Option Explicit
 Private m_dicTotal As Dictionary                                                '保存全部的属性，包括默认值
 Private m_Base As clsBaseControl                                                '基础控件类
 Private m_CanbeOutByMainForm As Boolean
+Private m_Text As String
 
 '输出PYTHON代码,
 'sCmdFunc: 输出参数，事件处理回调代码;
@@ -31,6 +32,15 @@ Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, re
     Dim scrlcmd As String
     
     m_Base.toString sOut, sCmdFunc, rel, oop, usettk
+    
+    '如果有初始文本，则插入文本到文本框
+    If Len(m_Text) > 0 Then
+        If oop Then
+            sOut.Append Space(8) & "self." & m_Base.Name & ".insert('1.0'," & m_Text & ")"
+        Else
+            sOut.Append Space(4) & m_Base.Name & ".insert('1.0'," & m_Text & ")"
+        End If
+    End If
     
     ' 增加滚动条的绑定处理
     scrlcmd = m_Base("xscrollcommand")
@@ -57,6 +67,12 @@ End Sub
 Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dMethods As Dictionary)
     
     m_Base.Name = o.Properties("Name")
+    m_Text = Replace(o.Properties("Text"), vbCrLf, "\n")
+    If InStr(1, m_Text, Chr(34)) > 0 Or InStr(1, m_Text, "'") > 0 Then
+        m_Text = String(3, Chr(34)) & m_Text & String(3, Chr(34))
+    Else
+        m_Text = "'" & m_Text & "'"
+    End If
     
     m_dicTotal("x") = m_Base.toPixelX(o.Properties("Left"))
     m_dicTotal("y") = m_Base.toPixelY(o.Properties("Top"))
@@ -66,13 +82,15 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
     m_dicTotal("rely") = Format(o.Properties("Top") / parentHeight, "0.###")
     m_dicTotal("relwidth") = Format(o.Properties("Width") / parentWidth, "0.###")
     m_dicTotal("relheight") = Format(o.Properties("Height") / parentHeight, "0.###")
-    m_dicTotal("text") = ""
     m_dicTotal("fg") = TranslateColor(o.Properties("ForeColor"))
     m_dicTotal("bg") = TranslateColor(o.Properties("BackColor"))
     m_dicTotal("bd") = "1"
     m_dicTotal("relief") = "SUNKEN"
     m_dicTotal("state") = IIf(o.Properties("Enabled"), "'normal'", "'disabled'")
     m_dicTotal("wrap") = "CHAR"
+    m_dicTotal("spacing1") = "0"
+    m_dicTotal("spacing2") = "0"
+    m_dicTotal("spacing3") = "0"
     m_dicTotal("font") = "(" & U(CStr(o.Properties("Font")("Name"))) & "," & Round(o.Properties("Font")("Size")) & _
                         IIf(o.Properties("Font")("Bold"), ",'bold'", "") & IIf(o.Properties("Font")("Italic"), ",'italic'", "") & _
                         IIf(o.Properties("Font")("Underline"), ",'underline'", "") & IIf(o.Properties("Font")("Strikethrough"), ",'overstrike')", ")")
@@ -138,11 +156,17 @@ Public Function Tips(sAttr As String) As String
     
     Tips = sAttr & vbCrLf
     Select Case sAttr:
-    Case "state":
+    Case "state"
         Tips = Tips & L("l_TipStateHasRO", "控件状态，请使用括号括起来，可选值有：'normal', 'readonly', 'disabled'")
-    Case "wrap":
+    Case "wrap"
         Tips = Tips & L("l_TipWrapMode", "换行模式，CHAR（默认）为可以在任何一个字符后换行，WORD为在单词后换行，NONE为不换行（则需要提供滚动条）。")
-    Case Else:
+    Case "spacing1"
+        Tips = Tips & L("l_TipSpacing1", "每行和前一行之间的行间距。")
+    Case "spacing2"
+        Tips = Tips & L("l_TipSpacing2", "超过文本框宽度的行在每个绕行之间的行间距。")
+    Case "spacing3"
+        Tips = Tips & L("l_TipSpacing3", "每行和后一行之间的行间距。")
+    Case Else
         Tips = m_Base.Tips(sAttr)
     End Select
 End Function

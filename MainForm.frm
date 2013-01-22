@@ -541,12 +541,13 @@ Private Sub CmdCopyToClipboard_Click()
     Me.PopupMenu mnuCopyToClipboard
 End Sub
 
-'更新各个列表，创建对应的控件类实例, 返回false表示初始化失败
-Private Function ResetLstComps(frm As Object) As Boolean
+'更新各个列表，创建对应的控件类实例, 返回False表示初始化失败，True表示成功
+Private Function ResetLstComps(frm As Object) As Long
     
     Dim Obj As Object, ObjClsModule As Object, i As Long, s As String, j As Long, idx As Long
     Dim nScaleMode As Long, nScaleWidth As Long, nScaleHeight As Long
     Dim CodeMember As Member, CodeMembers As Members, dMethods As New Dictionary
+    Dim ctlsIgnored As String
     
     ResetLstComps = False
     If frm Is Nothing Then Exit Function
@@ -643,8 +644,11 @@ Private Function ResetLstComps(frm As Object) As Boolean
             ResetLstComps = True
         ElseIf Obj.ClassName = "CommonDialog" Then
             m_HasCommonDialog = True
-        Else
-            MsgBox L_F("l_msgCtlNotSupport", "当前暂不支持'{0}'控件(控件名：{1})\n\n程序将不生成此控件的代码。", Obj.ClassName, Obj.Properties("Name")), vbInformation, App.Title
+        ElseIf Len(ctlsIgnored) = 0 Or InStr(1, ctlsIgnored, Obj.ClassName & ",") <= 0 Then
+            If MsgBox(L_F("l_msgCtlNotSupport", "当前暂不支持'{0}'控件(控件名：{1})\n\n程序将不生成此控件的代码。\n\n'确定' : 继续。\n'取消' : 忽略同类型的控件，不再提醒。", _
+                Obj.ClassName, Obj.Properties("Name")), vbInformation + vbOKCancel, App.Title) = vbCancel Then
+                ctlsIgnored = ctlsIgnored & Obj.ClassName & ","
+            End If
         End If
     Next  'frm.Designer.VBControls
     
@@ -1347,6 +1351,7 @@ Private Sub UpdateCfgtoCls(idx As Long)
     
     If idx < 0 Or idx > UBound(g_Comps) Then Exit Sub
     
+    LstCfg.UpdateIfPending
     LstCfg.Refresh
     
     s = ""

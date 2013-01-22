@@ -62,6 +62,10 @@
     import modules filedialog, simpledialog, colorchooser.    
 
 3. History
+  v1.4.2
+    1. bugfix:error when change the widget before update the configure of 
+       widget.
+    2. add properties spacing1, spacing2, spacing3 to widget 'Text'.
   v1.4.1
     1. Support scrollbar bind with widgets automatic.
     2. Control-Variable of Checkbutton changed to IntVar.

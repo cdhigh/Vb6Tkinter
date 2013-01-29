@@ -106,6 +106,7 @@ End Sub
 Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dMethods As Dictionary)
     
     Dim i As Long, nCnt As Long, s As String, Panels As IPanels
+    Dim sa() As String, Idx As Long
     
     m_Base.Name = o.Properties("Name")
     
@@ -137,6 +138,21 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
         End If
     End If
     
+    '使用控件的tag属性保存一些额外默认要保存的属性，
+    '开始字符为：p@，后接属性名，每个属性使用@隔开，属性值可选，如果有值，则使用k=v格式
+    s = Trim(o.Properties("Tag"))
+    If Len(s) Then
+        sa = Split(s, "@")
+        If sa(0) = "p" Or sa(0) = "P" Then
+            For i = 1 To UBound(sa)
+                s = sa(i)
+                Idx = InStr(2, s, "=")
+                If Idx > 0 Then '有值
+                    m_Base(Left$(s, Idx - 1)) = Mid$(s, Idx + 1)
+                End If
+            Next
+        End If
+    End If
 End Sub
 
 '设置属性值的可能值列表

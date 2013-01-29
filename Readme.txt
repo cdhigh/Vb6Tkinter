@@ -168,11 +168,18 @@
   1. TTK的Entry和Combobox控件背景色设置无效（可以设置，不报错，但是界面不变）。
   2. tkinter的Label控件可以通过插入'\n'来换行，但是ttk的Label只能通过wraplength
      属性来换行。
-  3. LabelFrame和Notebook控件的字体设置无效。
+  3. LabelFrame和Notebook控件的字体单独设置无效，但是可以设置ttk的全局字体属性来
+     改变，比如：self.style.configure('.', font=('宋体',12))。
   4. Python 2.7.3附带的ttk中的Treeview字体设置无效，但3.2.3的Treeview的字体
      设置有效。
 
 6. 版本历史
+  v1.4.3
+    1. 增加一个方便一段时间后再次修改GUI的特性：使用控件的Tag属性来保存修改的值。
+       方法是如果有一些属性不采用默认值，则在Tag属性中采用如下格式填写：
+       p@属性1@属性2@属性n 或 p@属性1=值1@属性2=值2@属性n=值n
+       每个属性的值是可以忽略的，忽略了值的属性则自动选中对应属性，不修改值。
+    2. 增加窗体启动位置属性，可选择启动时在屏幕上居中。
   v1.4.2
     1. bugfix:修正在配置列表框中选择下列列表时未更新就切换控件导致错误的问题。
     2. Text控件增加spacing1,spacing2,spacing3属性。

@@ -62,6 +62,10 @@
     import modules filedialog, simpledialog, colorchooser.    
 
 3. History
+  v1.4.3
+    1. use properties tag of widgets to save same config. format is 
+       p@property1@property2 or p@property1=value1@property2=value2
+    2. Add a property 'startup position' to Form.
   v1.4.2
     1. bugfix:error when change the widget before update the configure of 
        widget.

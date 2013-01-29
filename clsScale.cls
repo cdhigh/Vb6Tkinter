@@ -45,7 +45,7 @@ End Sub
 '创建对象后要马上调用这个函数初始化各参数
 Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dMethods As Dictionary)
     
-    Dim nIdx As Variant
+    Dim s As String, sa() As String, i As Long, Idx As Long
     
     m_Base.Name = o.Properties("Name")
     m_Base.StyleName = IIf(o.Properties("Orientation"), "Vertical", "Horizontal") & ".TScale"
@@ -98,6 +98,24 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
     If m_dicTotal("cursor") <> "" Then m_Base("cursor") = m_dicTotal("cursor")
     If m_dicTotal("bindcommand") <> "" Then m_Base("bindcommand") = m_dicTotal("bindcommand")
     
+    '使用控件的tag属性保存一些额外默认要保存的属性，
+    '开始字符为：p@，后接属性名，每个属性使用@隔开，属性值可选，如果有值，则使用k=v格式
+    s = Trim(o.Properties("Tag"))
+    If Len(s) Then
+        sa = Split(s, "@")
+        If sa(0) = "p" Or sa(0) = "P" Then
+            For i = 1 To UBound(sa)
+                s = sa(i)
+                Idx = InStr(2, s, "=")
+                If Idx > 0 Then '有值
+                    m_dicTotal(Left$(s, Idx - 1)) = Mid$(s, Idx + 1)
+                    m_Base(Left$(s, Idx - 1)) = m_dicTotal(Left$(s, Idx - 1))
+                ElseIf Len(s) > 0 And Len(m_dicTotal(s)) > 0 Then '仅有属性，则判断属性是否合法
+                    m_Base(s) = m_dicTotal(s)
+                End If
+            Next
+        End If
+    End If
 End Sub
 
 '设置属性值的可能值列表

@@ -14,7 +14,6 @@ Attribute VB_Exposed = False
 Option Explicit
 
 '窗体类的抽象，保存VB窗体属性
-
 Private m_Base As clsBaseControl
 Private m_Name As String
 Private m_Title As String
@@ -30,6 +29,7 @@ Private m_Bindcommand As String
 Private m_FrmPath As String          '保存窗体所在目录
 Private m_ScaleMode As Long
 Private m_IconFilesInPath As String '在窗体所在目录下所有的图标文件，使用逗号分隔
+Private m_StartupPosition As String
 
 '输出PYTHON代码,
 'sCmdFunc: 输出参数，事件处理回调代码;
@@ -40,7 +40,7 @@ Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, re
     
     If oop Then
         sOut.Append "        self.master.title(" & U(m_Title) & ")"
-        sOut.Append "        self.master.geometry('" & m_Geometry & "')"
+        If m_StartupPosition <> "Center" Then sOut.Append "        self.master.geometry('" & m_Geometry & "')"
         If Not m_Resizable Then sOut.Append "        self.master.resizable(0,0)"
         If Len(m_WindowState) > 0 And m_WindowState <> "'normal'" Then
             sOut.Append "        self.master.wm_state(" & m_WindowState & ")"
@@ -57,7 +57,7 @@ Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, re
     Else
         sOut.Append "    " & m_Name & " = Tk()"
         sOut.Append "    " & m_Name & ".title(" & U(m_Title) & ")"
-        sOut.Append "    " & m_Name & ".geometry('" & m_Geometry & "')"
+        If m_StartupPosition <> "Center" Then sOut.Append "    " & m_Name & ".geometry('" & m_Geometry & "')"
         If Not m_Resizable Then sOut.Append "    " & m_Name & ".resizable(0,0)"
         If Len(m_WindowState) > 0 And m_WindowState <> "'normal'" Then
             sOut.Append "    " & m_Name & ".wm_state(" & m_WindowState & ")"
@@ -75,10 +75,13 @@ Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, re
     ProcessBindCommand sOut, sCmdFunc, oop ' 处理bindcommand
     ProcessProtocol sOut, sCmdFunc, oop '窗口消息拦截，如果有的话
     
+    If m_StartupPosition = "Center" Then
+        CenterWindow sOut, oop  '如果需要窗体在屏幕中间
+    End If
+    
     If Not oop Then
         sOut.Append "    gComps['" & m_Name & "'] = " & m_Name & vbCrLf
     End If
-    
 End Sub
 
 Private Sub ProcessIcon(sOut As cStrBuilder, oop As Boolean)
@@ -199,6 +202,30 @@ Private Sub ProcessProtocol(sOut As cStrBuilder, sCmdFunc As cStrBuilder, oop As
     
 End Sub
 
+'将主窗体放置在屏幕中间
+Private Sub CenterWindow(sOut As cStrBuilder, oop As Boolean)
+    Dim W As String, H As String
+    
+    W = Left$(m_Geometry, InStr(1, m_Geometry, "x") - 1)
+    H = Mid$(m_Geometry, InStr(1, m_Geometry, "x") + 1)
+    
+    If oop Then
+        sOut.Append Space(8) & "# To center the window on the screen."
+        sOut.Append Space(8) & "ws = self.master.winfo_screenwidth()"
+        sOut.Append Space(8) & "hs = self.master.winfo_screenheight()"
+        sOut.Append Space(8) & "x = (ws / 2) - (" & W & " / 2)"
+        sOut.Append Space(8) & "y = (hs / 2) - (" & H & " / 2)"
+        sOut.Append Space(8) & "self.master.geometry('%dx%d+%d+%d' % (" & W & "," & H & ",x,y))"
+    Else
+        sOut.Append Space(4) & "# To center the window on the screen."
+        sOut.Append Space(4) & "ws = top.winfo_screenwidth()"
+        sOut.Append Space(4) & "hs = top.winfo_screenheight()"
+        sOut.Append Space(4) & "x = (ws / 2) - (" & W & " / 2)"
+        sOut.Append Space(4) & "y = (hs / 2) - (" & H & " / 2)"
+        sOut.Append Space(4) & "top.geometry('%dx%d+%d+%d' % (" & W & "," & H & ",x,y))"
+    End If
+End Sub
+
 Private Function CreateIconBase64(sPrexSpace As String) As String
 
     Dim sIconFile As String, abContent() As Byte
@@ -256,6 +283,7 @@ Public Sub InitConfig(o As Object, nWidth As Long, nHeight As Long, dMethods As 
     m_Bindcommand = ""
     m_Topmost = False
     m_Alpha = ""
+    m_StartupPosition = IIf(o.Properties("StartUpPosition") = 1 Or o.Properties("StartUpPosition") = 2, "Center", "Default")
     
 End Sub
 
@@ -277,6 +305,8 @@ Public Function GetAttrValueList(sAttr As String, ByRef sa() As String) As Long
     ElseIf sAttr = "alpha" Then
         sa = Split("0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0", ",")
         GetAttrValueList = 2
+    ElseIf sAttr = "position" Then
+        sa = Split("Default,Center", ",")
     Else
         GetAttrValueList = 0
     End If
@@ -305,6 +335,8 @@ Public Function Tips(sAttr As String) As String
             Tips = Tips & L("l_TipBindCommand", "使用bind()绑定的事件处理列表，绑定多个则使用逗号分隔(比如：<Control-C>,<F8>,<Alt-A>)。\n双击文本框查看详情。")
         Case "protocol"
             Tips = Tips & L("l_TipFrmProtocol", "处理窗口消息，比如设置为'WM_DELETE_WINDOW'则处理窗口关闭事件，如果要拦截多个消息，请使用逗号分隔，比如'WM_DELETE_WINDOW,WM_SAVE'")
+        Case "position"
+            Tips = Tips & L("l_TipFrmPosition", "窗体启动时位置。")
         Case Else:
             Tips = Tips & L("l_TipUnknown", "未知属性")
     End Select
@@ -333,6 +365,7 @@ Public Function Allitems() As Collection
     re.Add "windowstate|" & m_WindowState & "|1"
     re.Add "topmost|0|0"
     re.Add "alpha||0"
+    re.Add "position|" & m_StartupPosition & "|1"
     re.Add "icon|" & m_IconFile & "|1"
     re.Add "iconembedding|" & IIf(m_IconEmbedding, 1, 0) & "|1"
     re.Add "bindcommand||0"
@@ -354,6 +387,7 @@ Public Sub SetConfig(sAttrs As String)
     m_IconEmbedding = False
     m_Bindcommand = ""
     m_Protocol = ""
+    m_StartupPosition = ""
     
     sa = Split(sAttrs, "|")
     
@@ -391,6 +425,8 @@ Public Sub SetSingleConfig(sAttr As String)
                 m_Bindcommand = Trim(Replace(Replace(Replace(sa(1), Chr(34), ""), "'", ""), " ", ""))
             Case "protocol"
                 m_Protocol = Trim(Replace(Replace(Replace(sa(1), Chr(34), ""), "'", ""), " ", ""))
+            Case "position"
+                m_StartupPosition = Trim(sa(1))
         End Select
     End If
 End Sub

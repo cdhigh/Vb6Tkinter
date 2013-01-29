@@ -56,11 +56,11 @@ Begin VB.Form FrmMain
    End
    Begin MSComctlLib.StatusBar stabar 
       Align           =   2  'Align Bottom
-      Height          =   375
+      Height          =   378
       Left            =   0
       TabIndex        =   10
-      Top             =   7755
-      Width           =   12960
+      Top             =   7756
+      Width           =   12964
       _ExtentX        =   22860
       _ExtentY        =   660
       Style           =   1
@@ -68,6 +68,9 @@ Begin VB.Form FrmMain
       BeginProperty Panels {8E3867A5-8586-11D1-B16A-00C0F0283628} 
          NumPanels       =   1
          BeginProperty Panel1 {8E3867AB-8586-11D1-B16A-00C0F0283628} 
+            Bevel           =   0
+            Object.Width           =   2687
+            MinWidth        =   2687
          EndProperty
       EndProperty
    End
@@ -270,17 +273,6 @@ Begin VB.Form FrmMain
       Begin VB.Menu mnuSeparator3 
          Caption         =   "-"
       End
-      Begin VB.Menu mnuSaveConfig 
-         Caption         =   "保存配置到文件(&S)"
-         Enabled         =   0   'False
-      End
-      Begin VB.Menu mnuRestoreConfig 
-         Caption         =   "从文件恢复配置(&L)"
-         Enabled         =   0   'False
-      End
-      Begin VB.Menu mnuSeparator4 
-         Caption         =   "-"
-      End
       Begin VB.Menu mnuQuit 
          Caption         =   "退出(&Q)"
       End
@@ -351,15 +343,6 @@ Private m_TxtCodeExpanded As Boolean
 Private m_TxtTipsExpanded As Boolean
 Private m_BriefCaption As String
 
-'窗体和控件的序列化字符串都用相应的字符串包起来，方便查找和对应
-Const REGX_INC_FRM_S = "<<<HFS>>>"
-Const REGX_INC_FRM_E = "<<<HFE>>>"
-Const REGX_INC_CTL_S = "<<<CTS>>>"
-Const REGX_INC_CTL_E = "<<<CTE>>>"
-Const SEP_NAME_FROM_CONTENT = "<<<SNFC>>>"
-
-Const REGX_PATTERN_FRM = REGX_INC_FRM_S & "(.*[\s\S\n\r\b]*?)" & REGX_INC_FRM_E
-Const REGX_PATTERN_CTL = REGX_INC_CTL_S & "(.*[\s\S\n\r\b]*?)" & REGX_INC_CTL_E
 Private Declare Function GetSystemDefaultLCID Lib "kernel32" () As Long
 
 Private Sub Form_Load()
@@ -520,8 +503,6 @@ Private Sub cmbFrms_Click()
         mnuSaveToFile.Enabled = True
         mnuCopyToClipboard.Enabled = True
         mnuAddProperty.Enabled = True
-        'mnuSaveConfig.Enabled = True
-        'mnuRestoreConfig.Enabled = True
         mnuGenCode.Enabled = True
     Else
         CmdGenCode.Enabled = False
@@ -530,8 +511,6 @@ Private Sub cmbFrms_Click()
         mnuSaveToFile.Enabled = False
         mnuCopyToClipboard.Enabled = False
         mnuAddProperty.Enabled = False
-        mnuSaveConfig.Enabled = False
-        mnuRestoreConfig.Enabled = False
         mnuGenCode.Enabled = False
     End If
     
@@ -544,7 +523,7 @@ End Sub
 '更新各个列表，创建对应的控件类实例, 返回False表示初始化失败，True表示成功
 Private Function ResetLstComps(frm As Object) As Long
     
-    Dim Obj As Object, ObjClsModule As Object, i As Long, s As String, j As Long, idx As Long
+    Dim Obj As Object, ObjClsModule As Object, i As Long, s As String, j As Long, Idx As Long
     Dim nScaleMode As Long, nScaleWidth As Long, nScaleHeight As Long
     Dim CodeMember As Member, CodeMembers As Members, dMethods As New Dictionary
     Dim ctlsIgnored As String
@@ -576,9 +555,9 @@ Private Function ResetLstComps(frm As Object) As Long
         If Not CodeMembers Is Nothing Then
             For Each CodeMember In CodeMembers
                 If CodeMember.Type = vbext_mt_Method Then
-                    idx = InStrRev(CodeMember.Name, "_")
-                    If idx > 1 Then
-                        s = Left$(CodeMember.Name, idx - 1)
+                    Idx = InStrRev(CodeMember.Name, "_")
+                    If Idx > 1 Then
+                        s = Left$(CodeMember.Name, Idx - 1)
                         If dMethods.Exists(s) Then
                             dMethods.Item(s) = dMethods.Item(s) & "," & CodeMember.Name & "," '使用逗号做为分隔符方便查找
                         Else
@@ -670,7 +649,7 @@ End Function
 
 '生成一个控件字符实例对象:输入ctlobj:控件对象，clsobj:对应的字符串对象
 Private Function CreateObj(ByRef ctlobj As Object, ByRef clsobj As Object) As Object
-    Dim o As Object, sName As String, idx As Long
+    Dim o As Object, sName As String, Idx As Long
     
     Select Case ctlobj.ClassName:
         Case "Label"
@@ -694,11 +673,11 @@ Private Function CreateObj(ByRef ctlobj As Object, ByRef clsobj As Object) As Ob
             Set clsobj = New clsScale
         Case "Frame"
             '判断是否是TabStrip控件的一页
-            idx = InStr(2, ctlobj.Properties("Name"), "__Tab") '从2开始至少保证__Tab前有一个字符
-            If idx > 1 And Not m_curFrm Is Nothing Then
+            Idx = InStr(2, ctlobj.Properties("Name"), "__Tab") '从2开始至少保证__Tab前有一个字符
+            If Idx > 1 And Not m_curFrm Is Nothing Then
                 '循环查询是否有合适的TabStrip控件
                 Set clsobj = Nothing
-                sName = Left$(ctlobj.Properties("Name"), idx - 1)
+                sName = Left$(ctlobj.Properties("Name"), Idx - 1)
                 For Each o In m_curFrm.Designer.VBControls
                     If o.ClassName = "TabStrip" And o.Properties("Name") = sName Then
                         Set clsobj = New clsNotebookTab  '使用Tab类来代替Frame
@@ -711,11 +690,11 @@ Private Function CreateObj(ByRef ctlobj As Object, ByRef clsobj As Object) As Ob
             End If
         Case "PictureBox"
             '判断是否是TabStrip控件的一页
-            idx = InStr(2, ctlobj.Properties("Name"), "__Tab") '从2开始至少保证__Tab前有一个字符
-            If idx > 1 And Not m_curFrm Is Nothing Then
+            Idx = InStr(2, ctlobj.Properties("Name"), "__Tab") '从2开始至少保证__Tab前有一个字符
+            If Idx > 1 And Not m_curFrm Is Nothing Then
                 '循环查询是否有合适的TabStrip控件
                 Set clsobj = Nothing
-                sName = Left$(ctlobj.Properties("Name"), idx - 1)
+                sName = Left$(ctlobj.Properties("Name"), Idx - 1)
                 For Each o In m_curFrm.Designer.VBControls
                     If o.ClassName = "TabStrip" And o.Properties("Name") = sName Then
                         Set clsobj = New clsNotebookTab  '使用Tab类来代替PictureBox
@@ -780,7 +759,7 @@ End Sub
 '整理选项卡控件和其内部控件的父子关系
 Private Sub ArrangeNotebookAndSubWidgets()
 
-    Dim i As Long, j As Long, k As Long, L As Long, idx As Long, ctlNum As Long
+    Dim i As Long, j As Long, k As Long, L As Long, Idx As Long, ctlNum As Long
     Dim sTabName As String, sNbName As String, sTmp As String
     
     If UBound(g_Comps) <= 0 Then  ' 0固定为顶层窗体
@@ -791,9 +770,9 @@ Private Sub ArrangeNotebookAndSubWidgets()
     For i = 1 To ctlNum
         If TypeName(g_Comps(i)) = "clsNotebookTab" Then
             sTabName = g_Comps(i).Name
-            idx = InStr(2, sTabName, "__Tab")
-            If idx > 1 Then
-                sNbName = Left$(sTabName, idx - 1) ' Notebook控件名
+            Idx = InStr(2, sTabName, "__Tab")
+            If Idx > 1 Then
+                sNbName = Left$(sTabName, Idx - 1) ' Notebook控件名
                 For j = 1 To ctlNum
                     If TypeName(g_Comps(j)) = "clsNotebook" And g_Comps(j).Name = sNbName Then
                         '获取TAB号
@@ -1141,8 +1120,6 @@ Private Sub CmdRefsFormsList_Click()
         mnuSaveToFile.Enabled = False
         mnuCopyToClipboard.Enabled = False
         mnuAddProperty.Enabled = False
-        mnuSaveConfig.Enabled = False
-        mnuRestoreConfig.Enabled = False
         mnuGenCode.Enabled = False
         Exit Sub
     End If
@@ -1171,8 +1148,6 @@ Private Sub CmdRefsFormsList_Click()
         mnuSaveToFile.Enabled = False
         mnuCopyToClipboard.Enabled = False
         mnuAddProperty.Enabled = False
-        mnuSaveConfig.Enabled = False
-        mnuRestoreConfig.Enabled = False
         mnuGenCode.Enabled = False
     End If
     
@@ -1326,16 +1301,16 @@ Private Sub LstComps_Click()
 End Sub
 
 '在对象中获取配置信息到列表框
-Private Sub FetchCfgFromCls(idx As Long)
+Private Sub FetchCfgFromCls(Idx As Long)
     
     Dim nRow As Long, cfg As Variant, cItms As Collection
     
-    If idx < 0 Or idx > UBound(g_Comps) Then Exit Sub
+    If Idx < 0 Or Idx > UBound(g_Comps) Then Exit Sub
     
     LstCfg.Redraw = False
     If LstCfg.ItemCount > 0 Then LstCfg.TopRow = 0  '这个操作是为了规避GridOcx的滚动条BUG，就是切换控件后有部分项目无法完整显示
     LstCfg.Clear
-    Set cItms = g_Comps(idx).Allitems()
+    Set cItms = g_Comps(Idx).Allitems()
     For Each cfg In cItms
         nRow = LstCfg.AddItem(Left(cfg, InStr(1, cfg, "|") - 1))
         LstCfg.CellText(nRow, 1) = Mid(cfg, InStr(1, cfg, "|") + 1, InStrRev(cfg, "|") - InStr(1, cfg, "|") - 1)
@@ -1346,10 +1321,10 @@ Private Sub FetchCfgFromCls(idx As Long)
 End Sub
 
 '更新配置到实例对象,idx表示当前在LstCfg上显示的属性是属于哪个控件的。
-Private Sub UpdateCfgtoCls(idx As Long)
+Private Sub UpdateCfgtoCls(Idx As Long)
     Dim s As String, i As Long
     
-    If idx < 0 Or idx > UBound(g_Comps) Then Exit Sub
+    If Idx < 0 Or Idx > UBound(g_Comps) Then Exit Sub
     
     LstCfg.UpdateIfPending
     LstCfg.Refresh
@@ -1361,7 +1336,7 @@ Private Sub UpdateCfgtoCls(idx As Long)
         End If
     Next
     
-    If Len(s) Then g_Comps(idx).SetConfig s
+    If Len(s) Then g_Comps(Idx).SetConfig s
     
 End Sub
 
@@ -1440,8 +1415,6 @@ Private Sub mnuCopyToClipUiOnly_Click()
 End Sub
 
 Private Sub mnuFile_Click()
-    'mnuSaveConfig.Enabled = LstComps.ListCount > 0
-    'mnuRestoreConfig.Enabled = LstComps.ListCount > 0
     mnuGenCode.Enabled = LstComps.ListCount > 0
 End Sub
 
@@ -1656,126 +1629,6 @@ Private Sub mnuRelPos_Click()
 '    End If
 '
     SaveSetting App.Title, "Settings", "RelPos", IIf(mnuRelPos.Checked, "1", "0")
-End Sub
-
-'在文件中恢复配置
-Private Sub mnuRestoreConfig_Click()
-    
-    Dim cSerial As New clsSerialization
-    Dim sIn As String, i As Long, s As String, sF As String
-    Dim re As RegExp, Matches As MatchCollection, Mth As Match
-    Dim csa() As String
-    
-    If Len(cmbFrms.Text) = 0 Or LstComps.ListCount = 0 Or LstCfg.ItemCount = 0 Then
-        MsgBox L("l_msgChooseAForm", "请先选择一个窗体！"), vbInformation
-        Exit Sub
-    End If
-    
-    '判断是否安装了正则表达式组件VBScript.dll
-    On Error Resume Next
-    Set re = New RegExp
-    If Err.Number <> 0 Then
-        MsgBox L("l_msgNoRegExp", "系统没有注册VBScript.dll正则表达式组件，无法执行此功能！"), vbInformation
-        mnuRestoreConfig.Enabled = False
-        mnuSaveConfig.Enabled = False
-        Exit Sub
-    End If
-    Err.Clear
-    
-    sF = m_curFrm.FileNames(1) & ".save"
-    
-    On Error GoTo 0
-    
-    If sF = "" Or sF = ".save" Then
-        MsgBox L("l_msgFrmNoSaved", "设计窗体尚未保存，请先保存设计窗体。"), vbInformation
-        Exit Sub
-    End If
-    
-    If Len(Dir(sF)) = 0 Then
-        MsgBox L_F("l_msgFileNotExist", "{0} 文件不存在！", sF), vbInformation
-        Exit Sub
-    End If
-    
-    sIn = Utf8File_Read_VB(sF)
-    
-    re.MultiLine = True
-    re.Global = True
-    
-    'On Error Resume Next
-    're.Pattern = REGX_PATTERN_FRM
-    'Set Matches = re.Execute(sIn)
-    'Set Mth = Matches(0)
-    'cSerial.SerialString = Mth.SubMatches(0)
-    'cSerial.Deserializer m_curFrm.Caption, m_curFrm.ScaleWidth, m_curFrm.ScaleHeight
-    
-    re.Pattern = REGX_PATTERN_CTL
-    Set Matches = re.Execute(sIn)
-    For Each Mth In Matches
-        csa = Split(Mth, SEP_NAME_FROM_CONTENT)
-        csa(0) = Replace(csa(0), REGX_INC_CTL_S, "")
-        csa(1) = Replace(csa(1), REGX_INC_CTL_E, "")
-        For i = 0 To UBound(g_Comps)
-            If g_Comps(i).Name = csa(0) Then
-                cSerial.SerialString = csa(1)
-                cSerial.Deserializer g_Comps(i)
-                Exit For
-            End If
-        Next
-    Next
-    
-    '避免覆盖，先获取第一个控件数据到表格
-    FetchCfgFromCls 0
-    m_PrevCompIdx = 0
-    LstComps.ListIndex = 0
-    
-    Set re = Nothing
-    
-    MsgBox L_F("l_msgRestoreCfgSuccesed", "已经成功从文件\n{0}\n恢复自定义配置！", sF), vbInformation
-    
-End Sub
-
-'保存当前配置到窗体同名文件
-Private Sub mnuSaveConfig_Click()
-    
-    Dim sOut As New cStrBuilder, i As Long, s As String, sF As String
-    Dim cSerial As New clsSerialization
-    
-    On Error Resume Next
-    sF = m_curFrm.FileNames(1) & ".save"
-    On Error GoTo 0
-    
-    If sF = "" Or sF = ".save" Then
-        MsgBox L("l_msgFrmNoSaved", "设计窗体尚未保存，请先保存设计窗体。"), vbInformation
-        Exit Sub
-    End If
-    
-    If Len(cmbFrms.Text) = 0 Or LstComps.ListCount = 0 Or LstCfg.ItemCount = 0 Then
-        MsgBox L("l_msgHasNoCfgToSave", "当前没有可以保存的配置！"), vbInformation
-        Exit Sub
-    End If
-    
-    '先保存主窗体配置
-    'sOut.Append REGX_INC_FRM_S
-    'cSerial.Serializer m_curFrm.Caption, m_curFrm.ScaleWidth, m_curFrm.ScaleHeight
-    'sOut.Append cSerial.SerialString()
-    'sOut.Append REGX_INC_FRM_E
-    
-    For i = 0 To UBound(g_Comps)
-        sOut.Append REGX_INC_CTL_S
-        sOut.Append g_Comps(i).Name
-        sOut.Append SEP_NAME_FROM_CONTENT
-        
-        cSerial.Reset
-        cSerial.Serializer g_Comps(i)
-        
-        sOut.Append cSerial.SerialString()
-        sOut.Append REGX_INC_CTL_E
-    Next
-    
-    '保存到文件
-    Utf8File_Write_VB sF, sOut.toString()
-    MsgBox L_F("l_msgCfgSaved", "配置已经保存到：\n{0}", sF), vbInformation
-    
 End Sub
 
 Private Sub mnuUnicodePrefixU_Click()

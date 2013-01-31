@@ -235,6 +235,7 @@ Private Function CreateIconBase64(sPrexSpace As String) As String
     
     sIconFile = IIf(InStr(1, m_IconFile, "\") Or InStr(1, m_IconFile, "/"), "", m_FrmPath) & m_IconFile
     
+    On Error GoTo DirErr
     If Dir(sIconFile) = "" Then
         MsgBox L_F("l_msgFileNotExist", "文件{0}不存在，请重新选择文件。", sIconFile), vbInformation
         Exit Function
@@ -246,7 +247,9 @@ Private Function CreateIconBase64(sPrexSpace As String) As String
     End If
     
     Base64Encode abContent, CreateIconBase64, sPrexSpace
-    
+    Exit Function
+DirErr:
+    MsgBox L_F("l_msgFileNotExist", "文件{0}不存在，请重新选择文件。", sIconFile), vbInformation
 End Function
 
 
@@ -344,12 +347,18 @@ End Function
 
 '将窗体目录下的所有图标文件存入m_IconFilesInPath，以备后续选择
 Private Function AutoDetectIconFile() As String
+    Dim sOut As New cStrBuilder, s As String
     m_IconFilesInPath = ""
     If Len(m_FrmPath) Then
-        m_IconFilesInPath = Join(SearchFiles(m_FrmPath, "*.ico"), ",")
-        m_IconFilesInPath = m_IconFilesInPath & Join(SearchFiles(m_FrmPath, "*.gif"), ",")
-        m_IconFilesInPath = m_IconFilesInPath & Join(SearchFiles(m_FrmPath, "*.ppm"), ",")
-        m_IconFilesInPath = m_IconFilesInPath & Join(SearchFiles(m_FrmPath, "*.pgm"), ",")
+        s = Join(SearchFiles(m_FrmPath, "*.ico", True), ",")
+        If Len(s) Then sOut.Append s
+        s = Join(SearchFiles(m_FrmPath, "*.gif", True), ",")
+        If Len(s) Then sOut.Append s
+        s = Join(SearchFiles(m_FrmPath, "*.ppm", True), ",")
+        If Len(s) Then sOut.Append s
+        s = Join(SearchFiles(m_FrmPath, "*.pgm", True), ",")
+        If Len(s) Then sOut.Append s
+        m_IconFilesInPath = sOut.toString(",")
     End If
 End Function
 

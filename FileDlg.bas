@@ -331,19 +331,34 @@ End Function
 '  SearchFiles "C:\Program Files\WinRAR\", "*" '查找所有文件
 '  SearchFiles "C:\Program Files\WinRAR\", "*.exe" '查找所有exe文件
 '  SearchFiles "C:\Program Files\WinRAR\", "*in*.exe" '查找文件名中包含有 in 的exe文件
-Public Function SearchFiles(Path As String, FileType As String) As String()
-    Dim sPath As String, numFiles As Long
+Public Function SearchFiles(Path As String, FileType As String, Optional ForceSuffixMatch As Boolean = False) As String()
+    Dim sPath As String, numFiles As Long, suffix As String, nLensuffix As Long
     Dim saFiles() As String
     
     If Right$(Path, 1) <> "\" Then Path = Path & "\"
     
+    '强迫使用后缀匹配
+    If ForceSuffixMatch Then
+        nLensuffix = Len(FileType) - InStrRev(FileType, ".")
+        suffix = Right$(FileType, nLensuffix)
+    End If
+    
+    On Error GoTo SFErr
     sPath = Dir(Path & FileType) '查找第一个文件
     
     numFiles = 0
     Do While Len(sPath) '循环到没有文件为止
-        ReDim Preserve saFiles(numFiles) As String
-        saFiles(numFiles) = Path & sPath
-        numFiles = numFiles + 1
+        If ForceSuffixMatch Then  '强迫后缀名适配，而不仅仅是中间的一部分
+            If Right$(sPath, nLensuffix) = suffix Then
+                ReDim Preserve saFiles(numFiles) As String
+                saFiles(numFiles) = Path & sPath
+                numFiles = numFiles + 1
+            End If
+        Else
+            ReDim Preserve saFiles(numFiles) As String
+            saFiles(numFiles) = Path & sPath
+            numFiles = numFiles + 1
+        End If
         sPath = Dir '查找下一个文件
         'DoEvents '让出控制权
     Loop
@@ -353,4 +368,7 @@ Public Function SearchFiles(Path As String, FileType As String) As String()
     Else
         SearchFiles = Split("")
     End If
+    Exit Function
+SFErr:
+    SearchFiles = Split("")
 End Function

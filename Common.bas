@@ -21,12 +21,20 @@ Private Type Size
 End Type
 
 '注册表API声明
-Public Declare Function RegOpenKey Lib "advapi32.dll" Alias "RegOpenKeyA" (ByVal hKey As Long, ByVal lpSubKey As String, phkResult As Long) As Long
+'Public Declare Function RegOpenKey Lib "advapi32.dll" Alias "RegOpenKeyA" (ByVal hKey As Long, ByVal lpSubKey As String, phkResult As Long) As Long
+Public Declare Function RegOpenKeyEx Lib "advapi32.dll" Alias "RegOpenKeyExA" (ByVal hKey As Long, ByVal lpSubKey As String, ByVal ulOptions As Long, ByVal samDesired As Long, phkResult As Long) As Long
 Public Declare Function RegEnumKeyEx Lib "advapi32.dll" Alias "RegEnumKeyExA" (ByVal hKey As Long, ByVal dwIndex As Long, ByVal lpName As String, lpcbName As Long, ByVal lpReserved As Long, ByVal lpClass As String, lpcbClass As Long, lpftLastWriteTime As Long) As Long
 Public Declare Function RegCloseKey Lib "advapi32.dll" (ByVal hKey As Long) As Long
 Public Declare Function RegQueryValueEx Lib "advapi32.dll" Alias "RegQueryValueExA" (ByVal hKey As Long, ByVal lpValueName As String, ByVal lpReserved As Long, lpType As Long, ByVal lpData As Any, lpcbData As Long) As Long
 Public Const REG_SZ = 1
 Public Const HKEY_LOCAL_MACHINE = &H80000002
+Public Const KEY_QUERY_VALUE = &H1
+Public Const STANDARD_RIGHTS_READ = &H20000
+Public Const KEY_ENUMERATE_SUB_KEYS = &H8
+Public Const KEY_NOTIFY = &H10
+Public Const SYNCHRONIZE = &H100000
+Public Const KEY_READ = ((STANDARD_RIGHTS_READ Or KEY_QUERY_VALUE Or KEY_ENUMERATE_SUB_KEYS Or KEY_NOTIFY) And (Not SYNCHRONIZE))
+Public Const KEY_WOW64_64KEY = &H100
 
 '这些用于获取系统默认字体
 Private Declare Function GetStockObject Lib "gdi32" (ByVal nIndex As Long) As Long
@@ -265,46 +273,53 @@ Public Function TranslateColor(ByVal dwColor As OLE_COLOR) As String
     End If
 End Function
 
-
 ' 获取系统中所有安装的Python路径
 Public Function GetAllInstalledPython() As String()
     Dim nRe As Long, nHk As Long, nHk2 As Long, i As Long, nLen As Long
     Dim sVer As String, sAllPath As String, sBuff As String, sPythonExe As String
+    Dim saVer() As String, nVerNum As Long
     
-    nRe = RegOpenKey(HKEY_LOCAL_MACHINE, "SOFTWARE\Python\PythonCore", nHk)
+    nRe = RegOpenKeyEx(HKEY_LOCAL_MACHINE, "SOFTWARE\Python\PythonCore", 0, KEY_READ Or KEY_WOW64_64KEY, nHk)
     If nRe <> 0 Then
         GetAllInstalledPython = Split("")
         Exit Function
     End If
     
     i = 0
+    nVerNum = 0
     nLen = 255
     sBuff = String$(255, 0)
     Do While (RegEnumKeyEx(nHk, i, sBuff, nLen, 0, vbNullString, ByVal 0&, ByVal 0&) = 0)
         If nLen > 1 Then
             sBuff = Left$(sBuff, InStr(1, sBuff, Chr(0)) - 1)
             
-            '查询具体安装路径
-            nRe = RegOpenKey(HKEY_LOCAL_MACHINE, "SOFTWARE\Python\PythonCore\" & sBuff & "\InstallPath", nHk2)
-            If nRe = 0 Then
-                nLen = 255
-                sBuff = String$(255, 0)
-                nRe = RegQueryValueEx(nHk2, "", 0&, REG_SZ, sBuff, nLen)  '查询子键默认字符串值
-                
-                If nRe = 0 And nLen > 1 Then
-                    sBuff = Left$(sBuff, InStr(1, sBuff, Chr(0)) - 1)
-                    sPythonExe = sBuff & IIf(Right$(sBuff, 1) = "\", "", "\") & "python.exe"
-                    sPythonExe = sPythonExe & "," & sBuff & IIf(Right$(sBuff, 1) = "\", "", "\") & "pythonw.exe"
-                    sAllPath = sAllPath & IIf(Len(sAllPath), ",", "") & sPythonExe
-                End If
-                RegCloseKey nHk2
-            End If
+            ReDim Preserve saVer(nVerNum) As String
+            saVer(nVerNum) = sBuff
+            nVerNum = nVerNum + 1
         End If
         i = i + 1
         nLen = 255
         sBuff = String$(255, 0)
     Loop
     RegCloseKey nHk
+    
+    '查询具体安装路径
+    For i = 1 To nVerNum
+        nRe = RegOpenKeyEx(HKEY_LOCAL_MACHINE, "SOFTWARE\Python\PythonCore\" & saVer(i - 1) & "\InstallPath", 0, KEY_READ Or KEY_WOW64_64KEY, nHk2)
+        If nRe = 0 Then
+            nLen = 255
+            sBuff = String$(255, 0)
+            nRe = RegQueryValueEx(nHk2, "", 0&, REG_SZ, sBuff, nLen)  '查询子键默认字符串值
+            If nRe = 0 And nLen > 1 Then
+                sBuff = Left$(sBuff, InStr(1, sBuff, Chr(0)) - 1)
+                
+                sPythonExe = sBuff & IIf(Right$(sBuff, 1) = "\", "", "\") & "python.exe"
+                sPythonExe = sPythonExe & "," & sBuff & IIf(Right$(sBuff, 1) = "\", "", "\") & "pythonw.exe"
+                sAllPath = sAllPath & IIf(Len(sAllPath), ",", "") & sPythonExe
+            End If
+            RegCloseKey nHk2
+        End If
+    Next
     
     GetAllInstalledPython = Split(sAllPath, ",")
 End Function

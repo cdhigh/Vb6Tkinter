@@ -62,6 +62,8 @@
     import modules filedialog, simpledialog, colorchooser.    
 
 3. History
+  v1.4.5
+    1.Add a property 'scrollregion' to Canvas.
   v1.4.4
     1. Its a minor bugfix version.
   v1.4.3

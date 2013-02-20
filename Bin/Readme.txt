@@ -174,6 +174,8 @@
      设置有效。
 
 6. 版本历史
+  v1.4.5
+    1. Canvas控件增加scrollregion属性。
   v1.4.4
     1. bugfix:在windows7 64bit下获取python安装目录失败的bug（用于预览界面）。
     2. bugfix:在窗体目录下同时放置一个ico和一个gif文件时窗体图标文件设置错误。

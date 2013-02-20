@@ -73,6 +73,7 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
     m_dicTotal("relief") = "FLAT"
     m_dicTotal("takefocus") = IIf(o.Properties("TabStop"), 1, 0)
     m_dicTotal("cursor") = m_Base.GetCursorName(o.Properties("MousePointer"))
+    m_dicTotal("scrollregion") = ""
     m_dicTotal("xscrollcommand") = ""
     m_dicTotal("yscrollcommand") = ""
     m_dicTotal("xscrollincrement") = ""

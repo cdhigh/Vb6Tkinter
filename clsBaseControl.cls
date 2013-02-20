@@ -607,6 +607,8 @@ Public Function Tips(sAttr As String) As String
         Tips = Tips & L("l_TipXScrlIncre", "水平每次滚动增量，默认为0，可以随意滚动，可以设置为一个大于零的整数。")
     Case "yscrollincrement":
         Tips = Tips & L("l_TipYScrlIncre", "上下每次滚动增量，默认为0，可以随意滚动，可以设置为一个大于零的整数。")
+    Case "scrollregion"
+        Tips = Tips & L("l_TipScrlregion", "控件滚动范围（可以理解为控件实际上有多大），格式：(w,n,e,s)。\n如果要设置Canvas可以滚动，则必须设置此属性。")
     Case Else:
         Tips = Tips & L("l_TipUnknown", "未知属性")
     End Select

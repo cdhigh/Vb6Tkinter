@@ -74,6 +74,13 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
     m_dicTotal("takefocus") = IIf(o.Properties("TabStop"), 1, 0)
     m_dicTotal("cursor") = m_Base.GetCursorName(o.Properties("MousePointer"))
     m_dicTotal("scrollregion") = ""
+    m_dicTotal("confine") = "'true'"
+    m_dicTotal("highlightbackground") = ""
+    m_dicTotal("highlightcolor") = ""
+    m_dicTotal("highlightthickness") = IIf(o.Properties("BorderStyle"), "1", "0")
+    m_dicTotal("selectbackground") = ""
+    m_dicTotal("selectborderwidth") = ""
+    m_dicTotal("selectforeground") = ""
     m_dicTotal("xscrollcommand") = ""
     m_dicTotal("yscrollcommand") = ""
     m_dicTotal("xscrollincrement") = ""
@@ -89,10 +96,11 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
     m_Base("rely") = m_dicTotal("rely")
     m_Base("relwidth") = m_dicTotal("relwidth")
     m_Base("relheight") = m_dicTotal("relheight")
+    m_Base("takefocus") = m_dicTotal("takefocus")
     If o.Properties("BackColor") <> vbButtonFace Then m_Base("bg") = m_dicTotal("bg")
-    If m_dicTotal("takefocus") = 0 Then m_Base("takefocus") = m_dicTotal("takefocus")
     If m_dicTotal("cursor") <> "" Then m_Base("cursor") = m_dicTotal("cursor")
     If m_dicTotal("bindcommand") <> "" Then m_Base("bindcommand") = m_dicTotal("bindcommand")
+    If m_dicTotal("highlightthickness") <> "1" Then m_Base("highlightthickness") = m_dicTotal("highlightthickness")
     
     '使用控件的tag属性保存一些额外默认要保存的属性，
     '开始字符为：p@，后接属性名，每个属性使用@隔开，属性值可选，如果有值，则使用k=v格式
@@ -136,6 +144,9 @@ Public Function GetAttrValueList(sAttr As String, ByRef sa() As String) As Long
         Else
             GetAttrValueList = 0
         End If
+    ElseIf sAttr = "confine" Then
+        sa = Split("'true','false'", ",")
+        GetAttrValueList = 1
     Else
         GetAttrValueList = m_Base.GetAttrValueList(sAttr, sa)
     End If

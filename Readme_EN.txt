@@ -62,6 +62,9 @@
     import modules filedialog, simpledialog, colorchooser.    
 
 3. History
+  v1.4.6
+    1. Setup the coordinate of form in VB.
+    2. set the font and color of caption of labelframe.
   v1.4.5
     1.Add a property 'scrollregion' to Canvas.
   v1.4.4

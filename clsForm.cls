@@ -19,6 +19,8 @@ Private m_Name As String
 Private m_Title As String
 Private m_Geometry As String
 Private m_WindowState As String
+Private m_Left As Long
+Private m_Top As Long
 Private m_Topmost As Boolean
 Private m_Alpha As String
 Private m_Resizable As Boolean
@@ -40,7 +42,11 @@ Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, re
     
     If oop Then
         sOut.Append "        self.master.title(" & U(m_Title) & ")"
-        If m_StartupPosition <> "Center" Then sOut.Append "        self.master.geometry('" & m_Geometry & "')"
+        If m_StartupPosition = "Manual" Then  '手工指定窗口初始位置
+            sOut.Append "        self.master.geometry('" & m_Geometry & CoordinateOnStart() & "')"
+        ElseIf m_StartupPosition <> "Center" Then
+            sOut.Append "        self.master.geometry('" & m_Geometry & "')"
+        End If
         If Not m_Resizable Then sOut.Append "        self.master.resizable(0,0)"
         If Len(m_WindowState) > 0 And m_WindowState <> "'normal'" Then
             sOut.Append "        self.master.wm_state(" & m_WindowState & ")"
@@ -57,7 +63,11 @@ Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, re
     Else
         sOut.Append "    " & m_Name & " = Tk()"
         sOut.Append "    " & m_Name & ".title(" & U(m_Title) & ")"
-        If m_StartupPosition <> "Center" Then sOut.Append "    " & m_Name & ".geometry('" & m_Geometry & "')"
+        If m_StartupPosition = "Manual" Then  '手工指定窗口初始位置
+            sOut.Append "    " & m_Name & ".geometry('" & m_Geometry & CoordinateOnStart() & "')"
+        ElseIf m_StartupPosition = "Center" Then
+            sOut.Append "    " & m_Name & ".geometry('" & m_Geometry & "')"
+        End If
         If Not m_Resizable Then sOut.Append "    " & m_Name & ".resizable(0,0)"
         If Len(m_WindowState) > 0 And m_WindowState <> "'normal'" Then
             sOut.Append "    " & m_Name & ".wm_state(" & m_WindowState & ")"
@@ -276,6 +286,8 @@ Public Sub InitConfig(o As Object, nWidth As Long, nHeight As Long, dMethods As 
     m_Geometry = nWidth & "x" & nHeight
     m_WindowState = IIf(o.Properties("WindowState") = vbMaximized, "'zoomed'", IIf(o.Properties("WindowState") = vbMinimized, "'iconic'", "'normal'"))
     m_Resizable = IIf(o.Properties("MaxButton"), True, False)
+    m_Left = m_Base.toPixelX(o.Properties("Left"))
+    m_Top = m_Base.toPixelY(o.Properties("Top"))
     m_IconEmbedding = True
     m_Protocol = ""
     If InStr(1, m_IconFilesInPath, ",") <= 0 Then
@@ -286,7 +298,13 @@ Public Sub InitConfig(o As Object, nWidth As Long, nHeight As Long, dMethods As 
     m_Bindcommand = ""
     m_Topmost = False
     m_Alpha = ""
-    m_StartupPosition = IIf(o.Properties("StartUpPosition") = 1 Or o.Properties("StartUpPosition") = 2, "Center", "Default")
+    If o.Properties("StartUpPosition") = 1 Or o.Properties("StartUpPosition") = 2 Then
+        m_StartupPosition = "Center"
+    ElseIf o.Properties("StartUpPosition") = 0 Then
+        m_StartupPosition = "Manual"
+    Else
+        m_StartupPosition = "Default"
+    End If
     
 End Sub
 
@@ -309,7 +327,7 @@ Public Function GetAttrValueList(sAttr As String, ByRef sa() As String) As Long
         sa = Split("0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0", ",")
         GetAttrValueList = 2
     ElseIf sAttr = "position" Then
-        sa = Split("Default,Center", ",")
+        sa = Split("Default,Center,Manual", ",")
     Else
         GetAttrValueList = 0
     End If
@@ -322,6 +340,10 @@ Public Function Tips(sAttr As String) As String
             Tips = Tips & L("l_TipFrmTitle", "窗体的标题。")
         Case "geometry"
             Tips = Tips & L("l_TipFrmGeometry", "窗体的大小（宽x高），单位为像素。")
+        Case "left"
+            Tips = Tips & L("l_TipFrmLeft", "窗体的初始位置坐标，单位为像素。")
+        Case "top"
+            Tips = Tips & L("l_TipFrmTop", "窗体的初始位置坐标，单位为像素。")
         Case "resizable"
             Tips = Tips & L("l_TipFrmResizable", "用户是否可以改变窗体的大小。可选值：1/0。")
         Case "windowstate"
@@ -362,6 +384,12 @@ Private Function AutoDetectIconFile() As String
     End If
 End Function
 
+'计算和生成窗体启动坐标
+Private Function CoordinateOnStart() As String
+    CoordinateOnStart = IIf(m_Left >= 0, "+" & CStr(m_Left), CStr(m_Left))
+    CoordinateOnStart = CoordinateOnStart & IIf(m_Top >= 0, "+" & CStr(m_Top), CStr(m_Top))
+End Function
+
 '返回一个集合，每个项目三元对"属性名|值|是否默认选择"
 '这个函数用于主界面填充属性参数列表框
 Public Function Allitems() As Collection
@@ -370,6 +398,8 @@ Public Function Allitems() As Collection
     Set re = New Collection
     re.Add "geometry|" & m_Geometry & "|1"
     re.Add "title|" & m_Title & "|1"
+    re.Add "left|" & m_Left & "|1"
+    re.Add "top|" & m_Top & "|1"
     re.Add "resizable|" & IIf(m_Resizable, 1, 0) & "|1"
     re.Add "windowstate|" & m_WindowState & "|1"
     re.Add "topmost|0|0"
@@ -397,6 +427,8 @@ Public Sub SetConfig(sAttrs As String)
     m_Bindcommand = ""
     m_Protocol = ""
     m_StartupPosition = ""
+    m_Left = 0
+    m_Top = 0
     
     sa = Split(sAttrs, "|")
     
@@ -418,6 +450,10 @@ Public Sub SetSingleConfig(sAttr As String)
                 m_Title = UnQuote(Trim(sa(1)))
             Case "geometry"
                 m_Geometry = UnQuote(Trim(sa(1)))
+            Case "left"
+                m_Left = C2Lng(Trim(sa(1)))
+            Case "top"
+                m_Top = C2Lng(Trim(sa(1)))
             Case "resizable"
                 m_Resizable = IIf(Trim(sa(1)) = "1", True, False)
             Case "windowstate"
@@ -439,6 +475,11 @@ Public Sub SetSingleConfig(sAttr As String)
         End Select
     End If
 End Sub
+
+Private Function C2Lng(sv As String) As Long
+    On Error Resume Next
+    C2Lng = CLng(sv)
+End Function
 
 Public Property Get Parent() As String
     Parent = ""

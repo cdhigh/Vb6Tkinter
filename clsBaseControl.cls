@@ -87,7 +87,10 @@ Public Sub toStringStructure(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBu
     If usettk Then                                                              '创建STYLE对象
         sStyle = GetStyleParams(False, usettk)
         If Len(sStyle) Then
-            sOut.Append Space(4) & "style.configure('T" & m_Name & "." & m_StyleName & "'," & sStyle & ")"
+            sOut.Append Space(4) & "style.configure('T" & m_Name & "." & m_StyleName & "', " & sStyle & ")"
+            If m_Type = "LabelFrame" Then ' LabelFrame的字体和前景色要设置到Label
+                sOut.Append Space(4) & "style.configure('T" & m_Name & "." & m_StyleName & ".Label" & "', " & sStyle & ")"
+            End If
             sOtherParams = sOtherParams & IIf(Len(sOtherParams), ", ", "") & "style='T" & m_Name & "." & m_StyleName & "'"
         End If
     End If
@@ -230,6 +233,9 @@ Public Sub toStringOOP(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder,
         sStyle = GetStyleParams(True, usettk)
         If Len(sStyle) Then
             sOut.Append Space(8) & "self.style.configure('T" & m_Name & "." & m_StyleName & "', " & sStyle & ")"
+            If m_Type = "LabelFrame" Then ' LabelFrame的字体和前景色要设置到Label
+                sOut.Append Space(8) & "self.style.configure('T" & m_Name & "." & m_StyleName & ".Label" & "', " & sStyle & ")"
+            End If
             sOtherParams = sOtherParams & IIf(Len(sOtherParams), ", ", "") & "style='T" & m_Name & "." & m_StyleName & "'"
         End If
     End If
@@ -337,7 +343,8 @@ Public Function GetExtraParams(oop As Boolean, usettk As Boolean) As String
                 Else
                     sValue = U(Dic(k))
                 End If
-            ElseIf InStr(1, ",fg,bg,anchor,justify,show,state,activestyle,labelanchor,mode,cursor,", "," & k & ",") Then
+            ElseIf InStr(1, ",fg,bg,anchor,justify,show,state,activestyle,labelanchor,mode,cursor,highlightbackground,highlightcolor,selectbackground,selectforeground,", _
+                        "," & k & ",") Then
                 sValue = Quote(Dic(k))
             Else
                 sValue = Dic(k)
@@ -416,7 +423,8 @@ Private Function GetStyleParams(oop As Boolean, usettk As Boolean) As String
     If Len(Dic("jump")) Then s.Append "jump=" & Dic("jump")
     If Len(Dic("indicatoron")) Then s.Append "indicatoron=" & Dic("indicatoron")
     If Len(Dic("font")) Then
-        If Not usettk Or (m_Type <> "Entry" And m_Type <> "Combobox") Then  'ttk.Entry的font要写在构建函数中才管用
+        'ttk.Entry的font要写在构建函数中才管用,ttk.LabelFrame的font要设置到.Label属性才管用
+        If m_Type <> "Entry" And m_Type <> "Combobox" Then
             If Left$(Dic("font"), 1) = "(" Then
                 s.Append "font=" & Dic("font")
             Else  '如果用户忘了加括号，这里加上
@@ -564,13 +572,13 @@ Public Function Tips(sAttr As String) As String
     Case "relheight":
         Tips = Tips & L("l_TipRelHeight", "控件相对于父窗口的高度，值范围为0-1。")
     Case "fg":
-        Tips = Tips & L("l_TipFg", "前景色，请使用单引号或双引号括起来，格式为#RGB或red等单词，比如'#FFEA00'。")
+        Tips = Tips & L("l_TipFg", "前景色，格式为#RGB或red等单词，比如'#FFEA00'。")
     Case "bg":
-        Tips = Tips & L("l_TipBg", "背景色，请使用单引号或双引号括起来，格式为#RGB或red等单词，比如'#FFEA00'。")
+        Tips = Tips & L("l_TipBg", "背景色，格式为#RGB或red等单词，比如'#FFEA00'。")
     Case "bd":
         Tips = Tips & L("l_TipBd", "边框宽度，单位为像素。")
     Case "anchor":
-        Tips = Tips & L("l_TipAnchor", "控件内文字的对齐方式，请使用单引号或双引号括起来，可能值为：\n'w'|'n'|'s'|'e'|'nw'|'ne'|'sw'|'se'|'center'.")
+        Tips = Tips & L("l_TipAnchor", "控件内文字的对齐方式，可能值为：\n'w'|'n'|'s'|'e'|'nw'|'ne'|'sw'|'se'|'center'.")
     Case "relief":
         Tips = Tips & L("l_TipRelief", "外观效果，可选值有：FLAT, GROOVE, RAISED, RIDGE, SOLID, SUNKEN。")
     Case "overrelief":
@@ -582,7 +590,7 @@ Public Function Tips(sAttr As String) As String
     Case "underline":
         Tips = Tips & L("l_TipUnderline", "在哪个字母上添加下划线，做为快捷方式的表示，第一个字母索引为0。")
     Case "justify":
-        Tips = Tips & L("l_TipJustify", "控制多行字符的对齐方式，请使用单引号或双引号括起来，可能值为：" & vbCrLf & "left, right, center。")
+        Tips = Tips & L("l_TipJustify", "控制多行字符的对齐方式，可能值为：" & vbCrLf & "left, right, center。")
     Case "padding":
         Tips = Tips & L("l_TipPadding", "控件内部额外间距，一般不需要设置。如果需要设置，请提供'左 上 右 下'四个值，或三个值'左 上 右'(下=上)，两个值'左 上'(右=左,下=上)，一个值'左'(上=下=右=左)。")
     Case "orient":
@@ -609,8 +617,22 @@ Public Function Tips(sAttr As String) As String
         Tips = Tips & L("l_TipYScrlIncre", "上下每次滚动增量，默认为0，可以随意滚动，可以设置为一个大于零的整数。")
     Case "scrollregion"
         Tips = Tips & L("l_TipScrlregion", "控件滚动范围（可以理解为控件实际上有多大），格式：(w,n,e,s)。\n如果要设置Canvas可以滚动，则必须设置此属性。")
+    Case "confine"
+        Tips = Tips & L("l_TipConfine", "是否限制在scrollregion内滚动，默认为true。")
+    Case "highlightbackground"
+        Tips = Tips & L("l_TipHlbg", "控件失去焦点时边框的颜色。")
+    Case "highlightcolor"
+        Tips = Tips & L("l_TipHlColor", "控件选中状态时边框的颜色。")
+    Case "highlightthickness"
+        Tips = Tips & L("l_TipHlThickness", "焦点状态边框宽度，默认为1。")
+    Case "selectbackground"
+        Tips = Tips & L("l_TipSltbg", "控件内选中项的背景色。")
+    Case "selectborderwidth"
+        Tips = Tips & L("l_TipSltbd", "控件内选中项的边框宽度。")
+    Case "selectforeground"
+        Tips = Tips & L("l_TipSltfg", "控件内选中项的前景色。")
     Case Else:
-        Tips = Tips & L("l_TipUnknown", "未知属性")
+        Tips = Tips & L("l_TipUnknown", "未知属性。")
     End Select
     
 End Function

@@ -841,7 +841,8 @@ Private Sub TryAssignScrollbar2Widgets()
             vY2 = Obj.Properties("Top") + thresholdY2
             Assigned = False
             For Each o In m_curFrm.Designer.VBControls
-                If InStr(1, "PictureBox,ListBox,TreeView,TextBox,", o.ClassName & ",") > 0 Then '只有这些控件可能需要滚动条
+                If (o.Container Is Obj.Container) And _
+                    InStr(1, "PictureBox,ListBox,TreeView,TextBox,", o.ClassName & ",") > 0 Then  '只有这些控件可能需要滚动条
                     isWidgetScrl = True
                     If o.ClassName = "TextBox" Then '只有多行文本框才支持滚动
                         If Not o.Properties("MultiLine") Then
@@ -885,7 +886,8 @@ Private Sub TryAssignScrollbar2Widgets()
             vY2 = Obj.Properties("Top") + Obj.Properties("Height") + thresholdY1
             Assigned = False
             For Each o In m_curFrm.Designer.VBControls
-                If InStr(1, "PictureBox,ListBox,TreeView,TextBox,", o.ClassName & ",") > 0 Then '只有这些控件可能需要滚动条
+                If (o.Container Is Obj.Container) And _
+                    InStr(1, "PictureBox,ListBox,TreeView,TextBox,", o.ClassName & ",") > 0 Then '只有这些控件可能需要滚动条
                     isWidgetScrl = True
                     If o.ClassName = "TextBox" Then '只有多行文本框才支持滚动
                         If Not o.Properties("MultiLine") Then

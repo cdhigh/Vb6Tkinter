@@ -2,15 +2,15 @@ VERSION 5.00
 Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.0#0"; "MSCOMCTL.OCX"
 Begin VB.Form FrmMain 
    Caption         =   "Visual Tkinter of Python - cdhigh@sohu.com"
-   ClientHeight    =   8134
-   ClientLeft      =   56
-   ClientTop       =   672
-   ClientWidth     =   12964
+   ClientHeight    =   8125
+   ClientLeft      =   52
+   ClientTop       =   676
+   ClientWidth     =   12974
    Icon            =   "MainForm.frx":0000
    LinkTopic       =   "Form1"
-   ScaleHeight     =   581
+   ScaleHeight     =   625
    ScaleMode       =   3  'Pixel
-   ScaleWidth      =   926
+   ScaleWidth      =   998
    StartUpPosition =   2  '屏幕中心
    Begin VB.ComboBox cmbEditCombo 
       CausesValidation=   0   'False
@@ -41,12 +41,12 @@ Begin VB.Form FrmMain
       TabIndex        =   0
       Top             =   120
       Width           =   2295
-      _ExtentX        =   4039
-      _ExtentY        =   864
+      _ExtentX        =   4050
+      _ExtentY        =   863
       Caption         =   "刷新窗体列表(&R)"
       BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
          Name            =   "宋体"
-         Size            =   9.36
+         Size            =   9.5094
          Charset         =   134
          Weight          =   400
          Underline       =   0   'False
@@ -56,13 +56,13 @@ Begin VB.Form FrmMain
    End
    Begin MSComctlLib.StatusBar stabar 
       Align           =   2  'Align Bottom
-      Height          =   378
+      Height          =   377
       Left            =   0
       TabIndex        =   10
-      Top             =   7756
-      Width           =   12964
-      _ExtentX        =   22860
-      _ExtentY        =   660
+      Top             =   7748
+      Width           =   12974
+      _ExtentX        =   23914
+      _ExtentY        =   695
       Style           =   1
       _Version        =   393216
       BeginProperty Panels {8E3867A5-8586-11D1-B16A-00C0F0283628} 
@@ -87,7 +87,7 @@ Begin VB.Form FrmMain
    Begin VB.TextBox TxtTips 
       BeginProperty Font 
          Name            =   "宋体"
-         Size            =   10.8
+         Size            =   10.87
          Charset         =   134
          Weight          =   400
          Underline       =   0   'False
@@ -104,7 +104,7 @@ Begin VB.Form FrmMain
       Width           =   2415
    End
    Begin VB.ListBox LstComps 
-      Height          =   3514
+      Height          =   3432
       Left            =   120
       TabIndex        =   6
       Top             =   1200
@@ -116,11 +116,11 @@ Begin VB.Form FrmMain
       TabIndex        =   8
       Top             =   840
       Width           =   6015
-      _ExtentX        =   10617
-      _ExtentY        =   12090
+      _ExtentX        =   10615
+      _ExtentY        =   12101
       BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
          Name            =   "宋体"
-         Size            =   9.36
+         Size            =   9.5094
          Charset         =   134
          Weight          =   400
          Underline       =   0   'False
@@ -131,7 +131,7 @@ Begin VB.Form FrmMain
    Begin VB.TextBox TxtCode 
       BeginProperty Font 
          Name            =   "Courier New"
-         Size            =   10.8
+         Size            =   10.87
          Charset         =   0
          Weight          =   400
          Underline       =   0   'False
@@ -152,12 +152,12 @@ Begin VB.Form FrmMain
       TabIndex        =   1
       Top             =   120
       Width           =   2295
-      _ExtentX        =   4039
-      _ExtentY        =   864
+      _ExtentX        =   4050
+      _ExtentY        =   863
       Caption         =   "生成代码(&G)"
       BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
          Name            =   "宋体"
-         Size            =   9.36
+         Size            =   9.5094
          Charset         =   134
          Weight          =   400
          Underline       =   0   'False
@@ -171,12 +171,12 @@ Begin VB.Form FrmMain
       TabIndex        =   2
       Top             =   120
       Width           =   2295
-      _ExtentX        =   4039
-      _ExtentY        =   864
+      _ExtentX        =   4050
+      _ExtentY        =   863
       Caption         =   "拷贝到剪贴板(&C)"
       BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
          Name            =   "宋体"
-         Size            =   9.36
+         Size            =   9.5094
          Charset         =   134
          Weight          =   400
          Underline       =   0   'False
@@ -190,12 +190,12 @@ Begin VB.Form FrmMain
       TabIndex        =   3
       Top             =   120
       Width           =   2295
-      _ExtentX        =   4039
-      _ExtentY        =   864
+      _ExtentX        =   4050
+      _ExtentY        =   863
       Caption         =   "保存到文件(&F)"
       BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
          Name            =   "宋体"
-         Size            =   9.36
+         Size            =   9.5094
          Charset         =   134
          Weight          =   400
          Underline       =   0   'False
@@ -209,12 +209,12 @@ Begin VB.Form FrmMain
       TabIndex        =   4
       Top             =   120
       Width           =   2295
-      _ExtentX        =   4039
-      _ExtentY        =   864
+      _ExtentX        =   4050
+      _ExtentY        =   863
       Caption         =   "退出(&Q)"
       BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
          Name            =   "宋体"
-         Size            =   9.36
+         Size            =   9.5094
          Charset         =   134
          Weight          =   400
          Underline       =   0   'False
@@ -314,7 +314,7 @@ Begin VB.Form FrmMain
       End
    End
    Begin VB.Menu mnuLanguage 
-      Caption         =   "语言(&L)"
+      Caption         =   "Language(&L)"
       Begin VB.Menu mnuLng 
          Caption         =   "简体中文(&C)"
          Index           =   0

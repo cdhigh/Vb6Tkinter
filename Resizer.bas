@@ -11,7 +11,7 @@ Public Sub ResizeInit(FormName As Form)
     FormOldHeight = FormName.ScaleHeight
     On Error Resume Next
     For Each Obj In FormName
-        Obj.Tag = Obj.Left & "," & Obj.Top & "," & Obj.Width & "," & Obj.Height
+        Obj.Tag = Obj.Left & "|" & Obj.Top & "|" & Obj.Width & "|" & Obj.Height
     Next Obj
     
 End Sub
@@ -23,13 +23,17 @@ Public Sub ResizeForm(FormName As Form)
     Dim Obj As Control
     Dim ScaleX As Double, ScaleY As Double
     
+    If (FormOldWidth = 0) Or (FormOldHeight = 0) Then
+        ResizeInit FormName
+    End If
+    
     ScaleX = FormName.ScaleWidth / FormOldWidth
     ScaleY = FormName.ScaleHeight / FormOldHeight
     
     On Error Resume Next
     For Each Obj In FormName
         ReDim pos(0) As String
-        pos = Split(Obj.Tag, ",")
+        pos = Split(Obj.Tag, "|")
         If UBound(pos) >= 3 Then
             If TypeName(Obj) = "ComboBox" Then 'ComboBox高度不能变
                 Obj.Move CSng(pos(0)) * ScaleX, CSng(pos(1)) * ScaleY, CSng(pos(2)) * ScaleX
@@ -47,7 +51,7 @@ Public Function GetOrignalWidth(ctl As Control) As Single
     Dim pos() As String, i As Long
     
     On Error Resume Next
-    pos = Split(ctl.Tag, ",")
+    pos = Split(ctl.Tag, "|")
     If UBound(pos) >= 3 Then
         GetOrignalWidth = CSng(pos(2))
     Else
@@ -62,7 +66,7 @@ Public Function GetOrignalHeight(ctl As Control) As Single
     Dim pos() As String, i As Long
     
     On Error Resume Next
-    pos = Split(ctl.Tag, ",")
+    pos = Split(ctl.Tag, "|")
     If UBound(pos) >= 3 Then
         GetOrignalHeight = CSng(pos(3))
     Else

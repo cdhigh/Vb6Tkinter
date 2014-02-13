@@ -320,9 +320,11 @@ End Sub
 '根据rel(是否采用相对坐标)，生成对应的控件位置信息
 Public Function GetPositionParams(rel As Boolean) As String
     If rel Then
-        GetPositionParams = "relx=" & Dic("relx") & ", rely=" & Dic("rely") & ", relwidth=" & Dic("relwidth") & ", relheight=" & Dic("relheight")
+        GetPositionParams = "relx=" & Commas2Points(Dic("relx")) & ", rely=" & Commas2Points(Dic("rely")) & _
+            ", relwidth=" & Commas2Points(Dic("relwidth")) & ", relheight=" & Commas2Points(Dic("relheight"))
     Else
-        GetPositionParams = "x=" & Dic("x") & ", y=" & Dic("y") & ", width=" & Dic("width") & ", height=" & Dic("height")
+        GetPositionParams = "x=" & Commas2Points(Dic("x")) & ", y=" & Commas2Points(Dic("y")) & _
+            ", width=" & Commas2Points(Dic("width")) & ", height=" & Commas2Points(Dic("height"))
     End If
 End Function
 
@@ -776,4 +778,7 @@ Public Function GetCursorName(nCursor As Long) As String
     End Select
 End Function
 
-
+'For latin, decimal 123,45 changed to 123.45
+Function Commas2Points(ByVal InS As String) As String
+    Commas2Points = Replace(InS, ",", ".")
+End Function

@@ -1,15 +1,15 @@
 VERSION 5.00
 Begin VB.Form Form1 
    Caption         =   "Setup for VisualTkinter"
-   ClientHeight    =   2850
+   ClientHeight    =   3405
    ClientLeft      =   60
    ClientTop       =   450
-   ClientWidth     =   7740
+   ClientWidth     =   7770
    Icon            =   "Main.frx":0000
    LinkTopic       =   "Form1"
    MaxButton       =   0   'False
-   ScaleHeight     =   2850
-   ScaleWidth      =   7740
+   ScaleHeight     =   3405
+   ScaleWidth      =   7770
    StartUpPosition =   3  '´°¿ÚÈ±Ê¡
    Begin VB.CommandButton CmdUninstall 
       Caption         =   "Ð¶ÔØ(&U)"
@@ -17,7 +17,7 @@ Begin VB.Form Form1
       Height          =   615
       Left            =   2760
       TabIndex        =   3
-      Top             =   2040
+      Top             =   2745
       Width           =   1935
    End
    Begin VB.CommandButton CmdQuit 
@@ -25,7 +25,7 @@ Begin VB.Form Form1
       Height          =   615
       Left            =   5280
       TabIndex        =   2
-      Top             =   2040
+      Top             =   2745
       Width           =   1935
    End
    Begin VB.CommandButton CmdSetup 
@@ -33,7 +33,7 @@ Begin VB.Form Form1
       Height          =   615
       Left            =   240
       TabIndex        =   1
-      Top             =   2040
+      Top             =   2745
       Width           =   1935
    End
    Begin VB.Label Label1 
@@ -47,7 +47,7 @@ Begin VB.Form Form1
          Italic          =   0   'False
          Strikethrough   =   0   'False
       EndProperty
-      Height          =   1695
+      Height          =   2520
       Left            =   120
       TabIndex        =   0
       Top             =   120

@@ -19,7 +19,7 @@ Private m_Name As String
 Private m_Title As String
 Private m_Geometry As String
 Private m_WindowState As String
-Private m_Left As Long
+Private m_left As Long
 Private m_Top As Long
 Private m_Topmost As Boolean
 Private m_Alpha As String
@@ -266,7 +266,7 @@ End Function
 '创建对象后要马上调用这个函数初始化各参数, 窗体大小以像素为单位
 Public Sub InitConfig(o As Object, nWidth As Long, nHeight As Long, dMethods As Dictionary)
     
-    Dim s As String
+    Dim s As String, cAttr As String, cValue As String, sa() As String, i As Long, Idx As Long
     
     '获取窗体所在目录
     On Error Resume Next
@@ -286,7 +286,7 @@ Public Sub InitConfig(o As Object, nWidth As Long, nHeight As Long, dMethods As 
     m_Geometry = nWidth & "x" & nHeight
     m_WindowState = IIf(o.Properties("WindowState") = vbMaximized, "'zoomed'", IIf(o.Properties("WindowState") = vbMinimized, "'iconic'", "'normal'"))
     m_Resizable = IIf(o.Properties("MaxButton"), True, False)
-    m_Left = m_Base.toPixelX(o.Properties("Left"))
+    m_left = m_Base.toPixelX(o.Properties("Left"))
     m_Top = m_Base.toPixelY(o.Properties("Top"))
     m_IconEmbedding = True
     m_Protocol = ""
@@ -304,6 +304,38 @@ Public Sub InitConfig(o As Object, nWidth As Long, nHeight As Long, dMethods As 
         m_StartupPosition = "Manual"
     Else
         m_StartupPosition = "Default"
+    End If
+    
+    
+    '使用控件的tag属性保存一些额外默认要保存的属性，
+    '开始字符为：p@，后接（属性=值）对，每个属性使用@隔开，对于窗体来说，属性值必选
+    s = Trim(o.Properties("Tag"))
+    If Len(s) Then
+        sa = Split(s, "@")
+        If UCase(sa(0)) = "P" Then
+            For i = 1 To UBound(sa)
+                s = sa(i)
+                Idx = InStr(2, s, "=")
+                If Idx > 0 Then '有值
+                    cAttr = Left$(s, Idx - 1)
+                    cValue = Mid$(s, Idx + 1)
+                    Select Case cAttr
+                    Case "topmost"
+                        m_Topmost = IIf((cValue = "0" Or UCase(cValue) = "FALSE"), False, True)
+                    Case "alpha"
+                        m_Alpha = cValue
+                    Case "icon"
+                        m_IconFile = cValue
+                    Case "iconembedding"
+                        m_IconEmbedding = IIf((cValue = "0" Or UCase(cValue) = "FALSE"), False, True)
+                    Case "bindcommand"
+                        m_Bindcommand = cValue
+                    Case "protocol"
+                        m_Protocol = cValue
+                    End Select
+                End If
+            Next
+        End If
     End If
     
 End Sub
@@ -386,7 +418,7 @@ End Function
 
 '计算和生成窗体启动坐标
 Private Function CoordinateOnStart() As String
-    CoordinateOnStart = IIf(m_Left >= 0, "+" & CStr(m_Left), CStr(m_Left))
+    CoordinateOnStart = IIf(m_left >= 0, "+" & CStr(m_left), CStr(m_left))
     CoordinateOnStart = CoordinateOnStart & IIf(m_Top >= 0, "+" & CStr(m_Top), CStr(m_Top))
 End Function
 
@@ -398,20 +430,19 @@ Public Function Allitems() As Collection
     Set re = New Collection
     re.Add "geometry|" & m_Geometry & "|1"
     re.Add "title|" & m_Title & "|1"
-    re.Add "left|" & m_Left & "|1"
+    re.Add "left|" & m_left & "|1"
     re.Add "top|" & m_Top & "|1"
     re.Add "resizable|" & IIf(m_Resizable, 1, 0) & "|1"
     re.Add "windowstate|" & m_WindowState & "|1"
-    re.Add "topmost|0|0"
-    re.Add "alpha||0"
+    re.Add IIf(m_Topmost, "topmost|1|1", "topmost||0")
+    re.Add IIf(m_Alpha <> "", "alpha|" & m_Alpha & "|1", "alpha||0")
     re.Add "position|" & m_StartupPosition & "|1"
     re.Add "icon|" & m_IconFile & "|1"
     re.Add "iconembedding|" & IIf(m_IconEmbedding, 1, 0) & "|1"
-    re.Add "bindcommand||0"
-    re.Add "protocol||0"
+    re.Add IIf(m_Bindcommand <> "", "bindcommand|" & m_Bindcommand & "|1", "bindcommand||0")
+    re.Add IIf(m_Protocol <> "", "protocol|" & m_Protocol & "|1", "protocol||0")
     
     Set Allitems = re
-    
 End Function
 
 Public Sub SetConfig(sAttrs As String)
@@ -427,7 +458,7 @@ Public Sub SetConfig(sAttrs As String)
     m_Bindcommand = ""
     m_Protocol = ""
     m_StartupPosition = ""
-    m_Left = 0
+    m_left = 0
     m_Top = 0
     
     sa = Split(sAttrs, "|")
@@ -451,7 +482,7 @@ Public Sub SetSingleConfig(sAttr As String)
             Case "geometry"
                 m_Geometry = UnQuote(Trim(sa(1)))
             Case "left"
-                m_Left = C2Lng(Trim(sa(1)))
+                m_left = C2Lng(Trim(sa(1)))
             Case "top"
                 m_Top = C2Lng(Trim(sa(1)))
             Case "resizable"
@@ -476,9 +507,9 @@ Public Sub SetSingleConfig(sAttr As String)
     End If
 End Sub
 
-Private Function C2Lng(sv As String) As Long
+Private Function C2Lng(sV As String) As Long
     On Error Resume Next
-    C2Lng = CLng(sv)
+    C2Lng = CLng(sV)
 End Function
 
 Public Property Get Parent() As String

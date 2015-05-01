@@ -74,6 +74,8 @@
     import modules filedialog, simpledialog, colorchooser.    
 
 3. History
+  v1.4.10
+    1. properties tag of form is working now.
   v1.4.9
     1. bugfix: decimal seperator from comma to point in latin language.
   v1.4.6

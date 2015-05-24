@@ -10,13 +10,13 @@
   1.1 Install VB6.
     (if your os is windows 7 or later, please install VB6 SP6 version and 
     overwrite VB6.EXE using Vb6_SP6_Fix_for_Win7.exe)
-  1.2 Download Visual Tkinter from github.
-    https://github.com/cdhigh/Visual-Tkinter-for-Python
+  1.2 Download Tkinter Designer from github.
+    https://github.com/cdhigh/tkinter-designer
   1.3 Copy directory 'Bin' to other directory you want, execute 
-    'Setup for VisualTkinter.exe' to register VisualTkinter.dll.
+    'Setup for TkinterDesigner.exe' to register TkinterDesigner.dll.
   1.4 Open VB6, create a standard EXE project, design your layout firstly,
-    and than click the icon 'VisualTkinter' in toolbox of VB6.
-  1.5 Enjoy VisualTkinter.
+    and than click the icon 'Tkinter Designer' in toolbox of VB6.
+  1.5 Enjoy TkinterDesigner.
 
 # List of VB Controls Supported
   2.1 Label

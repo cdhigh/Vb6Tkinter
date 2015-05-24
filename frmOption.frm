@@ -15,44 +15,25 @@ Begin VB.Form frmOption
    ScaleWidth      =   7710
    ShowInTaskbar   =   0   'False
    StartUpPosition =   2  '屏幕中心
-   Begin VisualTkinter.xpcmdbutton cmdOptionOK 
-      Default         =   -1  'True
-      Height          =   375
-      Left            =   120
-      TabIndex        =   9
-      Top             =   720
-      Width           =   2055
-      _ExtentX        =   3625
-      _ExtentY        =   661
-      Caption         =   "确定(&O)"
-      BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
-         Name            =   "宋体"
-         Size            =   9
-         Charset         =   134
-         Weight          =   400
-         Underline       =   0   'False
-         Italic          =   0   'False
-         Strikethrough   =   0   'False
-      EndProperty
-   End
-   Begin VisualTkinter.xpcmdbutton cmdPythonExe 
-      Height          =   375
-      Left            =   7080
+   Begin VB.PictureBox cmdOptionOK 
+      BackColor       =   &H000000FF&
+      Height          =   1000
+      Left            =   0
+      ScaleHeight     =   945
+      ScaleWidth      =   945
       TabIndex        =   8
-      Top             =   120
-      Width           =   495
-      _ExtentX        =   873
-      _ExtentY        =   661
-      Caption         =   "..."
-      BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
-         Name            =   "宋体"
-         Size            =   9
-         Charset         =   134
-         Weight          =   400
-         Underline       =   0   'False
-         Italic          =   0   'False
-         Strikethrough   =   0   'False
-      EndProperty
+      Top             =   0
+      Width           =   1000
+   End
+   Begin VB.PictureBox cmdPythonExe 
+      BackColor       =   &H000000FF&
+      Height          =   1000
+      Left            =   0
+      ScaleHeight     =   945
+      ScaleWidth      =   945
+      TabIndex        =   9
+      Top             =   0
+      Width           =   1000
    End
    Begin VB.ComboBox cmbPythonExe 
       Height          =   300
@@ -121,44 +102,25 @@ Begin VB.Form frmOption
          Width           =   2055
       End
    End
-   Begin VisualTkinter.xpcmdbutton cmdOptionApply 
-      Height          =   375
-      Left            =   2820
+   Begin VB.PictureBox cmdOptionApply 
+      BackColor       =   &H000000FF&
+      Height          =   1000
+      Left            =   0
+      ScaleHeight     =   945
+      ScaleWidth      =   945
       TabIndex        =   10
-      Top             =   720
-      Width           =   2055
-      _ExtentX        =   3625
-      _ExtentY        =   661
-      Caption         =   "应用(&A)"
-      BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
-         Name            =   "宋体"
-         Size            =   9
-         Charset         =   134
-         Weight          =   400
-         Underline       =   0   'False
-         Italic          =   0   'False
-         Strikethrough   =   0   'False
-      EndProperty
+      Top             =   0
+      Width           =   1000
    End
-   Begin VisualTkinter.xpcmdbutton cmdOptionCancel 
-      Cancel          =   -1  'True
-      Height          =   375
-      Left            =   5520
+   Begin VB.PictureBox cmdOptionCancel 
+      BackColor       =   &H000000FF&
+      Height          =   1000
+      Left            =   0
+      ScaleHeight     =   945
+      ScaleWidth      =   945
       TabIndex        =   11
-      Top             =   720
-      Width           =   2055
-      _ExtentX        =   3625
-      _ExtentY        =   661
-      Caption         =   "取消(&C)"
-      BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
-         Name            =   "宋体"
-         Size            =   9
-         Charset         =   134
-         Weight          =   400
-         Underline       =   0   'False
-         Italic          =   0   'False
-         Strikethrough   =   0   'False
-      EndProperty
+      Top             =   0
+      Width           =   1000
    End
    Begin VB.Label lblPythonExe 
       Caption         =   "Python主文件"

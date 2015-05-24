@@ -44,7 +44,6 @@ c:\program files\microsoft visual studio\vb98\wizards\pdwizard\redist\comcat.dll
 c:\windows\system32\vb6chs.dll=
 
 [Package|标准安装软件包 1|Files In Project]
-D:\My Documents\编程类\Python\Visual Tkinter(Addin)\Visual Tkinter.dll=Yes
 C:\WINDOWS\system32\msvbvm60.dll=No
 C:\WINDOWS\system32\oleaut32.dll=No
 C:\WINDOWS\system32\olepro32.dll=No
@@ -70,7 +69,6 @@ Applicable=No
 Applicable=No
 
 [Package|标准安装软件包 1|Install Locations]
-D:\My Documents\编程类\Python\Visual Tkinter(Addin)\Visual Tkinter.dll=$(AppPath)
 C:\Program Files\Microsoft Visual Studio\VB98\WIZARDS\PDWizard\SETUP.EXE=$(AppPath)
 C:\Program Files\Microsoft Visual Studio\VB98\WIZARDS\PDWizard\SETUP1.EXE=$(WinPath)
 C:\WINDOWS\system32\VB6STKIT.DLL=$(WinSysPathSysFile)
@@ -78,19 +76,16 @@ C:\Program Files\Microsoft Visual Studio\VB98\WIZARDS\PDWizard\ST6UNST.EXE=$(Win
 
 [Package|标准安装软件包 1|Configure Shared Files]
 Applicable=Yes
-D:\My Documents\编程类\Python\Visual Tkinter(Addin)\Visual Tkinter.dll=No
 
 [Package|标准安装软件包 1|Distribution]
 Type=single
 Size=
-Title=Visual Tkinter
+Title=Tkinter Designer
 
 [Package|标准安装软件包 1|Package]
 PackageFolder=D:\My Documents\编程类\Python\pack
-ProjectFolder=D:\My Documents\编程类\Python\Visual Tkinter(Addin)
 ServerSideCab=
 File1=D:\My Documents\编程类\Python\pack\setup.exe
 File2=D:\My Documents\编程类\Python\pack\Setup.Lst
-File3=D:\My Documents\编程类\Python\pack\Visual Tkinter.CAB
 Handler1=PDWizard.FolderDplySubWiz
 Handler2=PDWizard.WebPostDplySubWiz

@@ -1,6 +1,6 @@
 VERSION 5.00
 Begin VB.Form Form1 
-   Caption         =   "Setup for VisualTkinter"
+   Caption         =   "Setup for Tkinter Designer"
    ClientHeight    =   3405
    ClientLeft      =   60
    ClientTop       =   450
@@ -70,15 +70,15 @@ Private Declare Function GetSystemDefaultLCID Lib "kernel32" () As Long
 Private m_English As Boolean
 
 Private Sub AddToINI()
-    WritePrivateProfileString "Add-Ins32", "VisualTkinter.Connect", "3", "VBADDIN.INI"
+    WritePrivateProfileString "Add-Ins32", "TkinterDesigner.Connect", "3", "VBADDIN.INI"
 End Sub
 Private Sub DelFromINI()
-    WritePrivateProfileString "Add-Ins32", "VisualTkinter.Connect", vbNullString, "VBADDIN.INI"
+    WritePrivateProfileString "Add-Ins32", "TkinterDesigner.Connect", vbNullString, "VBADDIN.INI"
 End Sub
 
 Private Sub DelRegister()
     On Error Resume Next
-    DeleteSetting "Visual Tkinter"
+    DeleteSetting "Tkinter Designer"
 End Sub
 
 Private Sub CmdQuit_Click()
@@ -89,13 +89,13 @@ Private Sub CmdSetup_Click()
     
     Dim sf As String
     
-    sf = App.Path & IIf(Right(App.Path, 1) = "\", "", "\") & "VisualTkinter.dll"
+    sf = App.Path & IIf(Right(App.Path, 1) = "\", "", "\") & "TkinterDesigner.dll"
     
     If Dir(sf) = "" Then
         If m_English Then
-            MsgBox "Please run the setup program in directory of VisualTkinter.dll", vbInformation
+            MsgBox "Please run the setup program in directory of TkinterDesigner.dll", vbInformation
         Else
-            MsgBox "请在VIsualTkinter.dll的同一目录下执行此软件。", vbInformation
+            MsgBox "请在TkinterDesigner.dll的同一目录下执行此软件。", vbInformation
         End If
         Exit Sub
     End If
@@ -113,7 +113,7 @@ Private Sub CmdSetup_Click()
     AddToINI
     
     Shell "regsvr32 /s " & Chr(34) & sf & Chr(34)
-        
+    
     MsgBox IIf(m_English, "Setup successed!", "注册完成！"), vbInformation
     
 End Sub
@@ -122,13 +122,13 @@ Private Sub CmdUninstall_Click()
     
     Dim sf As String
     
-    sf = App.Path & IIf(Right(App.Path, 1) = "\", "", "\") & "VisualTkinter.dll"
+    sf = App.Path & IIf(Right(App.Path, 1) = "\", "", "\") & "TkinterDesigner.dll"
     
     If Dir(sf) = "" Then
         If m_English Then
-            MsgBox "Please run the setup program in directory of VisualTkinter.dll", vbInformation
+            MsgBox "Please run the setup program in directory of TkinterDesigner.dll", vbInformation
         Else
-            MsgBox "请在VIsualTkinter.dll的同一目录下执行此软件。", vbInformation
+            MsgBox "请在TkinterDesigner.dll的同一目录下执行此软件。", vbInformation
         End If
         Exit Sub
     End If
@@ -161,25 +161,25 @@ Private Sub Form_Load()
     n = GetSystemDefaultLCID()
     Select Case n
         Case &H804, &H1004, &H404, &HC04
-            Label1.Caption = "这个程序用于注册Visual Tkinter插件，你也可以手工完成：" & vbCrLf & vbCrLf & _
-                "1. 运行：regsvr32 /s 你的目录\VisualTkinter.dll" & vbCrLf & _
+            Label1.Caption = "这个程序用于注册Tkinter Designer插件，你也可以手工完成：" & vbCrLf & vbCrLf & _
+                "1. 运行：regsvr32 /s 你的目录\TkinterDesigner.dll" & vbCrLf & _
                 "2. 在C:\WINDOWS\VBADDIN.INI的段[Add-Ins32]增加一行：" & vbCrLf & _
-                "      VisualTkinter.Connect=3"
+                "      TkinterDesigner.Connect=3"
             m_English = False
         Case Else
             CmdSetup.Caption = "Install(&S)"
             CmdUninstall.Caption = "Uninstall(&U)"
             CmdQuit.Caption = "Quit(&Q)"
             
-            Label1.Caption = "The programe will finish the setup procedure for addin of VB 'VisaulTkinter', you can do it manually too." & vbCrLf & vbCrLf & _
-                "1. Run Command : regsvr32 /s path\VisualTkinter.dll" & vbCrLf & _
+            Label1.Caption = "The programe will finish the setup procedure for addin of VB 'TkinterDesigner', you can do it manually too." & vbCrLf & vbCrLf & _
+                "1. Run Command : regsvr32 /s path\TkinterDesigner.dll" & vbCrLf & _
                 "2. Add a line in section Add-Ins32 of c:\windows\vbaddin.ini:" & vbCrLf & _
-                "      VisualTkinter.Connect=3"
+                "      TkinterDesigner.Connect=3"
             m_English = True
     End Select
     
     '确认是否已经安装
-    CmdUninstall.Enabled = IsRegistered("VisualTkinter.Connect")
+    CmdUninstall.Enabled = IsRegistered("TkinterDesigner.Connect")
     
 End Sub
 

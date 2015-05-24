@@ -1,16 +1,16 @@
 VERSION 5.00
-Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.0#0"; "MSCOMCTL.OCX"
+Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.1#0"; "MSCOMCTL.OCX"
 Begin VB.Form FrmMain 
-   Caption         =   "Visual Tkinter of Python - cdhigh@sohu.com"
-   ClientHeight    =   8125
-   ClientLeft      =   52
-   ClientTop       =   676
-   ClientWidth     =   12974
+   Caption         =   "Tkinter Designer of Python - cdhigh@sohu.com"
+   ClientHeight    =   8130
+   ClientLeft      =   45
+   ClientTop       =   675
+   ClientWidth     =   12975
    Icon            =   "MainForm.frx":0000
    LinkTopic       =   "Form1"
-   ScaleHeight     =   625
+   ScaleHeight     =   542
    ScaleMode       =   3  'Pixel
-   ScaleWidth      =   998
+   ScaleWidth      =   865
    StartUpPosition =   2  '屏幕中心
    Begin VB.ComboBox cmbEditCombo 
       CausesValidation=   0   'False
@@ -35,18 +35,17 @@ Begin VB.Form FrmMain
       Visible         =   0   'False
       Width           =   1095
    End
-   Begin VisualTkinter.xpcmdbutton CmdRefsFormsList 
+   Begin TkinterDesigner.xpcmdbutton CmdRefsFormsList 
       Height          =   495
       Left            =   120
       TabIndex        =   0
       Top             =   120
       Width           =   2295
-      _ExtentX        =   4050
-      _ExtentY        =   863
-      Caption         =   "刷新窗体列表(&R)"
+      _ExtentX        =   4048
+      _ExtentY        =   873
       BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
          Name            =   "宋体"
-         Size            =   9.5094
+         Size            =   9
          Charset         =   134
          Weight          =   400
          Underline       =   0   'False
@@ -61,8 +60,8 @@ Begin VB.Form FrmMain
       TabIndex        =   10
       Top             =   7748
       Width           =   12974
-      _ExtentX        =   23914
-      _ExtentY        =   695
+      _ExtentX        =   23918
+      _ExtentY        =   688
       Style           =   1
       _Version        =   393216
       BeginProperty Panels {8E3867A5-8586-11D1-B16A-00C0F0283628} 
@@ -87,7 +86,7 @@ Begin VB.Form FrmMain
    Begin VB.TextBox TxtTips 
       BeginProperty Font 
          Name            =   "宋体"
-         Size            =   10.87
+         Size            =   10.5
          Charset         =   134
          Weight          =   400
          Underline       =   0   'False
@@ -104,23 +103,23 @@ Begin VB.Form FrmMain
       Width           =   2415
    End
    Begin VB.ListBox LstComps 
-      Height          =   3432
+      Height          =   3300
       Left            =   120
       TabIndex        =   6
       Top             =   1200
       Width           =   2415
    End
-   Begin VisualTkinter.GridOcx LstCfg 
+   Begin TkinterDesigner.GridOcx LstCfg 
       Height          =   6855
       Left            =   2640
       TabIndex        =   8
       Top             =   840
       Width           =   6015
-      _ExtentX        =   10615
-      _ExtentY        =   12101
+      _ExtentX        =   10610
+      _ExtentY        =   12091
       BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
          Name            =   "宋体"
-         Size            =   9.5094
+         Size            =   9
          Charset         =   134
          Weight          =   400
          Underline       =   0   'False
@@ -131,7 +130,7 @@ Begin VB.Form FrmMain
    Begin VB.TextBox TxtCode 
       BeginProperty Font 
          Name            =   "Courier New"
-         Size            =   10.87
+         Size            =   10.5
          Charset         =   0
          Weight          =   400
          Underline       =   0   'False
@@ -146,18 +145,17 @@ Begin VB.Form FrmMain
       Top             =   840
       Width           =   4095
    End
-   Begin VisualTkinter.xpcmdbutton CmdGenCode 
+   Begin TkinterDesigner.xpcmdbutton CmdGenCode 
       Height          =   495
       Left            =   2760
       TabIndex        =   1
       Top             =   120
       Width           =   2295
-      _ExtentX        =   4050
-      _ExtentY        =   863
-      Caption         =   "生成代码(&G)"
+      _ExtentX        =   4048
+      _ExtentY        =   873
       BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
          Name            =   "宋体"
-         Size            =   9.5094
+         Size            =   9
          Charset         =   134
          Weight          =   400
          Underline       =   0   'False
@@ -165,18 +163,17 @@ Begin VB.Form FrmMain
          Strikethrough   =   0   'False
       EndProperty
    End
-   Begin VisualTkinter.xpcmdbutton CmdCopyToClipboard 
+   Begin TkinterDesigner.xpcmdbutton CmdCopyToClipboard 
       Height          =   495
       Left            =   5340
       TabIndex        =   2
       Top             =   120
       Width           =   2295
-      _ExtentX        =   4050
-      _ExtentY        =   863
-      Caption         =   "拷贝到剪贴板(&C)"
+      _ExtentX        =   4048
+      _ExtentY        =   873
       BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
          Name            =   "宋体"
-         Size            =   9.5094
+         Size            =   9
          Charset         =   134
          Weight          =   400
          Underline       =   0   'False
@@ -184,18 +181,17 @@ Begin VB.Form FrmMain
          Strikethrough   =   0   'False
       EndProperty
    End
-   Begin VisualTkinter.xpcmdbutton CmdSaveToFile 
+   Begin TkinterDesigner.xpcmdbutton CmdSaveToFile 
       Height          =   495
       Left            =   7950
       TabIndex        =   3
       Top             =   120
       Width           =   2295
-      _ExtentX        =   4050
-      _ExtentY        =   863
-      Caption         =   "保存到文件(&F)"
+      _ExtentX        =   4048
+      _ExtentY        =   873
       BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
          Name            =   "宋体"
-         Size            =   9.5094
+         Size            =   9
          Charset         =   134
          Weight          =   400
          Underline       =   0   'False
@@ -203,18 +199,17 @@ Begin VB.Form FrmMain
          Strikethrough   =   0   'False
       EndProperty
    End
-   Begin VisualTkinter.xpcmdbutton CmdQuit 
+   Begin TkinterDesigner.xpcmdbutton CmdQuit 
       Height          =   495
       Left            =   10560
       TabIndex        =   4
       Top             =   120
       Width           =   2295
-      _ExtentX        =   4050
-      _ExtentY        =   863
-      Caption         =   "退出(&Q)"
+      _ExtentX        =   4048
+      _ExtentY        =   873
       BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
          Name            =   "宋体"
-         Size            =   9.5094
+         Size            =   9
          Charset         =   134
          Weight          =   400
          Underline       =   0   'False
@@ -371,7 +366,7 @@ Private Sub Form_Load()
     LstCfg.SelectBackColor = &HFCC597 'vbHighlight
     LstCfg.Redraw = True
     
-    m_BriefCaption = "Visual Tkinter of Python - cdhigh@sohu.com - v" & App.Major & "." & App.Minor & IIf(App.Revision > 0, "." & App.Revision, "")
+    m_BriefCaption = "Tkinter Designer of Python - cdhigh@sohu.com - v" & App.Major & "." & App.Minor & IIf(App.Revision > 0, "." & App.Revision, "")
     #If DebugVer Then
         m_BriefCaption = m_BriefCaption & " [Debug Mode] "
     #End If
@@ -1743,7 +1738,7 @@ End Sub
 Private Sub stabar_MouseUp(Button As Integer, Shift As Integer, x As Single, y As Single)
     If Shift = vbCtrlMask Then
         Clipboard.Clear
-        Clipboard.SetText "https://github.com/cdhigh/Visual-Tkinter-for-Python"
+        Clipboard.SetText "https://github.com/cdhigh/tkinter-designer"
     End If
 End Sub
 
@@ -1881,6 +1876,6 @@ Private Sub TxtCode_MouseMove(Button As Integer, Shift As Integer, x As Single, 
 End Sub
 
 Private Sub stabar_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
-    stabar.SimpleText = "https://github.com/cdhigh/Visual-Tkinter-for-Python  ['Ctrl+Click' copy url to clipboard]"
+    stabar.SimpleText = "https://github.com/cdhigh/tkinter-designer  ['Ctrl+Click' copy url to clipboard]"
 End Sub
 

@@ -1,4 +1,4 @@
-1.Introduce
+# Introduce
     The program is a addin of VB6(Visual Basic 6), It allows you design
     your GUI layout of Tkinter (standard GUI library of Python) in VB6 
     Integrated Development Environment.
@@ -6,7 +6,19 @@
     only thing you need to do is that add your logical code in Callback of 
     GUI framework.
 
-2. List of VB Controls Supported
+# Install and Usage
+  1.1 Install VB6.
+    (if your os is windows 7 or later, please install VB6 SP6 version and 
+    overwrite VB6.EXE using Vb6_SP6_Fix_for_Win7.exe)
+  1.2 Download Visual Tkinter from github.
+    https://github.com/cdhigh/Visual-Tkinter-for-Python
+  1.3 Copy directory 'Bin' to other directory you want, execute 
+    'Setup for VisualTkinter.exe' to register VisualTkinter.dll.
+  1.4 Open VB6, create a standard EXE project, design your layout firstly,
+    and than click the icon 'VisualTkinter' in toolbox of VB6.
+  1.5 Enjoy VisualTkinter.
+
+# List of VB Controls Supported
   2.1 Label
     Has same appearance and behavior in Tkinter.
   2.2 TextBox
@@ -56,12 +68,17 @@
     Create a PictureBox named 'TabStrip1__Tab1' as container for Tab1 of 
     Notebook widget.
 
-  -----------------------------------------------------
   2.16 CommonDialog
     if the form has this control, then the addin will create code for 
     import modules filedialog, simpledialog, colorchooser.    
 
-3. History
+# History
+  v1.4.11
+    1. change the map of event 'xxx_MouseMove' to '<Motin> in tkinter.
+  v1.4.10
+    1. properties tag of form is working now.
+  v1.4.9
+    1. bugfix: decimal seperator from comma to point in latin language.
   v1.4.6
     1. Setup the coordinate of form in VB.
     2. set the font and color of caption of labelframe.

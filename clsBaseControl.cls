@@ -467,7 +467,7 @@ Public Function GetBindCommandStr(dMethods As Dictionary) As String
     If InStr(1, s, "," & m_Name & "_KeyPress,") > 0 Or InStr(1, s, "," & m_Name & "_KeyDown,") > 0 Then sOut.Append "<KeyPress>"
     If InStr(1, s, "," & m_Name & "_KeyUp,") > 0 Then sOut.Append "<KeyRelease>"
     If InStr(1, s, "," & m_Name & "_MouseUp,") > 0 Then sOut.Append "<ButtonRelease-1>"
-    If InStr(1, s, "," & m_Name & "_Enter,") > 0 Or InStr(1, s, "," & m_Name & "_MouseMove,") > 0 Then sOut.Append "<Enter>"
+    If InStr(1, s, "," & m_Name & "_Enter,") > 0 Or InStr(1, s, "," & m_Name & "_MouseMove,") > 0 Then sOut.Append "<Motion>"
     If InStr(1, s, "," & m_Name & "_Leave,") > 0 Then sOut.Append "<Leave>"
     
     If InStr(1, s, "," & m_Name & "_Change,") > 0 Then sOut.Append "<Change>"  '这个事件由内部处理，不是标准tk事件

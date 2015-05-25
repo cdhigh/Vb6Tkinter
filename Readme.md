@@ -1,4 +1,4 @@
-﻿Readme of english version refers to Readme_EN.md
+﻿Readme of english version refers to [Readme_EN.md](https://github.com/cdhigh/tkinter-designer/blob/master/Readme_EN.md)
 --------------------------------
 # 简介
 这是一个VB6的ADDIN（外接程序），用于使用VB6开发工具直接拖放控件，直接可视化完成Python的TKinter的GUI布局和设计，可以在VB界面上设置控件的一些属性，最终自动生成必要的代码（包括回调函数框架），代码生成后仅需要在对应的回调函数中增加相应的逻辑功能代码即可。

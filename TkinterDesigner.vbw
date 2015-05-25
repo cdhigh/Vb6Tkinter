@@ -1,4 +1,4 @@
-GridOcx = 161, 210, 778, 631, Z, 154, 203, 753, 640, C
+GridOcx = 161, 210, 778, 631, , 154, 203, 753, 640, C
 Common = 66, 87, 665, 544, 
 FileDlg = 69, 90, 681, 511, C
 clsBaseControl = 115, 150, 732, 571, 
@@ -17,7 +17,7 @@ clsSerialization = 0, 0, 0, 0, C
 clsText = 69, 90, 686, 511, C
 cStrBuilder = 92, 120, 704, 541, C
 Dictionary = 0, 0, 609, 434, C
-FrmMain = 88, 116, 687, 553, , 22, 29, 621, 486, C
+FrmMain = 88, 116, 687, 553, Z, 22, 29, 621, 486, C
 clsMenu = 120, 160, 729, 620, C
 clsMenuItem = 92, 120, 709, 541, C
 clsProgressBar = 138, 180, 757, 601, C

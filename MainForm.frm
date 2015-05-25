@@ -1,7 +1,7 @@
 VERSION 5.00
 Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.1#0"; "MSCOMCTL.OCX"
 Begin VB.Form FrmMain 
-   Caption         =   "Tkinter Designer of Python - cdhigh@sohu.com"
+   Caption         =   "Tkinter Designer - cdhigh@sohu.com"
    ClientHeight    =   8130
    ClientLeft      =   45
    ClientTop       =   675
@@ -366,7 +366,7 @@ Private Sub Form_Load()
     LstCfg.SelectBackColor = &HFCC597 'vbHighlight
     LstCfg.Redraw = True
     
-    m_BriefCaption = "Tkinter Designer of Python - cdhigh@sohu.com - v" & App.Major & "." & App.Minor & IIf(App.Revision > 0, "." & App.Revision, "")
+    m_BriefCaption = "Tkinter Designer - cdhigh@sohu.com - v" & App.Major & "." & App.Minor & IIf(App.Revision > 0, "." & App.Revision, "")
     #If DebugVer Then
         m_BriefCaption = m_BriefCaption & " [Debug Mode] "
     #End If

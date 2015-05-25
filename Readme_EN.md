@@ -5,6 +5,7 @@
     The addin will generate python code of GUI framework for you. the 
     only thing you need to do is that add your logical code in Callback of 
     GUI framework.
+    ![image](https://raw.githubusercontent.com/cdhigh/tkinter-designer/master/Setup/Screenshots/TkinterDesigner_ScrPrnt.JPG)
 
 # Install and Usage
   1.1 Install VB6.

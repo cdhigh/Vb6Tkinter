@@ -5,6 +5,8 @@
     直接可视化完成Python的TKinter的GUI布局和设计，可以在VB界面上设置
     控件的一些属性，最终自动生成必要的代码（包括回调函数框架），代码
     生成后仅需要在对应的回调函数中增加相应的逻辑功能代码即可。
+    ![image](https://raw.githubusercontent.com/cdhigh/tkinter-designer/master/Setup/Screenshots/TkinterDesigner_ScrPrnt.JPG)
+
     这个工具支持绝大部分TKiner控件，可应付一般GUI的需求。
    （列表参见下面的控件说明）。
 

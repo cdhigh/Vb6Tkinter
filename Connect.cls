@@ -11,7 +11,7 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
-Attribute VB_Description = "VisualTkinter"
+Attribute VB_Description = "TkinterDesigner"
 Option Explicit
 
 Private mcbMenuItem         As Office.CommandBarControl

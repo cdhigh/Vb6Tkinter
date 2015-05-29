@@ -19,7 +19,7 @@ Option Explicit
 
 Private m_dicTotal As Dictionary                                                '保存全部的属性，包括默认值
 Private m_Base As clsBaseControl                                                '基础控件类
-Private m_CanbeOutByMainForm As Boolean
+Private m_CanbeOutByMainForm As Boolean                                         '由主函数调用生成字符串还是由其他对象调用
 
 '输出PYTHON代码,
 'sCmdFunc: 输出参数，事件处理回调代码;

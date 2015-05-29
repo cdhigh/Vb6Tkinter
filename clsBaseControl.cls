@@ -321,10 +321,16 @@ End Sub
 Public Function GetPositionParams(rel As Boolean) As String
     If rel Then
         GetPositionParams = "relx=" & Commas2Points(Dic("relx")) & ", rely=" & Commas2Points(Dic("rely")) & _
-            ", relwidth=" & Commas2Points(Dic("relwidth")) & ", relheight=" & Commas2Points(Dic("relheight"))
+            ", relwidth=" & Commas2Points(Dic("relwidth"))
+        If m_Type <> "Combobox" Then 'Combobox不需要设置height属性
+            GetPositionParams = GetPositionParams & ", relheight=" & Commas2Points(Dic("relheight"))
+        End If
     Else
         GetPositionParams = "x=" & Commas2Points(Dic("x")) & ", y=" & Commas2Points(Dic("y")) & _
-            ", width=" & Commas2Points(Dic("width")) & ", height=" & Commas2Points(Dic("height"))
+            ", width=" & Commas2Points(Dic("width"))
+        If m_Type <> "Combobox" Then 'Combobox不需要设置height属性
+            GetPositionParams = GetPositionParams & ", height=" & Commas2Points(Dic("height"))
+        End If
     End If
 End Function
 

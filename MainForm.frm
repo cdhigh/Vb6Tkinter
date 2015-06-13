@@ -1,5 +1,5 @@
 VERSION 5.00
-Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.1#0"; "MSCOMCTL.OCX"
+Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.0#0"; "MSCOMCTL.OCX"
 Begin VB.Form FrmMain 
    Caption         =   "Tkinter Designer - cdhigh@sohu.com"
    ClientHeight    =   8130
@@ -60,8 +60,8 @@ Begin VB.Form FrmMain
       TabIndex        =   10
       Top             =   7748
       Width           =   12974
-      _ExtentX        =   23918
-      _ExtentY        =   688
+      _ExtentX        =   22886
+      _ExtentY        =   661
       Style           =   1
       _Version        =   393216
       BeginProperty Panels {8E3867A5-8586-11D1-B16A-00C0F0283628} 
@@ -986,10 +986,7 @@ Private Sub CmdGenCode_Click()
         End If
         strHead.Append vbCrLf
     Else
-        strHead.Append "try:"
-        strHead.Append "    from tkinter import *"
-        strHead.Append "except ImportError:  #Python 2.x"
-        strHead.Append "    PythonVersion = 2"
+        strHead.Append "if sys.version_info[0] == 2:"
         strHead.Append "    from Tkinter import *"
         strHead.Append "    from tkFont import Font"
         If usettk Then
@@ -1004,7 +1001,7 @@ Private Sub CmdGenCode_Click()
             strHead.Append "    import tkColorChooser  #askcolor()"
         End If
         strHead.Append "else:  #Python 3.x"
-        strHead.Append "    PythonVersion = 3"
+        strHead.Append "    from tkinter import *"
         strHead.Append "    from tkinter.font import Font"
         If usettk Then
             strHead.Append "    from tkinter.ttk import *"

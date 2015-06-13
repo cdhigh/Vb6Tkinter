@@ -73,6 +73,8 @@ The addin will generate python code of GUI framework for you. the only thing you
     import modules filedialog, simpledialog, colorchooser.    
 
 # History
+* v1.4.13
+    1. Change codeline of judge of python's version for better compatibility.
 * v1.4.12
     1. combox don't need property 'height' or 'relheight'.
 * v1.4.11

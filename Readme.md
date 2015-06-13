@@ -151,6 +151,8 @@
 4. Python 2.7.3附带的ttk中的Treeview字体设置无效，但3.2.3的Treeview的字体设置有效。
 
 # 版本历史
+*  v1.4.13
+    1. 改变判断python版本的代码，增强兼容性。
 *  v1.4.12
     1. combox不需要设置relheight或height属性。
 *  v1.4.11

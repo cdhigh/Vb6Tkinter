@@ -73,6 +73,8 @@ The addin will generate python code of GUI framework for you. the only thing you
     import modules filedialog, simpledialog, colorchooser.    
 
 # History
+* v1.5
+    1. feature added: encode a file to Base64 string.
 * v1.4.13
     1. Change codeline of judge of python's version for better compatibility.
 * v1.4.12

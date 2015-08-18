@@ -4,21 +4,27 @@ Attribute VB_Name = "Base64"
 Option Explicit
 
 '外部直接调用此函数即可
-Public Sub Base64Encode(ByRef pbAInput() As Byte, ByRef sOut As String, Optional ByRef sPrexSpace As String = "")
+Public Sub Base64Encode(ByRef pbAInput() As Byte, ByRef sOut As String, Optional ByRef sPrexSpace As String = "", Optional ByRef charsPerLine As Integer = 68)
     
     Dim abOut() As Byte, i As Long, s As String
     
     Encode pbAInput, abOut
+    
     ByteArrayToString abOut, s
+    
     sOut = ""
     
     If Len(s) = 0 Then Exit Sub
     
     '转换为合适的换行模式
-    For i = 1 To Len(s) Step 68
-        sOut = sOut & sPrexSpace & Mid(s, i, 68) & vbCrLf
-    Next
-    sOut = Mid(sOut, 1, Len(sOut) - 3)
+    If charsPerLine > 0 Then
+        For i = 1 To Len(s) Step charsPerLine
+            sOut = sOut & sPrexSpace & Mid(s, i, charsPerLine) & vbCrLf
+        Next
+        sOut = Mid(sOut, 1, Len(sOut) - 3)
+    Else
+        sOut = s
+    End If
     
 End Sub
 

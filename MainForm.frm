@@ -1,5 +1,5 @@
 VERSION 5.00
-Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.0#0"; "MSCOMCTL.OCX"
+Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.0#0"; "mscomctl.ocx"
 Begin VB.Form FrmMain 
    Caption         =   "Tkinter Designer - cdhigh@sohu.com"
    ClientHeight    =   8130
@@ -306,6 +306,9 @@ Begin VB.Form FrmMain
          Caption         =   "界面预览(&P)"
          Enabled         =   0   'False
          Shortcut        =   {F5}
+      End
+      Begin VB.Menu mnuEncodeAFile 
+         Caption         =   "编码磁盘文件为Base64字符串(&B)"
       End
    End
    Begin VB.Menu mnuLanguage 
@@ -1406,6 +1409,10 @@ Private Sub mnuCopyToClipUiOnly_Click()
         MsgBox L("l_msgNoClsUi", "代码中找不到Application_ui类！"), vbInformation
     End If
     
+End Sub
+
+Private Sub mnuEncodeAFile_Click()
+    frmEncodeAFile.Show vbModal
 End Sub
 
 Private Sub mnuFile_Click()

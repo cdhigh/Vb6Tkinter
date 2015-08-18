@@ -145,12 +145,15 @@
 # ttk库额外说明
   ttk主题扩展看起来很漂亮，在不同操作系统下界面呈现为本地化风格，建议使用，
   只是要注意以下几个ttk的BUG：
+  
 1. TTK的Entry和Combobox控件背景色设置无效（可以设置，不报错，但是界面不变）。
 2. tkinter的Label控件可以通过插入'\n'来换行，但是ttk的Label只能通过wraplength属性来换行。
 3. LabelFrame和Notebook控件的字体单独设置无效，但是可以设置ttk的全局字体属性来改变，比如：self.style.configure('.', font=('宋体',12))。
 4. Python 2.7.3附带的ttk中的Treeview字体设置无效，但3.2.3的Treeview的字体设置有效。
 
 # 版本历史
+*  v1.5
+    1. 添加一个功能：可以将一个磁盘文件编码为Base64字符串，可以用于将一些资源文件保存到python源文件中。
 *  v1.4.13
     1. 改变判断python版本的代码，增强兼容性。
 *  v1.4.12

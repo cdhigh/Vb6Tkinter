@@ -45,7 +45,7 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
     m_dicTotal("relwidth") = Format(o.Properties("Width") / parentWidth, "0.###")
     m_dicTotal("relheight") = Format(o.Properties("Height") / parentHeight, "0.###")
     m_dicTotal("text") = Replace(o.Properties("Caption"), "&", "")
-    m_dicTotal("value") = IIf(o.Properties("Value"), 1, 0)
+    m_dicTotal("value") = o.Properties("TabIndex") 'IIf(o.Properties("Value"), 1, 0)
     m_dicTotal("fg") = TranslateColor(o.Properties("ForeColor"))
     m_dicTotal("bg") = TranslateColor(o.Properties("BackColor"))
     m_dicTotal("bd") = "1"
@@ -53,7 +53,7 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
     m_dicTotal("relief") = "FLAT"
     m_dicTotal("overrelief") = "FLAT"
     m_dicTotal("indicatoron") = "1"
-    m_dicTotal("variable") = o.Properties("Name") & "Var"
+    m_dicTotal("variable") = Parent & "RadioVar"
     m_dicTotal("textvariable") = o.Properties("Name") & "TextVar"
     m_dicTotal("font") = "(" & U(CStr(o.Properties("Font")("Name"))) & "," & Round(o.Properties("Font")("Size")) & _
                         IIf(o.Properties("Font")("Bold"), ",'bold'", "") & IIf(o.Properties("Font")("Italic"), ",'italic'", "") & _

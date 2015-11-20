@@ -595,11 +595,11 @@ Private Function ResetLstComps(frm As Object) As Long
             
             '初始化各控件对应的类模块对象
             If Obj.Container Is frm.Designer Then
-                g_Comps(i).InitConfig Obj, frm.Properties("ScaleWidth"), frm.Properties("ScaleHeight"), dMethods
                 g_Comps(i).Parent = IIf(Obj.ClassName = "Menu", "MainMenu", WTOP)
+                g_Comps(i).InitConfig Obj, frm.Properties("ScaleWidth"), frm.Properties("ScaleHeight"), dMethods
             ElseIf Obj.Container.ClassName = "Menu" Then  '子菜单
-                g_Comps(i).InitConfig Obj, 0, 0, dMethods
                 g_Comps(i).Parent = Obj.Container.Properties("Name")
+                g_Comps(i).InitConfig Obj, 0, 0, dMethods
             Else
                 On Error Resume Next
                 nScaleMode = Obj.Container.Properties("ScaleMode")
@@ -613,8 +613,8 @@ Private Function ResetLstComps(frm As Object) As Long
                 Err.Clear
                 On Error GoTo 0
                 g_Comps(i).ScaleMode = nScaleMode
-                g_Comps(i).InitConfig Obj, nScaleWidth, nScaleHeight, dMethods
                 g_Comps(i).Parent = Obj.Container.Properties("Name")
+                g_Comps(i).InitConfig Obj, nScaleWidth, nScaleHeight, dMethods
             End If
             
             i = i + 1

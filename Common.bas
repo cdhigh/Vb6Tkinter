@@ -120,6 +120,7 @@ End Function
 '要添加引用Microsoft Activex data objects 2.8 library
 Public Sub Utf8File_Write_VB(ByVal sFileName As String, ByVal vVar As String)
     Dim adostream As New ADODB.Stream
+    Dim fn As Long, abContent() As Byte, nSize As Long
     With adostream
         .Type = adTypeText
         .Mode = adModeReadWrite
@@ -131,6 +132,23 @@ Public Sub Utf8File_Write_VB(ByVal sFileName As String, ByVal vVar As String)
         .Close
     End With
     Set adostream = Nothing
+    
+    '去掉BOM
+    On Error GoTo FileError
+    
+    fn = FreeFile
+    Open sFileName For Binary As fn
+    nSize = LOF(fn)
+    ReDim abContent(1 To nSize - 3) As Byte
+    Get fn, 4, abContent
+    Close fn
+    Open sFileName For Binary As fn
+    Put fn, , abContent
+    Close fn
+    Exit Sub
+    
+FileError:
+    Close fn
 End Sub
 
 '要添加引用Microsoft Activex data objects 2.8 library
@@ -365,23 +383,17 @@ End Function
 '根据依赖关系排序控件，简单的冒泡排序，这需要在生成代码之前调用
 '基本原理是顶层控件先生成代码，父控件先生成代码，最后是子控件
 Public Sub SortWidgets(ByRef aCompsSorted() As Object, ByVal cnt As Long)
-    Dim Index As Long
+    Dim idx1 As Long, idx2 As Long
     Dim tmp4exchange As Object
-    Dim cursor As Long
     
-    cursor = 0
-    Do While (cursor < cnt - 1) '一层循环，从前往后
-        Index = cnt - 1 '二层循环，从后往前
-        Do While (Index > cursor)
-            If aCompsSorted(Index).Compare(aCompsSorted(Index - 1)) < 0 Then '重者沉底
-                Set tmp4exchange = aCompsSorted(Index)
-                Set aCompsSorted(Index) = aCompsSorted(Index - 1)
-                Set aCompsSorted(Index - 1) = tmp4exchange
+    For idx1 = 0 To cnt - 2
+        For idx2 = idx1 + 1 To cnt - 1
+            If aCompsSorted(idx1).Compare(aCompsSorted(idx2)) > 0 Then '重者沉底
+                Set tmp4exchange = aCompsSorted(idx1)
+                Set aCompsSorted(idx1) = aCompsSorted(idx2)
+                Set aCompsSorted(idx2) = tmp4exchange
             End If
-            Index = Index - 1
-        Loop
-        cursor = cursor + 1
-    Loop
+        Next
+    Next
     
 End Sub
-

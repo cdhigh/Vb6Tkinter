@@ -152,6 +152,10 @@
 4. Python 2.7.3附带的ttk中的Treeview字体设置无效，但3.2.3的Treeview的字体设置有效。
 
 # 版本历史
+*  v1.5.1
+    1. bugfix:修正在特定条件下因代码生成顺序问题导致Python变量在定义前引用的错误。
+    2. RadioButton的variable名字修改为ParentName + 'RadioVar'，同时value默认为TabIndex。
+    3. 保存代码文件的格式从带BOM的utf-8修改为不带BOM的utf-8。
 *  v1.5
     1. 添加一个功能：可以将一个磁盘文件编码为Base64字符串，可以用于将一些资源文件保存到python源文件中。
 *  v1.4.13

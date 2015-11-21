@@ -73,6 +73,8 @@ The addin will generate python code of GUI framework for you. the only thing you
     import modules filedialog, simpledialog, colorchooser.    
 
 # History
+* v1.5.2
+    1. value of RadioButton changed to it's name.
 * v1.5.1
     1. bugfix: Reference of some variable before defined. 
     2. Name of variable of RadioButton changed to 'ParentName' + 'RadioVar'.

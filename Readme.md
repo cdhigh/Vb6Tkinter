@@ -152,6 +152,8 @@
 4. Python 2.7.3附带的ttk中的Treeview字体设置无效，但3.2.3的Treeview的字体设置有效。
 
 # 版本历史
+*  v1.5.2
+    1. RadioButton的value值默认设置为其控件名，这样直接xxxRadioVar.set(控件名) 就可以选择对应单选框。
 *  v1.5.1
     1. bugfix:修正在特定条件下因代码生成顺序问题导致Python变量在定义前引用的错误。
     2. RadioButton的variable名字修改为ParentName + 'RadioVar'，同时value默认为TabIndex。

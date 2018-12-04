@@ -77,7 +77,7 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
     If m_dicTotal("font") <> "(" & U(GetDefaultFontName()) & ",9)" Then m_Base("font") = m_dicTotal("font")
     If m_dicTotal("takefocus") = 0 Then m_Base("takefocus") = m_dicTotal("takefocus")
     If m_dicTotal("cursor") <> "" Then m_Base("cursor") = m_dicTotal("cursor")
-    If m_Base.IsExistCommand(dMethods, "Change") Then m_Base("textvariable") = m_dicTotal("textvariable")
+    'If m_Base.IsExistCommand(dMethods, "Change") Then m_Base("textvariable") = m_dicTotal("textvariable")
     If m_dicTotal("bindcommand") <> "" Then m_Base("bindcommand") = m_dicTotal("bindcommand")
     
     '使用控件的tag属性保存一些额外默认要保存的属性，

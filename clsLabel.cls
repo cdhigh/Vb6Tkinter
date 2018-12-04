@@ -71,6 +71,7 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
     m_Base("relwidth") = m_dicTotal("relwidth")
     m_Base("relheight") = m_dicTotal("relheight")
     m_Base("text") = m_dicTotal("text")
+    m_Base("textvariable") = m_dicTotal("textvariable")
     If o.Properties("ForeColor") <> vbButtonText Then m_Base("fg") = m_dicTotal("fg")
     If o.Properties("BackColor") <> vbButtonFace Then m_Base("bg") = m_dicTotal("bg")
     If m_dicTotal("relief") <> "FLAT" Then m_Base("relief") = m_dicTotal("relief")
@@ -78,7 +79,7 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
     If m_dicTotal("font") <> "(" & U(GetDefaultFontName()) & ",9)" Then m_Base("font") = m_dicTotal("font")
     If m_dicTotal("underline") <> "-1" Then m_Base("underline") = m_dicTotal("underline")
     If m_dicTotal("cursor") <> "" Then m_Base("cursor") = m_dicTotal("cursor")
-    If m_Base.IsExistCommand(dMethods, "Change") Then m_Base("textvariable") = m_dicTotal("textvariable")
+    'If m_Base.IsExistCommand(dMethods, "Change") Then m_Base("textvariable") = m_dicTotal("textvariable")
     If m_dicTotal("bindcommand") <> "" Then m_Base("bindcommand") = m_dicTotal("bindcommand")
     
     '使用控件的tag属性保存一些额外默认要保存的属性，

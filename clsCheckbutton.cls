@@ -47,6 +47,7 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
     m_dicTotal("relheight") = Format(o.Properties("Height") / parentHeight, "0.###")
     m_dicTotal("text") = Replace(o.Properties("Caption"), "&", "")
     m_dicTotal("variable") = o.Properties("Name") & "Var"
+    m_dicTotal("textvariable") = o.Properties("Name") & "TextVar"
     m_dicTotal("fg") = TranslateColor(o.Properties("ForeColor"))
     m_dicTotal("bg") = TranslateColor(o.Properties("BackColor"))
     m_dicTotal("bd") = "1"

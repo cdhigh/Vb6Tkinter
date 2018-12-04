@@ -138,9 +138,14 @@
 
 
 # 其他建议
-1. 不支持使用控件数组，界面可以显示，但是后面的同名控件名会覆盖前面定义的。
-2. 窗体的ScaleMode建议保持默认值(vbTwips)，如果要设置为其他值，则Frame控件内就不要再放Frame控件了，否则其内部的控件布局错误。
-3. 如果仅需要简体汉字界面，则可以删掉Language.lng文件，仅需TkinterDesigner.dll一个文件。
+1. 针对Entry/Label/Button/CheckBox/OptionButton，可以直接使用扩展的setText()/text()方法获取对应的字符串。
+   而不需要再操作控件背后的textvariable，前提是生成代码时选中了textvariable变量。
+   Entry/Label/Button默认选中textvariable，CheckBox/OptionButton需要手工选中（因为一般很少需要运行时修改其显示文本）。
+   `self.Text1.setText('new text')`
+   `print(self.Text1.text()`
+2. 不支持使用控件数组，界面可以显示，但是后面的同名控件名会覆盖前面定义的。
+3. 窗体的ScaleMode建议保持默认值(vbTwips)，如果要设置为其他值，则Frame控件内就不要再放Frame控件了，否则其内部的控件布局错误。
+4. 如果仅需要简体汉字界面，则可以删掉Language.lng文件，仅需TkinterDesigner.dll一个文件。
 
 # ttk库额外说明
   ttk主题扩展看起来很漂亮，在不同操作系统下界面呈现为本地化风格，建议使用，
@@ -152,6 +157,8 @@
 4. Python 2.7.3附带的ttk中的Treeview字体设置无效，但3.2.3的Treeview的字体设置有效。
 
 # 版本历史
+*  v1.6
+    1. 简单扩展tkinter，隐藏控件的textvariable操作，给控件动态添加setText()/text()函数用于设置和获取对应的字符串。
 *  v1.5.2
     1. RadioButton的value值默认设置为其控件名，这样直接xxxRadioVar.set(控件名) 就可以选择对应单选框。
 *  v1.5.1

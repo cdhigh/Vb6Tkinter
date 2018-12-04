@@ -97,7 +97,16 @@ Public Sub toStringStructure(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBu
     
     extra = GetExtraParams(False, usettk)
     extra = extra & IIf(Len(extra) > 0 And Len(sOtherParams) > 0, ", ", "") & sOtherParams
+    '创建控件实例
     sOut.Append Space(4) & m_Name & " = " & m_Type & "(" & m_Parent & IIf(Len(extra), ", ", "") & extra & ")"
+    
+    '如果需要，给实例添加几个简单的“封装方法”方便访问variable，比如Entry的setText/text方法
+    If Len(Dic("textvariable")) Then
+        sOut.Append Space(4) & m_Name & ".setText = lambda x: " & Dic("textvariable") & ".set(x)"
+        sOut.Append Space(4) & m_Name & ".text = lambda : " & Dic("textvariable") & ".get()"
+    End If
+    
+    '放置控件
     sOut.Append Space(4) & m_Name & ".place(" & GetPositionParams(rel) & ")"
     sOut.Append Space(4) & "gComps['" & m_Name & "'] = " & m_Name
     
@@ -242,7 +251,16 @@ Public Sub toStringOOP(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder,
     
     extra = GetExtraParams(True, usettk)
     extra = extra & IIf(Len(extra) > 0 And Len(sOtherParams) > 0, ", ", "") & sOtherParams
+    '创建本控件实例
     sOut.Append Space(8) & "self." & m_Name & " = " & m_Type & "(self." & m_Parent & IIf(Len(extra), ", ", "") & extra & ")"
+    
+    '如果需要，给实例添加几个简单的“封装方法”方便访问variable，比如Entry的setText/text方法
+    If Len(Dic("textvariable")) Then
+        sOut.Append Space(8) & "self." & m_Name & ".setText = lambda x: self." & Dic("textvariable") & ".set(x)"
+        sOut.Append Space(8) & "self." & m_Name & ".text = lambda : self." & Dic("textvariable") & ".get()"
+    End If
+    
+    '放置控件
     sOut.Append Space(8) & "self." & m_Name & ".place(" & GetPositionParams(rel) & ")"
     
     '创建事件处理函数框架（如果有），事件里面有点号说明是调用系统的函数，不需要生成函数体

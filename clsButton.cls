@@ -73,6 +73,7 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
     m_Base("relwidth") = m_dicTotal("relwidth")
     m_Base("relheight") = m_dicTotal("relheight")
     m_Base("text") = m_dicTotal("text")
+    m_Base("textvariable") = m_dicTotal("textvariable")
     m_Base("command") = m_dicTotal("command")
     If o.Properties("BackColor") <> vbButtonFace Then m_Base("bg") = m_dicTotal("bg")
     If m_dicTotal("state") <> "'normal'" Then m_Base("state") = m_dicTotal("state")

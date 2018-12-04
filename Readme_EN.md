@@ -73,6 +73,8 @@ The addin will generate python code of GUI framework for you. the only thing you
     import modules filedialog, simpledialog, colorchooser.    
 
 # History
+* v1.6
+    1. Add setText()/text() method to Entry/Label/Button/CheckBox/OptionButton
 * v1.5.2
     1. value of RadioButton changed to it's name.
 * v1.5.1

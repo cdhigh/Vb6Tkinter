@@ -135,7 +135,7 @@ Public Function Deserializer(vSer As clsSerialization)
 End Function
 
 Public Property Get Description() As String
-    Description = L("l_DescNotebookTab", "选项卡的页对象，对应到Tkinter.ttk的Notebook控件里面的每一页，没有可设置的属性。")
+    Description = L("l_DescNotebookTab", "Tab of widget Notebook. TTK needed.")
 End Property
 
 Public Property Let ScaleMode(nV As Long)

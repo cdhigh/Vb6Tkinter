@@ -101,13 +101,13 @@ Public Function Tips(sAttr As String) As String
     Tips = sAttr & vbCrLf
     Select Case sAttr:
     Case "length":
-        Tips = Tips & L("l_TipProgresLen", "进度条长轴的长度。")
+        Tips = Tips & L("l_TipProgresLen", "Specifies the length of the long axis of the progress bar.")
     Case "mode":
-        Tips = Tips & L("l_TipProgresMode", "控件模式，可选值：'determinate'（默认）和'indeterminate'，'determinate'就是普通进度显示模式，'indeterminate'有一个小指示块移动，用于提示用户程序正在处理中。")
+        Tips = Tips & L("l_TipProgresMode", "One of 'determinate' or 'indeterminate'.\n 'determinate' represents the amount of work completed.")
     Case "maximum":
-        Tips = Tips & L("l_TipMaximum", "设置最大值，默认100。")
+        Tips = Tips & L("l_TipMaximum", "A number specifying the maximum value. Defaults to 100.")
     Case "value":
-        Tips = Tips & L("l_TipProgresValue", "设置当前值，可以不设置，使用variable变量设置和读取。")
+        Tips = Tips & L("l_TipProgresValue", "The current value of the progress bar.")
     Case Else:
         Tips = m_Base.Tips(sAttr)
     End Select
@@ -201,7 +201,7 @@ Public Function Deserializer(vSer As clsSerialization)
 End Function
 
 Public Property Get Description() As String
-    Description = L("l_DescProgressbar", "进度条对象，对应到Tkinter.ttk扩展库的ProgressBar控件，需要启用TTK扩展。")
+    Description = L("l_DescProgressbar", "ProgressBar widget. TTK needed.")
 End Property
 
 Public Property Let ScaleMode(nV As Long)

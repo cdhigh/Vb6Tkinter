@@ -117,9 +117,9 @@ Public Function Tips(sAttr As String) As String
     Tips = sAttr & vbCrLf
     Select Case sAttr:
     Case "state":
-        Tips = Tips & L("l_TipStateHasRO", "控件状态，请使用括号括起来，可选值有：'normal', 'readonly', 'disabled'")
+        Tips = Tips & L("l_TipStateHasRO", "State of the widget. They are 'normal', 'readonly', 'disabled'")
     Case "show":
-        Tips = Tips & L("l_TipShow", "设置用来作为代替显示的字符，比如设置为*则为密码输入框，要用单引号或双引号括起来。")
+        Tips = Tips & L("l_TipShow", "To make a 'password' entry that echoes each character as an asterisk, set to '*'.")
     Case Else:
         Tips = m_Base.Tips(sAttr)
     End Select
@@ -215,7 +215,7 @@ Public Function Deserializer(vSer As clsSerialization)
 End Function
 
 Public Property Get Description() As String
-    Description = L("l_DescEntry", "单行文本输入框对象，对应到Tkinter的Entry控件。")
+    Description = L("l_DescEntry", "Entry widget.")
 End Property
 
 Public Property Let ScaleMode(nV As Long)

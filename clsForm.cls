@@ -247,19 +247,19 @@ Private Function CreateIconBase64(sPrexSpace As String) As String
     
     On Error GoTo DirErr
     If Dir(sIconFile) = "" Then
-        MsgBox L_F("l_msgFileNotExist", "文件{0}不存在，请重新选择文件。", sIconFile), vbInformation
+        MsgBox L_F("l_msgFileNotExist", "File '{0}' not exist!", sIconFile), vbInformation
         Exit Function
     End If
     
     If ReadFileBinaryContent(sIconFile, abContent) = 0 Then
-        MsgBox L_F("l_msgReadFileError", "读取文件{0}出错。", sIconFile), vbInformation
+        MsgBox L_F("l_msgReadFileError", "Error in Reading File {0}.", sIconFile), vbInformation
         Exit Function
     End If
     
     Base64Encode abContent, CreateIconBase64, sPrexSpace
     Exit Function
 DirErr:
-    MsgBox L_F("l_msgFileNotExist", "文件{0}不存在，请重新选择文件。", sIconFile), vbInformation
+    MsgBox L_F("l_msgFileNotExist", "File '{0}' not exist!", sIconFile), vbInformation
 End Function
 
 
@@ -369,33 +369,33 @@ Public Function Tips(sAttr As String) As String
     Tips = sAttr & vbCrLf
     Select Case sAttr:
         Case "title"
-            Tips = Tips & L("l_TipFrmTitle", "窗体的标题。")
+            Tips = Tips & L("l_TipFrmTitle", "Title of Form.")
         Case "geometry"
-            Tips = Tips & L("l_TipFrmGeometry", "窗体的大小（宽x高），单位为像素。")
+            Tips = Tips & L("l_TipFrmGeometry", "Geometry of Form(width x height), unit is pixel.")
         Case "left"
-            Tips = Tips & L("l_TipFrmLeft", "窗体的初始位置坐标，单位为像素。")
+            Tips = Tips & L("l_TipFrmLeft", "Coordinate of Form on startup, unit is pixel.")
         Case "top"
-            Tips = Tips & L("l_TipFrmTop", "窗体的初始位置坐标，单位为像素。")
+            Tips = Tips & L("l_TipFrmTop", "Coordinate of Form on startup, unit is pixel.")
         Case "resizable"
-            Tips = Tips & L("l_TipFrmResizable", "用户是否可以改变窗体的大小。可选值：1/0。")
+            Tips = Tips & L("l_TipFrmResizable", "Form is resizable or not, They are 1/0.")
         Case "windowstate"
-            Tips = Tips & L("l_TipFrmState", "窗体启动时的状态。'iconic'：最小化，'zoomed'：最大化，'normal'：正常状态。")
+            Tips = Tips & L("l_TipFrmState", "window state of Form on startup. 'iconic':minimized, 'zoomed':maximized, 'normal': normal.")
         Case "topmost"
-            Tips = Tips & L("l_TipFrmTopmost", "窗体是否置顶。")
+            Tips = Tips & L("l_TipFrmTopmost", "Specifies whether this is a topmost window (displays above all other windows).")
         Case "alpha"
-            Tips = Tips & L("l_TipFrmAlpha", "窗体透明度。取值范围为0-1，0为全透明，1为不透明。")
+            Tips = Tips & L("l_TipFrmAlpha", "Specifies the alpha transparency level of the toplevel. It accepts a value from 0.0 (fully transparent) to 1.0 (opaque).")
         Case "icon"
-            Tips = Tips & L("l_TipFrmIcon", "图标文件名，支持ico,gif,ppm,pgm格式，省略路径名则在当前VB窗体目录下查找，建议icon文件放在py文件同一目录下。")
+            Tips = Tips & L("l_TipFrmIcon", "Icon file of Form, supports ico,gif,ppm,pgm.")
         Case "iconembedding"
-            Tips = Tips & L("l_TipFrmIconEmbedding", "是否将图标文件转换为base64编码嵌入源代码，仅支持GIF格式嵌入。")
+            Tips = Tips & L("l_TipFrmIconEmbedding", "Is icon embedding in source code or not, suports gif only.")
         Case "bindcommand"
-            Tips = Tips & L("l_TipBindCommand", "使用bind()绑定的事件处理列表，绑定多个则使用逗号分隔(比如：<Control-C>,<F8>,<Alt-A>)。\n双击文本框查看详情。")
+            Tips = Tips & L("l_TipBindCommand", "Used to attach events binding to a widget. for example:<Control-C>,<F8>,<Alt-A>.")
         Case "protocol"
-            Tips = Tips & L("l_TipFrmProtocol", "处理窗口消息，比如设置为'WM_DELETE_WINDOW'则处理窗口关闭事件，如果要拦截多个消息，请使用逗号分隔，比如'WM_DELETE_WINDOW,WM_SAVE'")
+            Tips = Tips & L("l_TipFrmProtocol", "Process window events, for example 'WM_DELETE_WINDOW', separate events using comma like 'WM_DELETE_WINDOW,WM_SAVE'.")
         Case "position"
-            Tips = Tips & L("l_TipFrmPosition", "窗体启动时位置。")
+            Tips = Tips & L("l_TipFrmPosition", "The Startup position of Window.")
         Case Else:
-            Tips = Tips & L("l_TipUnknown", "未知属性")
+            Tips = Tips & L("l_TipUnknown", "Unknown Attribute")
     End Select
 End Function
 
@@ -539,7 +539,7 @@ Public Property Let EnableOutByMainForm(bEnable As Boolean)
 End Property
 
 Public Property Get Description() As String
-    Description = L("l_DescForm", "窗体对象，设置顶层窗口的属性。")
+    Description = L("l_DescForm", "Main Form.")
 End Property
 
 Public Property Let ScaleMode(nV As Long)

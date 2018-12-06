@@ -278,7 +278,7 @@ Public Function Deserializer(vSer As clsSerialization)
 End Function
 
 Public Property Get Description() As String
-    Description = L("l_DescNotebook", "选项卡对象，对应到Tkinter.ttk的Notebook控件。")
+    Description = L("l_DescNotebook", "Notebook widget. TTK needed.")
 End Property
 
 Public Property Let ScaleMode(nV As Long)

@@ -1,11 +1,20 @@
 VERSION 5.00
-Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.0#0"; "mscomctl.ocx"
+Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.0#0"; "MSCOMCTL.OCX"
 Begin VB.Form FrmMain 
    Caption         =   "Tkinter Designer - cdhigh@sohu.com"
    ClientHeight    =   8130
    ClientLeft      =   45
    ClientTop       =   675
    ClientWidth     =   12975
+   BeginProperty Font 
+      Name            =   "Courier New"
+      Size            =   9
+      Charset         =   0
+      Weight          =   400
+      Underline       =   0   'False
+      Italic          =   0   'False
+      Strikethrough   =   0   'False
+   EndProperty
    Icon            =   "MainForm.frx":0000
    LinkTopic       =   "Form1"
    ScaleHeight     =   542
@@ -14,7 +23,7 @@ Begin VB.Form FrmMain
    StartUpPosition =   2  '屏幕中心
    Begin VB.ComboBox cmbEditCombo 
       CausesValidation=   0   'False
-      Height          =   300
+      Height          =   345
       ItemData        =   "MainForm.frx":058A
       Left            =   7560
       List            =   "MainForm.frx":058C
@@ -25,7 +34,7 @@ Begin VB.Form FrmMain
       Width           =   1095
    End
    Begin VB.ComboBox cmbEditList 
-      Height          =   300
+      Height          =   345
       ItemData        =   "MainForm.frx":058E
       Left            =   6360
       List            =   "MainForm.frx":0590
@@ -43,10 +52,11 @@ Begin VB.Form FrmMain
       Width           =   2295
       _ExtentX        =   4048
       _ExtentY        =   873
+      Caption         =   "Refresh Forms(&R)"
       BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
-         Name            =   "宋体"
+         Name            =   "Courier New"
          Size            =   9
-         Charset         =   134
+         Charset         =   0
          Weight          =   400
          Underline       =   0   'False
          Italic          =   0   'False
@@ -72,9 +82,18 @@ Begin VB.Form FrmMain
             MinWidth        =   2687
          EndProperty
       EndProperty
+      BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
+         Name            =   "Courier New"
+         Size            =   9
+         Charset         =   0
+         Weight          =   400
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
    End
    Begin VB.ComboBox cmbFrms 
-      Height          =   300
+      Height          =   345
       ItemData        =   "MainForm.frx":0592
       Left            =   120
       List            =   "MainForm.frx":0594
@@ -85,9 +104,9 @@ Begin VB.Form FrmMain
    End
    Begin VB.TextBox TxtTips 
       BeginProperty Font 
-         Name            =   "宋体"
+         Name            =   "Courier New"
          Size            =   10.5
-         Charset         =   134
+         Charset         =   0
          Weight          =   400
          Underline       =   0   'False
          Italic          =   0   'False
@@ -103,7 +122,7 @@ Begin VB.Form FrmMain
       Width           =   2415
    End
    Begin VB.ListBox LstComps 
-      Height          =   3300
+      Height          =   3210
       Left            =   120
       TabIndex        =   6
       Top             =   1200
@@ -118,9 +137,9 @@ Begin VB.Form FrmMain
       _ExtentX        =   10610
       _ExtentY        =   12091
       BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
-         Name            =   "宋体"
+         Name            =   "Courier New"
          Size            =   9
-         Charset         =   134
+         Charset         =   0
          Weight          =   400
          Underline       =   0   'False
          Italic          =   0   'False
@@ -153,10 +172,11 @@ Begin VB.Form FrmMain
       Width           =   2295
       _ExtentX        =   4048
       _ExtentY        =   873
+      Caption         =   "Generate Code(&G)"
       BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
-         Name            =   "宋体"
+         Name            =   "Courier New"
          Size            =   9
-         Charset         =   134
+         Charset         =   0
          Weight          =   400
          Underline       =   0   'False
          Italic          =   0   'False
@@ -171,10 +191,11 @@ Begin VB.Form FrmMain
       Width           =   2295
       _ExtentX        =   4048
       _ExtentY        =   873
+      Caption         =   "Copy to Clipboard(&C)"
       BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
-         Name            =   "宋体"
+         Name            =   "Courier New"
          Size            =   9
-         Charset         =   134
+         Charset         =   0
          Weight          =   400
          Underline       =   0   'False
          Italic          =   0   'False
@@ -189,10 +210,11 @@ Begin VB.Form FrmMain
       Width           =   2295
       _ExtentX        =   4048
       _ExtentY        =   873
+      Caption         =   "Save to File(&F)"
       BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
-         Name            =   "宋体"
+         Name            =   "Courier New"
          Size            =   9
-         Charset         =   134
+         Charset         =   0
          Weight          =   400
          Underline       =   0   'False
          Italic          =   0   'False
@@ -207,10 +229,11 @@ Begin VB.Form FrmMain
       Width           =   2295
       _ExtentX        =   4048
       _ExtentY        =   873
+      Caption         =   "Quit(&Q)"
       BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
-         Name            =   "宋体"
+         Name            =   "Courier New"
          Size            =   9
-         Charset         =   134
+         Charset         =   0
          Weight          =   400
          Underline       =   0   'False
          Italic          =   0   'False
@@ -218,103 +241,103 @@ Begin VB.Form FrmMain
       EndProperty
    End
    Begin VB.Menu mnuFile 
-      Caption         =   "文件(&F)"
+      Caption         =   "File(&F)"
       Begin VB.Menu mnuRefreshForms 
-         Caption         =   "刷新窗体列表(&R)"
+         Caption         =   "Refresh Forms(&R)"
          Shortcut        =   ^R
       End
       Begin VB.Menu mnuSeparator1 
          Caption         =   "-"
       End
       Begin VB.Menu mnuGenCode 
-         Caption         =   "生成代码(&G)"
+         Caption         =   "Generate Code(&G)"
          Shortcut        =   ^G
       End
       Begin VB.Menu mnuSeparator10 
          Caption         =   "-"
       End
       Begin VB.Menu mnuSaveToFile 
-         Caption         =   "保存代码到文件(&F)"
+         Caption         =   "Save Code to File(&F)"
          Begin VB.Menu mnuSaveAll 
-            Caption         =   "保存全部内容(&A)"
+            Caption         =   "Save All Code(&A)"
          End
          Begin VB.Menu mnuSaveMainOnly 
-            Caption         =   "仅保存main()函数(&M)"
+            Caption         =   "Save main() Only(&M)"
             Visible         =   0   'False
          End
          Begin VB.Menu mnuSaveUiOnly 
-            Caption         =   "仅保存界面生成类(&G)"
+            Caption         =   "Save Class UI Only(&G)"
          End
       End
       Begin VB.Menu mnuCopyToClipboard 
-         Caption         =   "拷贝代码到剪贴板(&C)"
+         Caption         =   "Copy Code To Clipboard(&C)"
          Begin VB.Menu mnuCopyToClipAll 
-            Caption         =   "拷贝全部内容(&A)"
+            Caption         =   "Copy All Code(&A)"
          End
          Begin VB.Menu mnuCopyToClipMainOnly 
-            Caption         =   "仅拷贝main()函数(&M)"
+            Caption         =   "Copy main() Only(&M)"
             Visible         =   0   'False
          End
          Begin VB.Menu mnuCopyToClipUiOnly 
-            Caption         =   "仅拷贝界面生成类(&G)"
+            Caption         =   "Copy Class UI Only(&G)"
          End
       End
       Begin VB.Menu mnuSeparator2 
          Caption         =   "-"
       End
       Begin VB.Menu mnuAddProperty 
-         Caption         =   "增加一个自定义属性(&P)"
+         Caption         =   "Add One Property(&P)"
       End
       Begin VB.Menu mnuSeparator3 
          Caption         =   "-"
       End
       Begin VB.Menu mnuQuit 
-         Caption         =   "退出(&Q)"
+         Caption         =   "Quit(&Q)"
       End
    End
    Begin VB.Menu mnuOptions 
-      Caption         =   "选项(&O)"
+      Caption         =   "Options(&O)"
       Begin VB.Menu mnuOopCode 
-         Caption         =   "生成面向对象代码(&P)"
+         Caption         =   "Generate OOP Code(&P)"
          Checked         =   -1  'True
       End
       Begin VB.Menu mnuV2andV3Code 
-         Caption         =   "生成Python 2.x/3.x兼容代码(&C)"
+         Caption         =   "Compatible Code for Python 2.x/3.x(&C)"
          Checked         =   -1  'True
       End
       Begin VB.Menu mnuUseTtk 
-         Caption         =   "启用TTK主题库(&T)"
+         Caption         =   "Use TTK Themed Library(&T)"
          Checked         =   -1  'True
       End
       Begin VB.Menu mnuRelPos 
-         Caption         =   "使用相对坐标(&R)"
+         Caption         =   "Use Relative Position(&R)"
          Checked         =   -1  'True
       End
       Begin VB.Menu mnuUnicodePrefixU 
-         Caption         =   "Unicode字符串增加前缀u(&U)"
+         Caption         =   "Add A Prefix 'u' to Unicode String(&U)"
       End
       Begin VB.Menu mnuSeparator5 
          Caption         =   "-"
       End
       Begin VB.Menu mnuPythonExe 
-         Caption         =   "设置Python.exe位置(&E)..."
+         Caption         =   "Set diretory of python.exe(&E)..."
       End
    End
    Begin VB.Menu mnuTools 
-      Caption         =   "工具(&T)"
+      Caption         =   "Tools(&T)"
       Begin VB.Menu mnuPreview 
-         Caption         =   "界面预览(&P)"
+         Caption         =   "Preview(&P)"
          Enabled         =   0   'False
          Shortcut        =   {F5}
       End
       Begin VB.Menu mnuEncodeAFile 
-         Caption         =   "编码磁盘文件为Base64字符串(&B)"
+         Caption         =   "Encode File to Base64(&B)"
       End
    End
    Begin VB.Menu mnuLanguage 
       Caption         =   "Language(&L)"
       Begin VB.Menu mnuLng 
-         Caption         =   "简体中文(&C)"
+         Caption         =   "English(&E)"
          Index           =   0
       End
    End
@@ -487,7 +510,7 @@ Private Sub cmbFrms_Click()
     If Not ResetLstComps(m_curFrm) Then
         LstComps.Clear
         LstCfg.Clear
-        TxtTips.Text = L("l_TipHasNoControl", "目前窗体上没有任何控件，请先在窗体上添加控件。")
+        TxtTips.Text = L("l_TipHasNoControl", "Has no control on Form, please add at least one control on it.")
         m_PrevCompIdx = -1
     Else
         LstComps.ListIndex = 0
@@ -622,7 +645,7 @@ Private Function ResetLstComps(frm As Object) As Long
         ElseIf Obj.ClassName = "CommonDialog" Then
             m_HasCommonDialog = True
         ElseIf Len(ctlsIgnored) = 0 Or InStr(1, ctlsIgnored, Obj.ClassName & ",") <= 0 Then
-            If MsgBox(L_F("l_msgCtlNotSupport", "当前暂不支持'{0}'控件(控件名：{1})\n\n程序将不生成此控件的代码。\n\n'确定' : 继续。\n'取消' : 忽略同类型的控件，不再提醒。", _
+            If MsgBox(L_F("l_msgCtlNotSupport", "The addin not support '{0}' control (Name:{1}).\n\nIt will not be processed.\n\n'Ok' to continue.\n'Cancel' for ignoring controls of same type.", _
                 Obj.ClassName, Obj.Properties("Name")), vbInformation + vbOKCancel, App.Title) = vbCancel Then
                 ctlsIgnored = ctlsIgnored & Obj.ClassName & ","
             End If
@@ -938,8 +961,7 @@ Private Sub CmdGenCode_Click()
     On Error Resume Next
     s = m_curFrm.Name
     If Err.Number Then
-        If MsgBox(L("l_msgGetAttrOfFrmFailed", "获取窗体属性失败，对应VB工程已经关闭？\n请重新刷新窗体列表或重新打开工程再试。" & _
-            "\n现在重新刷新窗体列表吗？"), vbInformation + vbYesNo) = vbYes Then
+        If MsgBox(L("l_msgGetAttrOfFrmFailed", "Failed in getting property of the form, please reopen the vb project and retry.\nRefresh list of forms now?"), vbInformation + vbYesNo) = vbYes Then
             CmdRefsFormsList_Click
         End If
         Exit Sub
@@ -957,7 +979,7 @@ Private Sub CmdGenCode_Click()
 '        '如果使用绝对坐标，则Frame控件仅支持vbTwips模式
 '        For Each o In m_curFrm.Designer.VBControls
 '            If o.ClassName = "Frame" Then
-'                MsgBox L("l_msgFrameNotSupportInAbs", "绝对坐标布局不支持Frame控件，请改用相对坐标或去掉Frame控件。"), vbInformation
+'                MsgBox L("l_msgFrameNotSupportInAbs", "The control 'Frame' is not support when menu 'Use Relative Position' unchecked."), vbInformation
 '                Exit Sub
 '            End If
 '        Next
@@ -1029,12 +1051,12 @@ Private Sub CmdGenCode_Click()
     If OutOOP Then
         strCmd.Append vbCrLf
         strCmd.Append "class Application(Application_ui):"
-        strCmd.Append "    " & L("l_cmtClsApp", "#这个类实现具体的事件处理回调函数。界面生成代码在Application_ui中。")
+        strCmd.Append "    " & L("l_cmtClsApp", "#The class will implement callback function for events and your logical code.")
         strCmd.Append "    def __init__(self, master=None):"
         strCmd.Append "        Application_ui.__init__(self, master)" & vbCrLf
         
         strOut.Append "class Application_ui(Frame):"
-        strOut.Append "    " & L("l_cmtClsUi", "#这个类仅实现界面生成功能，具体事件处理代码在子类Application中。")
+        strOut.Append "    " & L("l_cmtClsUi", "#The class will create all widgets for UI.")
         strOut.Append "    def __init__(self, master=None):"
         strOut.Append "        Frame.__init__(self, master)"
         g_Comps(0).toString strOut, strCmd, OutRelPos, OutOOP, usettk  'g_Comps(0)固定是Form
@@ -1043,7 +1065,7 @@ Private Sub CmdGenCode_Click()
         strOut.Append "        self." & WTOP & " = self.winfo_toplevel()" & vbCrLf
         If usettk Then strOut.Append "        self.style = Style()" & vbCrLf
     Else
-        strHead.Append L("l_cmtgComps", "#所有控件和控件绑定变量引用字典，使用这个字典是为了方便在其他函数中引用所有控件。")
+        strHead.Append L("l_cmtgComps", "#Global dictionary of widgets for using in others functions.")
         strHead.Append "gComps = {}"
         strHead.Append vbCrLf & vbCrLf
         
@@ -1128,7 +1150,7 @@ Private Sub CmdRefsFormsList_Click()
         If frm.Type = vbext_ct_VBForm Then
             nScaleMode = frm.Properties("ScaleMode")
             If nScaleMode <> vbTwips And nScaleMode <> vbPoints And nScaleMode <> vbPixels Then
-                MsgBox L_F("l_msgFailedScaleMode", "查找到窗体'{0}'，但是ScaleMode={1}，程序仅支持模式1/2/3。", _
+                MsgBox L_F("l_msgFailedScaleMode", "Found form'{0}', but its ScaleMode={1}, now can only support mode 1/2/3.", _
                          frm.Properties("Name"), nScaleMode), vbInformation
             Else
                 cmbFrms.AddItem frm.Name
@@ -1267,8 +1289,7 @@ Private Sub LstComps_Click()
     On Error Resume Next
     s = m_curFrm.Name
     If Err.Number Then
-        If MsgBox(L("l_msgGetAttrOfFrmFailed", "获取窗体属性失败，对应VB工程已经关闭？\n请重新刷新窗体列表或重新打开工程再试。" & _
-            "\n现在重新刷新窗体列表吗？"), vbInformation + vbYesNo) = vbYes Then
+        If MsgBox(L("l_msgGetAttrOfFrmFailed", "Failed in getting property of the form, please reopen the vb project and retry.\nRefresh list of forms now?"), vbInformation + vbYesNo) = vbYes Then
             CmdRefsFormsList_Click
         End If
         Exit Sub
@@ -1344,7 +1365,7 @@ Private Sub mnuAddProperty_Click()
     
     If LstCfg.ItemCount <= 0 Then Exit Sub
     
-    s = InputBox(L("l_ProForAddAttr", "请输入属性和数值对，使用'属性=值'的形式，比如：x=20 。\n注意Python是大小写敏感的。"), App.Title)
+    s = InputBox(L("l_ProForAddAttr", "Please input string format as 'Property=Value', for example x=20.\nCase sensitive."), App.Title)
     s = Trim(s)
     If Len(s) <= 0 Then
         Exit Sub
@@ -1389,7 +1410,7 @@ Private Sub mnuCopyToClipMainOnly_Click()
         Clipboard.Clear
         Clipboard.SetText Mid(s, nm, nf - nm)
     Else
-        MsgBox L("l_msgNoMain", "代码中找不到main()函数！"), vbInformation
+        MsgBox L("l_msgNoMain", "Function 'main()' no founded in code!"), vbInformation
     End If
     
 End Sub
@@ -1406,7 +1427,7 @@ Private Sub mnuCopyToClipUiOnly_Click()
         Clipboard.Clear
         Clipboard.SetText Mid(s, nui, napp - nui)
     Else
-        MsgBox L("l_msgNoClsUi", "代码中找不到Application_ui类！"), vbInformation
+        MsgBox L("l_msgNoClsUi", "Class 'Application_ui' no founded in code!"), vbInformation
     End If
     
 End Sub
@@ -1452,7 +1473,7 @@ End Sub
 Private Sub mnuSaveAll_Click()
     
     Dim sF As String
-    sF = FileDialog(Me, True, L("l_fdSave", "将Python文件保存到："), "*.py", m_prevsf)
+    sF = FileDialog(Me, True, L("l_fdSave", "Save file to:"), "*.py", m_prevsf)
     
     If Len(sF) Then
         If Len(FileExt(sF)) = 0 Then sF = sF & ".py"  '如果文件名没有扩展名，自动添加.py扩展名
@@ -1473,13 +1494,13 @@ Private Sub mnuSaveMainOnly_Click()
     nm = InStr(1, s, "def main(argv):")
     nf = InStr(1, s, "if __name__")
     If nm > 0 And nf > 0 Then
-        sF = FileDialog(Me, True, L("l_fdSave", "将Python文件保存到："), "*.py", m_prevsf)
+        sF = FileDialog(Me, True, L("l_fdSave", "Save file to:"), "*.py", m_prevsf)
         If Len(sF) Then
             If Len(FileExt(sF)) = 0 Then sF = sF & ".py"  '如果文件名没有扩展名，自动添加.py扩展名
             Utf8File_Write_VB sF, Mid(s, nm, nf - nm)
         End If
     Else
-        MsgBox L("l_msgNoMain", "代码中找不到main()函数！"), vbInformation
+        MsgBox L("l_msgNoMain", "Function 'main()' no founded in code!"), vbInformation
     End If
     
     m_prevsf = sF
@@ -1496,13 +1517,13 @@ Private Sub mnuSaveUiOnly_Click()
     nui = InStr(1, s, "class Application_ui(Frame):")
     napp = InStr(1, s, "class Application(Application_ui):")
     If nui > 0 And napp > 0 Then
-        sF = FileDialog(Me, True, "将Python文件保存到：", "*.py", m_prevsf)
+        sF = FileDialog(Me, True, L("l_fdSave", "Save file to:"), "*.py", m_prevsf)
         If Len(sF) Then
             If Len(FileExt(sF)) = 0 Then sF = sF & ".py"  '如果文件名没有扩展名，自动添加.py扩展名
             Utf8File_Write_VB sF, Mid(s, nui, napp - nui)
         End If
     Else
-        MsgBox L("l_msgNoClsUi", "代码中找不到Application_ui类！"), vbInformation
+        MsgBox L("l_msgNoClsUi", "Class 'Application_ui' no founded in code!"), vbInformation
     End If
     
     m_prevsf = sF
@@ -1564,7 +1585,7 @@ Private Sub mnuPreview_Click()
         Utf8File_Write_VB sTmpFile, sCode
         Shell Chr(34) & g_PythonExe & """ """ & sTmpFile & Chr(34)
     Else
-        MsgBox L("l_msgCreateTempFileFailed", "创建临时文件失败！"), vbInformation
+        MsgBox L("l_msgCreateTempFileFailed", "Failed in creating a temp file."), vbInformation
     End If
     
 End Sub
@@ -1621,7 +1642,7 @@ Private Sub mnuRelPos_Click()
 '            '如果使用绝对坐标，不支持Frame控件
 '            For Each o In m_curFrm.Designer.VBControls
 '                If o.ClassName = "Frame" Then
-'                    MsgBox L("l_msgFrameNotSupportInAbs", "绝对坐标布局不支持Frame控件，请改用相对坐标或去掉Frame控件。"), vbInformation
+'                    MsgBox L("l_msgFrameNotSupportInAbs", "The control 'Frame' is not support when menu 'Use Relative Position' unchecked."), vbInformation
 '                    mnuRelPos.Checked = True
 '                    Exit For
 '                End If
@@ -1634,7 +1655,7 @@ End Sub
 
 Private Sub mnuUnicodePrefixU_Click()
     
-    If MsgBox(L("l_msgChangePrefixU", "改变UNICODE字符串的前缀选项需要全部刷新控件状态。\n继续吗？"), vbQuestion + vbOKCancel) = vbCancel Then
+    If MsgBox(L("l_msgChangePrefixU", "Change the prefix of UNICODE string will refresh all widgets of the form, \nContinue?"), vbQuestion + vbOKCancel) = vbCancel Then
         Exit Sub
     End If
     
@@ -1663,7 +1684,7 @@ Private Sub mnuUseTtk_Click()
             s = Mid(LstComps.List(i), InStr(1, LstComps.List(i), "(") + 1)
             s = Left(s, Len(s) - 1)
             If InStr(1, " ProgressBar, TreeView, TabStrip, Line, ", " " & s & ",") > 0 Then
-                MsgBox L("l_msgCantCancelTTK", "窗体中有部分控件仅在TTK库中存在，不能取消TTK选项。"), vbInformation
+                MsgBox L("l_msgCantCancelTTK", "Can't uncheck the menu 'Use TTK Themed Library' for has some widgets specified in TTK."), vbInformation
                 mnuUseTtk.Checked = True
                 Exit For
             End If
@@ -1735,7 +1756,7 @@ Private Sub FillcmbEdit(Row As Long, Col As Long)
 End Sub
 
 Private Sub stabar_DblClick()
-    MsgBox L("l_msgCtlsSupported", "支持控件列表：") & vbCrLf & "Menu, Label, TextBox, PictureBox, Frame, CommandButton, CheckBox, OptionButton, ComboBox," & vbCrLf & _
+    MsgBox L("l_msgCtlsSupported", "Controls supported:") & vbCrLf & "Menu, Label, TextBox, PictureBox, Frame, CommandButton, CheckBox, OptionButton, ComboBox," & vbCrLf & _
             "ListBox, HScrollBar, VScrollBar, Slider, ProgressBar, TreeView, StatusBar, CommonDialog, Line" & vbCrLf & vbCrLf
 End Sub
 
@@ -1836,35 +1857,35 @@ Private Sub TxtTips_KeyUp(KeyCode As Integer, Shift As Integer)
 End Sub
 
 Private Sub TxtTips_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
-    stabar.SimpleText = L("l_staTips", "属性解析窗口，在有些属性状态下可以双击变大。")
+    stabar.SimpleText = L("l_staTips", "Tips of properties.")
 End Sub
 
 Private Sub LstComps_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
-    stabar.SimpleText = L("l_staComps", "控件列表窗口，列出对应窗体上所有控件名和控件类型。")
+    stabar.SimpleText = L("l_staComps", "List of controls.")
 End Sub
 
 Private Sub cmbFrms_GotFocus()
-    stabar.SimpleText = L("l_staFrms", "窗体列表，程序中支持多个设计窗口。")
+    stabar.SimpleText = L("l_staFrms", "List of forms.")
 End Sub
 
 Private Sub CmdCopyToClipboard_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
-    stabar.SimpleText = L("l_staCopyCode", "拷贝代码到剪贴板，可以选择拷贝全部还是仅拷贝界面生成部分。")
+    stabar.SimpleText = L("l_staCopyCode", "Copy code to clipboard.")
 End Sub
 
 Private Sub CmdGenCode_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
-    stabar.SimpleText = L("l_staCmdGenCode", "全部的控件属性都配置完成后，使用这个按钮生成Python代码。")
+    stabar.SimpleText = L("l_staCmdGenCode", "Generate python code after confirm properties of controls.")
 End Sub
 
 Private Sub CmdQuit_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
-    stabar.SimpleText = L("l_staQuit", "直接退出！")
+    stabar.SimpleText = L("l_staQuit", "Quit!")
 End Sub
 
 Private Sub CmdRefsFormsList_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
-    stabar.SimpleText = L("l_staRefsFrms", "刷新窗体和控件，如果插件运行后修改了窗体和控件，请刷新后再重新生成代码。")
+    stabar.SimpleText = L("l_staRefsFrms", "Resfresh list of forms and controls.")
 End Sub
 
 Private Sub CmdSaveToFile_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
-    stabar.SimpleText = L("l_staCmdSaveFile", "如果必要，可以选择代码保存到文件(UTF-8带BOM格式)。")
+    stabar.SimpleText = L("l_staCmdSaveFile", "Save code to file (format utf-8 with BOM).")
 End Sub
 
 Private Sub Form_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
@@ -1872,11 +1893,11 @@ Private Sub Form_MouseMove(Button As Integer, Shift As Integer, x As Single, y A
 End Sub
 
 Private Sub LstCfg_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
-    stabar.SimpleText = L("l_staLstCfg", "属性列表窗口，双击属性值或按F2键可以编辑，程序只生成对应前面打钩的属性的代码。")
+    stabar.SimpleText = L("l_staLstCfg", "List of properties of control, F2/Return/DblClick to modify a property.")
 End Sub
 
 Private Sub TxtCode_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
-    stabar.SimpleText = L("l_staTxtCode", "代码预览窗口，双击可以放大。如果需要，也可以直接在这里修改代码。")
+    stabar.SimpleText = L("l_staTxtCode", "Preview python code here, DblClick to zoom out/in.")
 End Sub
 
 Private Sub stabar_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)

@@ -163,15 +163,15 @@ Public Function Tips(sAttr As String) As String
     Tips = sAttr & vbCrLf
     Select Case sAttr:
     Case "displayrows":
-        Tips = Tips & L("l_TipDisplayRows", "指定要显示行数。")
+        Tips = Tips & L("l_TipDisplayRows", "How many rows be displayed.")
     Case "state":
-        Tips = Tips & L("l_TipStateHasRO", "控件状态，请使用括号括起来，可选值有：'normal', 'readonly', 'disabled'")
+        Tips = Tips & L("l_TipStateHasRO", "State of the widget. They are 'normal', 'readonly', 'disabled'")
     Case "values":
-        Tips = Tips & L("l_TipValues", "控件的下拉文本列表，此属性值设置为变量名（为一个列表），如果需要运行时添加和删除下拉文本列表，需要重新使用组合框的configure方法设置values属性。")
+        Tips = Tips & L("l_TipValues", "List of text of widget. This attribute set to a name of variable (type list).")
     Case "postcommand":
-        Tips = Tips & L("l_TipPostCmd", "每次下拉列表打开前调用此回调函数。")
+        Tips = Tips & L("l_TipPostCmd", "A procedure that is called immediately before displaying the values")
     Case "exportselection":
-        Tips = Tips & L("l_TipExportSelection", "默认为False，为True时连接至Window Manager selection。")
+        Tips = Tips & L("l_TipExportSelection", "If set to True, the widget selection is linked to the Window Manager selection")
     Case Else:
         Tips = m_Base.Tips(sAttr)
     End Select
@@ -275,7 +275,7 @@ Public Function Deserializer(vSer As clsSerialization)
 End Function
 
 Public Property Get Description() As String
-    Description = L("l_DescCombobox", "文本组合框对象，对应到tkinter.ttk的Combobox控件。")
+    Description = L("l_DescCombobox", "Combobox widget. TTK needed.")
 End Property
 
 Public Property Let ScaleMode(nV As Long)

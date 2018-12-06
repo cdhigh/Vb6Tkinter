@@ -50,12 +50,12 @@ Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, re
     
     '增加几行示例代码，更形象，生手也可以很快上手使用
     If oop Then
-        sOut.Append vbCrLf & Space(8) & "self." & m_Base.Name & ".insert('', 'end', 'TOP', text='Sample', open=True)  " & L("l_cmtTreeviewSample", "#以下四行为示例代码，请删掉写自己的项目代码")
+        sOut.Append vbCrLf & Space(8) & "self." & m_Base.Name & ".insert('', 'end', 'TOP', text='Sample', open=True)  " & L("l_cmtTreeviewSample", "#The four lines of sample code hereinafter.")
         sOut.Append Space(8) & "self." & m_Base.Name & ".insert('', 'end', 'TOP2', text='TOP2')"
         sOut.Append Space(8) & "self." & m_Base.Name & ".insert('TOP', 'end', 'TOP.1', text='Sample.1')"
         sOut.Append Space(8) & "self." & m_Base.Name & ".insert('TOP', 'end', 'TOP.2', text='Sample.2')"
     Else
-        sOut.Append vbCrLf & Space(4) & m_Base.Name & ".insert('', 'end', 'TOP', text='Sample', open=True)  " & L("l_cmtTreeviewSample", "#以下四行为示例代码，请删掉写自己的项目代码")
+        sOut.Append vbCrLf & Space(4) & m_Base.Name & ".insert('', 'end', 'TOP', text='Sample', open=True)  " & L("l_cmtTreeviewSample", "#The four lines of sample code hereinafter.")
         sOut.Append Space(4) & m_Base.Name & ".insert('', 'end', 'TOP2', text='TOP2')"
         sOut.Append Space(4) & m_Base.Name & ".insert('TOP', 'end', 'TOP.1', text='Sample.1')"
         sOut.Append Space(4) & m_Base.Name & ".insert('TOP', 'end', 'TOP.2', text='Sample.2')"
@@ -165,15 +165,15 @@ Public Function Tips(sAttr As String) As String
     Tips = sAttr & vbCrLf
     Select Case sAttr:
     Case "columns":
-        Tips = Tips & L("l_TipColumns", "一个列表变量名，指定控件列数和列标题。不设置此参数则没有标题，并且只显示一列。")
+        Tips = Tips & L("l_TipColumns", "A list of column identifiers, specifying the number of columns and their names.")
     Case "displaycolumns":
-        Tips = Tips & L("l_TipDisplayColumns", "一个列表变量名，指定显示列数、标题和顺序，或可设置为'#all'显示所有'columns'属性中设置的所有列。")
+        Tips = Tips & L("l_TipDisplayColumns", "A list of column identifiers specifying which data columns are displayed and the order in which they appear, or the string '#all'.")
     Case "displayrows":
-        Tips = Tips & L("l_TipDisplayRows", "指定要显示行数。")
+        Tips = Tips & L("l_TipDisplayRows", "How many rows be displayed.")
     Case "selectmode":
-        Tips = Tips & L("l_TipSelectModeTV", "项目选择模式，需要括号括起来，可选值：'extended'(默认)可选多个项目, 'browse'只能选择一个项目 or 'none' 不显示")
+        Tips = Tips & L("l_TipSelectModeTV", "Controls how the built-in class bindings manage the selection.\nThey are:'extended','browse','none'")
     Case "show":
-        Tips = Tips & L("l_TipShowTV", "控件显示配置。需要括号括起来，默认为'tree headings'，表示第一列显示树，显示标题行。配置为'tree'则不显示标题行。")
+        Tips = Tips & L("l_TipShowTV", "Specifying which elements of the tree to display.\nDefault is 'tree headings'.\nSet to 'tree' hide the heading.")
     Case Else:
         Tips = m_Base.Tips(sAttr)
     End Select
@@ -267,7 +267,7 @@ Public Function Deserializer(vSer As clsSerialization)
 End Function
 
 Public Property Get Description() As String
-    Description = L("l_DescTreeview", "树形控件对象，对应到Tkinter.ttk扩展库的Treeview控件，需要启用TTK扩展。")
+    Description = L("l_DescTreeview", "Treeview widget. TTK needed.")
 End Property
 
 Public Property Let ScaleMode(nV As Long)

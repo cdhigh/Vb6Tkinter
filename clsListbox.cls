@@ -171,11 +171,11 @@ Public Function Tips(sAttr As String) As String
     Tips = sAttr & vbCrLf
     Select Case sAttr:
         Case "listvariable":
-            Tips = Tips & L("l_TipListVariable", "控件的列表项变量，这里设置为变量名。")
+            Tips = Tips & L("l_TipListVariable", "A StringVar that is connected to the complete list of values in the listbox.")
         Case "activestyle":
-            Tips = Tips & L("l_TipActiveStyle", "选中的行的样式，可选值有：'underline','dotbox', 'none'")
+            Tips = Tips & L("l_TipActiveStyle", "Specifies the appearance of the active line. They are 'underline','dotbox', 'none'")
         Case "selectmode":
-            Tips = Tips & L("l_TipSelectMode", "选择模式，可选值有：SINGLE, BROWSE, EXTENDED, MULTIPLE")
+            Tips = Tips & L("l_TipSelectMode", "Determines how many items can be selected. They are: SINGLE, BROWSE, EXTENDED, MULTIPLE")
         Case Else:
             Tips = m_Base.Tips(sAttr)
     End Select
@@ -269,7 +269,7 @@ Public Function Deserializer(vSer As clsSerialization)
 End Function
 
 Public Property Get Description() As String
-    Description = L("l_DescListbox", "列表框对象，对应到Tkinter的Listbox控件。")
+    Description = L("l_DescListbox", "Listbox widget.")
 End Property
 
 Public Property Let ScaleMode(nV As Long)

@@ -1,11 +1,20 @@
 VERSION 5.00
 Begin VB.Form frmEncodeAFile 
    BorderStyle     =   1  'Fixed Single
-   Caption         =   "编码文件为Base64字符串"
+   Caption         =   "Encode File to Base64"
    ClientHeight    =   9645
    ClientLeft      =   45
    ClientTop       =   435
    ClientWidth     =   13230
+   BeginProperty Font 
+      Name            =   "Courier New"
+      Size            =   9
+      Charset         =   0
+      Weight          =   400
+      Underline       =   0   'False
+      Italic          =   0   'False
+      Strikethrough   =   0   'False
+   EndProperty
    Icon            =   "frmEncodeAFile.frx":0000
    LinkTopic       =   "Form1"
    MaxButton       =   0   'False
@@ -15,7 +24,7 @@ Begin VB.Form frmEncodeAFile
    StartUpPosition =   1  '所有者中心
    Begin VB.TextBox txtCharsPerLine 
       Height          =   375
-      Left            =   1680
+      Left            =   2280
       TabIndex        =   8
       Text            =   "80"
       Top             =   720
@@ -29,11 +38,11 @@ Begin VB.Form frmEncodeAFile
       Width           =   1935
       _ExtentX        =   3413
       _ExtentY        =   873
-      Caption         =   "退出(&Q)"
+      Caption         =   "Exit(&Q)"
       BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
-         Name            =   "宋体"
+         Name            =   "Courier New"
          Size            =   9
-         Charset         =   134
+         Charset         =   0
          Weight          =   400
          Underline       =   0   'False
          Italic          =   0   'False
@@ -48,11 +57,11 @@ Begin VB.Form frmEncodeAFile
       Width           =   1935
       _ExtentX        =   3413
       _ExtentY        =   873
-      Caption         =   "保存(&S)"
+      Caption         =   "Save(&S)"
       BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
-         Name            =   "宋体"
+         Name            =   "Courier New"
          Size            =   9
-         Charset         =   134
+         Charset         =   0
          Weight          =   400
          Underline       =   0   'False
          Italic          =   0   'False
@@ -67,11 +76,11 @@ Begin VB.Form frmEncodeAFile
       Width           =   1935
       _ExtentX        =   3413
       _ExtentY        =   873
-      Caption         =   "编码(&E)"
+      Caption         =   "Encode(&E)"
       BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
-         Name            =   "宋体"
+         Name            =   "Courier New"
          Size            =   9
-         Charset         =   134
+         Charset         =   0
          Weight          =   400
          Underline       =   0   'False
          Italic          =   0   'False
@@ -98,9 +107,9 @@ Begin VB.Form frmEncodeAFile
       _ExtentY        =   661
       Caption         =   "..."
       BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
-         Name            =   "宋体"
+         Name            =   "Courier New"
          Size            =   9
-         Charset         =   134
+         Charset         =   0
          Weight          =   400
          Underline       =   0   'False
          Italic          =   0   'False
@@ -109,28 +118,28 @@ Begin VB.Form frmEncodeAFile
    End
    Begin VB.TextBox txtSourceToEncode 
       Height          =   375
-      Left            =   1680
+      Left            =   2280
       TabIndex        =   1
       Top             =   240
-      Width           =   10695
+      Width           =   10095
    End
    Begin VB.Label lblCharsPerLine 
       Alignment       =   1  'Right Justify
-      Caption         =   "每行字符数"
+      Caption         =   "Chars Per Line"
       Height          =   375
-      Left            =   120
+      Left            =   0
       TabIndex        =   7
       Top             =   720
-      Width           =   1455
+      Width           =   2175
    End
    Begin VB.Label lblSourceToEncode 
       Alignment       =   1  'Right Justify
-      Caption         =   "源文件"
+      Caption         =   "Source File"
       Height          =   375
       Left            =   120
       TabIndex        =   0
       Top             =   240
-      Width           =   1455
+      Width           =   2055
    End
 End
 Attribute VB_Name = "frmEncodeAFile"
@@ -147,7 +156,7 @@ Private Sub cmdBase64It_Click()
     
     sFileName = Trim$(txtSourceToEncode.Text)
     If Len(sFileName) <= 0 Then
-        MsgBox L("l_msgFileFieldNull", "文件不能为空！"), vbInformation
+        MsgBox L("l_msgFileFieldNull", "File can't be null."), vbInformation
         Exit Sub
     End If
     
@@ -156,26 +165,26 @@ Private Sub cmdBase64It_Click()
     charsPerLine = CInt(txtCharsPerLine.Text)
     
     If Dir(sFileName) = "" Then
-        MsgBox L_F("l_msgFileNotExist", "文件{0}不存在，请重新选择文件。", sFileName), vbInformation
+        MsgBox L_F("l_msgFileNotExist", "File '{0}' not exist!", sFileName), vbInformation
         Exit Sub
     ElseIf FileLen(sFileName) > 500000 Then
-        MsgBox L("l_msgFileTooBig", "文件太大，速度会很慢，暂时不支持！"), vbInformation
+        MsgBox L("l_msgFileTooBig", "File is too big, app will take too much time to convert, can't continue now!"), vbInformation
         Exit Sub
     End If
     
     '用二进制方式读取内容
     If ReadFileBinaryContent(sFileName, abContent) = 0 Then
-        MsgBox L_F("l_msgReadFileError", "读取文件{0}出错。", sFileName), vbInformation
+        MsgBox L_F("l_msgReadFileError", "Error in Reading File {0}.", sFileName), vbInformation
         Exit Sub
     End If
     
     Base64Encode abContent, sResult, "", charsPerLine
     
     If Len(sResult) >= 65530 Then
-        MsgBox L("l_msgEncodeResultTooLong", "转换后的编码字符串太长，文本框装不下，请选择一个文件直接用于保存结果！"), vbInformation
+        MsgBox L("l_msgEncodeResultTooLong", "Size of encoded string is too big to load into TextBox, please choose a file to save it."), vbInformation
         txtBase64Result.Text = ""
         
-        sF = FileDialog(Me, True, L("l_fdSave", "将文件保存到："), "All Files (*.*)|*.*")
+        sF = FileDialog(Me, True, L("l_fdSave", "Save file to:"), "All Files (*.*)|*.*")
         If Len(sF) > 0 Then
             SaveStringToFile sF, sResult
         End If
@@ -185,7 +194,7 @@ Private Sub cmdBase64It_Click()
     
     Exit Sub
 DirErr:
-    MsgBox L_F("l_msgFileNotExist", "文件{0}不存在，请重新选择文件。", sFileName), vbInformation
+    MsgBox L_F("l_msgFileNotExist", "File '{0}' not exist!", sFileName), vbInformation
     
 End Sub
 
@@ -196,7 +205,7 @@ End Sub
 '打开文件浏览框，选择一个文件进行编码
 Private Sub cmdChooseSourceToEncode_Click()
     Dim sF As String
-    sF = FileDialog(Me, False, L("l_fdOpen", "请选择文件"), "All Files (*.*)|*.*", txtSourceToEncode.Text)
+    sF = FileDialog(Me, False, L("l_fdOpen", "Please Choose file:"), "All Files (*.*)|*.*", txtSourceToEncode.Text)
     If Len(sF) Then
         txtSourceToEncode.Text = sF
     End If
@@ -208,7 +217,7 @@ Private Sub cmdSaveBase64Result_Click()
     
     s = txtBase64Result.Text
     If Len(s) > 2 Then
-        sF = FileDialog(Me, True, L("l_fdSave", "将文件保存到："), "Python Files (*.py)|*.py|Text Files (*.txt)|*.txt|All Files (*.*)|*.*")
+        sF = FileDialog(Me, True, L("l_fdSave", "Save file to:"), "Python Files (*.py)|*.py|Text Files (*.txt)|*.txt|All Files (*.*)|*.*")
         If Len(sF) Then
             If Len(FileExt(sF)) = 0 Then sF = sF & ".py"  '如果文件名没有扩展名，自动添加.py扩展名
             SaveStringToFile sF, s
@@ -238,7 +247,7 @@ Private Sub SaveStringToFile(ByRef sFileName As String, ByRef s As String)
     Close fileNum
     Exit Sub
 errHandler:
-    MsgBox L_F("l_msgWriteFileError", "写文件{0}出错。", sFileName), vbInformation
+    MsgBox L_F("l_msgWriteFileError", "Error in Writing File {0}.", sFileName), vbInformation
 End Sub
 
 '添加Ctrl+A快捷键

@@ -318,11 +318,11 @@ End Function
 Public Function Tips(sAttr As String) As String
     
     If sAttr = "tearoff" Then
-        Tips = sAttr & vbCrLf & L("l_TipTearOff", "菜单是否可以变成单独窗口，设置为1（默认）时，菜单第一项为虚线，用户点击这条虚线会将菜单弹出为一个单独的窗口，就像PYTHON默认编辑器IDLE一样。")
+        Tips = sAttr & vbCrLf & L("l_TipTearOff", "Determines menu can be torn off or not.")
     ElseIf sAttr = "postcommand" Then
-        Tips = sAttr & vbCrLf & L("l_TipPostCmdMenu", "每次用户点击菜单弹出时调用的回调函数。")
+        Tips = sAttr & vbCrLf & L("l_TipPostCmdMenu", "A procedure will be called every time someone brings up this menu.")
     ElseIf sAttr = "accelerator" Then
-        Tips = sAttr & vbCrLf & L("l_TipAcceleratorMenu", "全局快捷键定义。")
+        Tips = sAttr & vbCrLf & L("l_TipAcceleratorMenu", "To display an keystroke combination on the right side of a menu choice.")
     Else
         Tips = m_Base.Tips(sAttr)
     End If
@@ -424,7 +424,7 @@ Public Function Deserializer(vSer As clsSerialization)
 End Function
 
 Public Property Get Description() As String
-    Description = L("l_DescMenuItem", "菜单项对象，每一个对象对应到Tkinter的Menu响应命令的项目。")
+    Description = L("l_DescMenuItem", "Menu item in Menu widget.")
 End Property
 
 Public Sub AddChild(o As Object)

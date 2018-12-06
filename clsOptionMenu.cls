@@ -30,7 +30,7 @@ Private m_CanbeOutByMainForm As Boolean
 Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, rel As Boolean, oop As Boolean, usettk As Boolean)
     
     If Len(m_Base("variable")) = 0 Then
-        MsgBox L_F("l_msgMusthasVar", "OptionMenu(ComboBox)必须要选择variable属性，现在将不生成OptionMenu({0})的代码。", m_Base.Name), vbInformation
+        MsgBox L_F("l_msgMusthasVar", "'variable' is obligatory for OptionMenu(ComboBox), will not generate code for OptionMenu({0}) now.", m_Base.Name), vbInformation
         Exit Sub
     End If
     
@@ -233,7 +233,7 @@ End Function
 Public Function Tips(sAttr As String) As String
     Tips = sAttr & vbCrLf
     If sAttr = "wraplength" Then
-        Tips = Tips & L("l_TipWrapLen", "多少个字符后自动换行。用于多行显示。")
+        Tips = Tips & L("l_TipWrapLen", "You can limit the number of characters in each line by setting this option to the desired number")
     Else
         Tips = m_Base.Tips(sAttr)
     End If
@@ -341,7 +341,7 @@ Public Function Deserializer(vSer As clsSerialization)
 End Function
 
 Public Property Get Description() As String
-    Description = L("l_DescOptionmenu", "组合框对象，需要预先设置要显示的字符列表，对应到Tkinter的Optionmenu控件。")
+    Description = L("l_DescOptionmenu", "Optionmenu widget.")
 End Property
 
 Public Property Let ScaleMode(nV As Long)

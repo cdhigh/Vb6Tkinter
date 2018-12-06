@@ -170,9 +170,9 @@ End Function
 Public Function Tips(sAttr As String) As String
     
     If sAttr = "side" Then
-        Tips = sAttr & vbCrLf & L("l_TipSide", "状态栏放置位置\n可选值有：TOP,BOTTOM,留空则可以放置在任何位置。")
+        Tips = sAttr & vbCrLf & L("l_TipSide", "Position of statusbar. they are TOP,BOTTOM, or blank.")
     ElseIf sAttr = "panelwidths" Then
-        Tips = sAttr & vbCrLf & L("l_TipPanelWidths", "一个元组或列表，状态栏各窗格的宽度（字符数），最后一个窗格总是占满剩余空间，不需要列出。")
+        Tips = sAttr & vbCrLf & L("l_TipPanelWidths", "A tuple or list of number of chars of panels.")
     Else
         Tips = m_Base.Tips(sAttr)
     End If
@@ -287,7 +287,7 @@ Public Function Deserializer(vSer As clsSerialization)
 End Function
 
 Public Property Get Description() As String
-    Description = L("l_DescStatusbar", "状态栏对象，为自定义控件，可设置多个窗格，直接使用控件的set()方法设置状态提示。")
+    Description = L("l_DescStatusbar", "Statusbar widget. it has method set(), text(), panelwidth(), clear()")
 End Property
 
 Public Property Let ScaleMode(nV As Long)

@@ -113,7 +113,7 @@ Public Function Tips(sAttr As String) As String
     Tips = sAttr & vbCrLf
     Select Case sAttr:
         Case "wraplength":
-            Tips = Tips & L("l_TipWrapLen", "多少个字符后自动换行。用于多行显示。")
+            Tips = Tips & L("l_TipWrapLen", "You can limit the number of characters in each line by setting this option to the desired number")
         Case Else:
             Tips = m_Base.Tips(sAttr)
     End Select
@@ -207,7 +207,7 @@ Public Function Deserializer(vSer As clsSerialization)
 End Function
 
 Public Property Get Description() As String
-    Description = L("l_DescLabel", "标签条对象，对应到Tkinter的Label控件。")
+    Description = L("l_DescLabel", "Label widget.")
 End Property
 
 Public Property Let ScaleMode(nV As Long)

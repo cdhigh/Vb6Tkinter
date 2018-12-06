@@ -32,7 +32,7 @@ End Sub
 
 '创建对象后要马上调用这个函数初始化各参数
 Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dMethods As Dictionary)
-    Dim s As String, sa() As String, i As Long, idx As Long
+    Dim s As String, sa() As String, i As Long, Idx As Long
     
     m_Base.Name = o.Properties("Name")
     
@@ -93,10 +93,10 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
         If sa(0) = "p" Or sa(0) = "P" Then
             For i = 1 To UBound(sa)
                 s = sa(i)
-                idx = InStr(2, s, "=")
-                If idx > 0 Then '有值
-                    m_dicTotal(Left$(s, idx - 1)) = Mid$(s, idx + 1)
-                    m_Base(Left$(s, idx - 1)) = m_dicTotal(Left$(s, idx - 1))
+                Idx = InStr(2, s, "=")
+                If Idx > 0 Then '有值
+                    m_dicTotal(Left$(s, Idx - 1)) = Mid$(s, Idx + 1)
+                    m_Base(Left$(s, Idx - 1)) = m_dicTotal(Left$(s, Idx - 1))
                 ElseIf Len(s) > 0 And Len(m_dicTotal(s)) > 0 Then '仅有属性，则判断属性是否合法
                     m_Base(s) = m_dicTotal(s)
                 End If
@@ -121,12 +121,11 @@ Public Function Tips(sAttr As String) As String
     Tips = sAttr & vbCrLf
     Select Case sAttr:
         Case "indicatoron"
-            Tips = Tips & L("l_TipIndicatorOn", "是否显示文本坐标的标识，可选值有：0,1")
+            Tips = Tips & L("l_TipIndicatorOn", "Specifies if displays its indicator or not.")
         Case "value"
-            Tips = Tips & L("l_TipValue", "控件的表示值，一组控件的每一个控件的值不能相同。")
+            Tips = Tips & L("l_TipValue", "Value of widget.")
         Case "variable"
-            Tips = Tips & L("l_TipVariableRadio", "相同一组单选框则设置为同一个variable变量，每个控件的value设置为不同值，通过设置variable变量的实际值来选择哪个单选框选中" & _
-            "或通过variable变量的实际值可以知道用户选择了哪个单选框。")
+            Tips = Tips & L("l_TipVariableRadio", "The control variable that this radiobutton shares with the other radiobuttons in the group.")
         Case Else
             Tips = m_Base.Tips(sAttr)
     End Select
@@ -224,7 +223,7 @@ Public Function Deserializer(vSer As clsSerialization)
 End Function
 
 Public Property Get Description() As String
-    Description = L("l_DescRadiobutton", "单选按钮对象，在Tkinter中单选按钮的分组方法和VB有区别，同一组单选按钮的variable属性要设置为同一个变量，对应到Tkinter的Radiobutton控件。")
+    Description = L("l_DescRadiobutton", "Radiobutton widget.")
 End Property
 
 Public Property Let ScaleMode(nV As Long)

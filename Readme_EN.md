@@ -5,14 +5,17 @@ The addin will generate python code of GUI framework for you. the only thing you
 ![screenshot](https://raw.githubusercontent.com/cdhigh/tkinter-designer/master/Setup/Screenshots/TkinterDesigner_ScrPrnt_EN.JPG)
 
 # Install and Usage
-1. Install VB6.
+1. Install VB6 (You can install VB6 Lite or nano version).
     (if your os is windows 7 or later, please install VB6 SP6 version and 
     overwrite VB6.EXE using Vb6_SP6_Fix_for_Win7.exe)
     
 2. Download Tkinter Designer from github.
     [https://github.com/cdhigh/tkinter-designer](https://github.com/cdhigh/tkinter-designer)
     
-3. Copy directory 'Bin' to other directory you want, execute 'Setup for TkinterDesigner.exe' to register TkinterDesigner.dll. you may need language.lng too.
+3. Copy directory 'Bin' to other directory you want, execute 'Setup for TkinterDesigner.exe' to register TkinterDesigner.dll.   Or you can do it manual.
+    1. run regsvr32 /s diretory\TkinerDesigner.dll   
+    2. Add a line to sector [Add-Ins32] of C:\Windows\VBADDIN.INI:   
+       `TkinterDesigner.Connect=3`
 
 4. Open VB6, create a standard EXE project, design your layout firstly,
     and than click the icon 'Tkinter Designer' in toolbox of VB6.
@@ -72,9 +75,23 @@ The addin will generate python code of GUI framework for you. the only thing you
     if the form has this control, then the addin will create code for 
     import modules filedialog, simpledialog, colorchooser.    
 
+# Extends to tkinter
+1. Added a Statusbar widget.  
+   (Statusbar in component "Microsoft Windows Common Controls 6.0" in VB IDE)
+2. Added More intuitive setText()/text() methods to Entry/Label/Button/Checkbutton/Radiobutton.    
+   (not apply to CheckBCheckbutton/Radiobutton by default, please select 'textvariable' in tkinter-designer.)
+3. Similar to 2, Added setValue()/value() to Checkbutton/Radiobutton, parameter is 1/0.   
+   `self.Text1.setText('new text')`    
+   `print(self.text())`    
+   `print(self.Check1.value())`    
+   `self.Option1.setValue(1)`    
+   `print(Option1.value())`    
+
 # History
+* v1.6.1
+    1. Added setValue()/value() to Checkbutton/Radiobutton.
 * v1.6
-    1. Add setText()/text() method to Entry/Label/Button/CheckBox/OptionButton
+    1. Added setText()/text() method to Entry/Label/Button/Checkbutton/Radiobutton
 * v1.5.2
     1. value of RadioButton changed to it's name.
 * v1.5.1

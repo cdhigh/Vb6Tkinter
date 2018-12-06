@@ -176,15 +176,15 @@ Public Function Tips(sAttr As String) As String
     Tips = sAttr & vbCrLf
     Select Case sAttr:
     Case "state"
-        Tips = Tips & L("l_TipStateHasRO", "控件状态，请使用括号括起来，可选值有：'normal', 'readonly', 'disabled'")
+        Tips = Tips & L("l_TipStateHasRO", "State of the widget. They are 'normal', 'readonly', 'disabled'")
     Case "wrap"
-        Tips = Tips & L("l_TipWrapMode", "换行模式，CHAR（默认）为可以在任何一个字符后换行，WORD为在单词后换行，NONE为不换行（则需要提供滚动条）。")
+        Tips = Tips & L("l_TipWrapMode", "Controls the display of lines that are too wide.\n'CHAR':will be broken at any character.\n'WORD': will break the line after the last word that will fit.\n'NONE':provide a horizontal scrollbar.")
     Case "spacing1"
-        Tips = Tips & L("l_TipSpacing1", "每行和前一行之间的行间距。")
+        Tips = Tips & L("l_TipSpacing1", "Specifies how much extra vertical space is put above each line of text.")
     Case "spacing2"
-        Tips = Tips & L("l_TipSpacing2", "超过文本框宽度的行在每个绕行之间的行间距。")
+        Tips = Tips & L("l_TipSpacing2", "Specifies how much extra vertical space to add between displayed lines of text when a logical line wraps.")
     Case "spacing3"
-        Tips = Tips & L("l_TipSpacing3", "每行和后一行之间的行间距。")
+        Tips = Tips & L("l_TipSpacing3", "Specifies how much extra vertical space is added below each line of text.")
     Case Else
         Tips = m_Base.Tips(sAttr)
     End Select
@@ -276,7 +276,7 @@ Public Function Deserializer(vSer As clsSerialization)
 End Function
 
 Public Property Get Description() As String
-    Description = L("l_DescText", "多行文本框对象，对应到Tkinter的Text控件。")
+    Description = L("l_DescText", "Text widget.")
 End Property
 
 Public Property Let ScaleMode(nV As Long)

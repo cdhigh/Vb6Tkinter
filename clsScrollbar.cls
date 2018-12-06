@@ -125,9 +125,9 @@ Public Function Tips(sAttr As String) As String
     Tips = sAttr & vbCrLf
     Select Case sAttr:
     Case "jump"
-        Tips = Tips & L("l_TipJump", "设置为0（默认值）则每次滚动条数值变化就调用一次回调函数，设置为1则等鼠标松开后才调一次回调函数。")
+        Tips = Tips & L("l_TipJump", "Set to 1, the callback isn't called until the user releases the mouse button.")
     Case "activerelief"
-        Tips = Tips & L("l_TipActiveRelief", "设置鼠标指针移动在滚动条上时的式样，可选值：FLAT, GROOVE, RAISED, RIDGE, SOLID, SUNKEN。")
+        Tips = Tips & L("l_TipActiveRelief", "To display the slider with a different relief style when the mouse is over the slider.")
     Case Else:
         Tips = m_Base.Tips(sAttr)
     End Select
@@ -219,7 +219,7 @@ Public Function Deserializer(vSer As clsSerialization)
 End Function
 
 Public Property Get Description() As String
-    Description = L("l_DescScrollbar", "滚动条对象，对应到Tkinter的Scrollbar控件。")
+    Description = L("l_DescScrollbar", "Scrollbar widget.")
 End Property
 
 Public Property Let ScaleMode(nV As Long)

@@ -203,7 +203,7 @@ Public Function Deserializer(vSer As clsSerialization)
 End Function
 
 Public Property Get Description() As String
-    Description = L("l_DescButton", "按钮对象，对应到Tkinter的Button控件。")
+    Description = L("l_DescButton", "Button widget.")
 End Property
 
 Public Property Let ScaleMode(nV As Long)

@@ -97,7 +97,7 @@ End Function
 Private Sub Class_Initialize()
     Set m_dic = CreateObject("Scripting.Dictionary")
     If m_dic Is Nothing Then
-        MsgBox L("l_msgCreateDictionaryFailed", "创建Scripting.Dictionary对象失败，程序无法继续执行。\n请确认scrrun.dll是否存在！"), vbCritical
+        MsgBox L("l_msgCreateDictionaryFailed", "Create 'Scripting.Dictionary' failed.\nplease confirm 'scrrun.dll' exists or not."), vbCritical
     End If
 End Sub
 

@@ -246,7 +246,7 @@ Public Function Deserializer(vSer As clsSerialization)
 End Function
 
 Public Property Get Description() As String
-    Description = L("l_DescCanvas", "画布对象，对应到Tkinter的Canvas控件。")
+    Description = L("l_DescCanvas", "Canvas widget.")
 End Property
 
 Public Property Let ScaleMode(nV As Long)

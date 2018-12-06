@@ -8,14 +8,17 @@
 （列表参见下面的控件说明）。
 
 # 适用对象
-* 适用于学习了TKinter并不想太麻烦写GUI代码，也不想用其他工具和框架比如wxPython,PyQt4的同学。
-* 适用于界面不太复杂的小程序开发，界面复杂的还是适用wxPython等框架吧。
-* 因为TKinter为Python标准库，使用TKinter完成的Python程序可以称为“绿色软件”，不需要目标机器上安装wxPython,PyQt4等框架，只要有Python的机器就能运行。
-* 如果软件逻辑不是很复杂，通常一个*.py搞定，不像其他框架，需要几个文件。
-  > （如果不希望py运行时弹出黑漆漆的命令行窗口，后缀名请改为pyw）
-    
+* 适用于学习了TKinter并不想太麻烦手写GUI生成和排版代码，也不想用其他第三方工具和框架比如wxPython/PyQt的同学。
+* 适用于界面不太复杂的小程序开发，界面复杂的还是适用wxPython/PyQt等框架吧。
+* 因为TKinter为Python标准库，使用TKinter完成的Python程序可以称为"绿色软件"，不需要目标机器上安装wxPython/PyQt等框架，只要有Python的机器就能运行。即使使用pyinstaller/cx_freeze等打包成exe，最终文件也不会很大。
+* 如果软件逻辑不是很复杂，通常一个*.py搞定，不像其他一些辅助框架，需要几个文件。    
+  > （如果不希望py直接解析运行时弹出黑漆漆的命令行窗口，后缀名请改为pyw）     
+
 # 使用方法简介
-1. 首先注册此插件，可以使用自带的安装程序，或自己手动完成。
+1. 首先注册此插件，可以使用自带的安装程序，或自己手动完成。   
+    1. 运行regsvr32 /s diretory\TkinerDesigner.dll   
+    2. 在C:\Windows\VBADDIN.INI的段[Add-Ins32]增加一行：   
+       `TkinterDesigner.Connect=3`
 
 2. 打开VB6，新建一个标准EXE工程，在窗体上设计自己的GUI布局，这个工作估计没有VB基础的同学都可以完成，同时可以设置相应的控件属性。
 
@@ -34,8 +37,7 @@
 8. 如果程序有多个GUI界面，可以在VB工程中添加窗体，就可以选择产生哪个窗体的对应代码。
 
 9. 针对结构化代码，如果要在Python代码中引用和修改其他控件的值，可以使用全局字典gComps，这个字典保存了所有的GUI元素和一些对应的控件变量，可以直接使用形如gComps["Text1Var"].set("new Text")的代码来访问对应控件。
-    如果输出的是面向对象代码，则可以在界面派生类Application中直接访问
-    对应的控件。
+    如果输出的是面向对象代码，则可以在界面派生类Application中使用self.widgetname方式直接访问对应的控件。
     
 10. 一般的GUI框架都会将UI部分和逻辑代码部分分别放在不同的文件中，在逻辑代码文件中导入UI文件，实现修改UI不影响逻辑代码。因为对于实现简单的程序来说，我偏爱单文件，所以我将UI类和逻辑代码类都放在同一个文件中，在修改界面后，你可以直接覆盖对应的Application_ui类即可实现界面的变更，不过如果增加了新的事件回调函数，需要在子类Application中增加才行。
 
@@ -129,34 +131,41 @@
     所以还是建议如果有TabStrip控件的话，使用绝对坐标。
     * Frame和PictureBox均可作为容器，如果使用Frame作为容器，则其标题可以作为选项页
     标题，如果你没有设置选项页标题的话。（选项卡控件的标题设置优先）
-
 17. CommonDialog
     这个控件也算支持，如果VB窗体中有这个控件，则在Python代码中导入
     filedialog、simpledialog、colorchooser这三个模块，这三个模块提供简单的
     文件选择、输入框、颜色选择对话框功能。
     需要在控件工具箱增加"Microsoft Common Dialog Control 6.0"
 
+# 本应用对tkinter的扩展和"封装"
+1. tkinter没有Statusbar控件，所以我使用Label实现了一个简单的Statusbar，在VB窗体中添加Statusbar后会插入这部分实现代码。   
+   （VB需要先添加“Microsoft Windows Common Controls 6.0”部件才有Statusbar）
+2. 隐藏反人类的TK控件设置和获取控件显示值的机制（textvariable），给Entry/Label/Button/Checkbutton/Radiobutton控件
+   添加更符合直觉的setText()/text()方法，可以直接设置和获取其控件显示的文本值。    
+   （CheckBCheckbutton/Radiobutton默认不添加，需要在tkinter-designer将textvariable打勾，因为很少需要运行时修改这两个控件的文本。）
+3. 同样类似第二条，给Checkbutton/Radiobutton添加setValue()/value()方法，参数为1/0。    
+   `self.Text1.setText('new text')`    
+   `print(self.text())`    
+   `print(self.Check1.value())`    
+   `self.Option1.setValue(1)`    
+   `print(Option1.value())`   
 
 # 其他建议
-1. 针对Entry/Label/Button/CheckBox/OptionButton，可以直接使用扩展的setText()/text()方法获取对应的字符串。
-   而不需要再操作控件背后的textvariable，前提是生成代码时选中了textvariable变量。
-   Entry/Label/Button默认选中textvariable，CheckBox/OptionButton需要手工选中（因为一般很少需要运行时修改其显示文本）。
-   `self.Text1.setText('new text')`
-   `print(self.Text1.text()`
-2. 不支持使用控件数组，界面可以显示，但是后面的同名控件名会覆盖前面定义的。
-3. 窗体的ScaleMode建议保持默认值(vbTwips)，如果要设置为其他值，则Frame控件内就不要再放Frame控件了，否则其内部的控件布局错误。
-4. 如果仅需要简体汉字界面，则可以删掉Language.lng文件，仅需TkinterDesigner.dll一个文件。
+1. 不支持使用控件数组，界面可以显示，但是后面的同名控件名会覆盖前面定义的。
+2. 窗体的ScaleMode建议保持默认值(vbTwips)，如果要设置为其他值，则Frame控件内就不要再放Frame控件了，否则其内部的控件布局错误。
+3. 如果需要简体汉字界面，则需要Language.lng文件在TkinterDesigner.dll同一目录。
 
 # ttk库额外说明
-  ttk主题扩展看起来很漂亮，在不同操作系统下界面呈现为本地化风格，建议使用，
-  只是要注意以下几个ttk的BUG：
-  
+  ttk主题扩展看起来很漂亮，在不同操作系统下界面呈现为本地化风格，建议使用，    
+  只是要注意以下几个ttk的BUG：    
 1. TTK的Entry和Combobox控件背景色设置无效（可以设置，不报错，但是界面不变）。
 2. tkinter的Label控件可以通过插入'\n'来换行，但是ttk的Label只能通过wraplength属性来换行。
 3. LabelFrame和Notebook控件的字体单独设置无效，但是可以设置ttk的全局字体属性来改变，比如：self.style.configure('.', font=('宋体',12))。
-4. Python 2.7.3附带的ttk中的Treeview字体设置无效，但3.2.3的Treeview的字体设置有效。
+4. Python 2.7.3附带的ttk中的Treeview字体设置无效，但3.2.3及之后的的Treeview的字体设置有效。
 
 # 版本历史
+*  v1.6.1
+    1. 给Checkbutton/Radiobutton添加setValue()/value()函数，参数为整型1/0。
 *  v1.6
     1. 简单扩展tkinter，隐藏控件的textvariable操作，给控件动态添加setText()/text()函数用于设置和获取对应的字符串。
 *  v1.5.2

@@ -15,7 +15,7 @@ Option Explicit
 Private Declare Function GetPrivateProfileString Lib "kernel32" Alias "GetPrivateProfileStringA" (ByVal lpApplicationName As String, ByVal lpKeyName As Any, ByVal lpDefault As String, ByVal lpReturnedString As String, ByVal nSize As Long, ByVal lpFileName As String) As Long
 Private Const LanguageFile = "Language.lng"
 Private m_Lng As New Dictionary                                                 '对应语种的{名称,字符串}字典
-Public Const DEF_LNG = "简体中文(&C)"
+Public Const DEF_LNG = "English(&E)"
 
 '根据当前语种设置获取一个字符串
 Public Function L(sKey As String, ByVal sDefault As String) As String
@@ -48,7 +48,7 @@ Public Function GetAllLanguageName() As String()
         ns = GetPrivateProfileString(vbNullString, vbNullString, vbNullString, s, 1000, LngFile())
         GetAllLanguageName = Split(Trim(Replace(Left(s, ns), Chr(0) & Chr(0), "")), Chr(0))
     Else
-        GetAllLanguageName = Split(DEF_LNG)                                     '默认是中文，即使没有语言文件
+        GetAllLanguageName = Split(DEF_LNG)                                     '没有语言文件则默认为英文
     End If
     s = ""
 End Function
@@ -87,7 +87,7 @@ Public Sub ChangeControlLanguage(ctl As Control, Language As String)
 End Sub
 
 Private Function LngFile() As String
-    LngFile = App.path & IIf(Right(App.path, 1) = "\", "", "\") & LanguageFile
+    LngFile = App.Path & IIf(Right(App.Path, 1) = "\", "", "\") & LanguageFile
 End Function
 
 Public Function LngFileExist() As Boolean

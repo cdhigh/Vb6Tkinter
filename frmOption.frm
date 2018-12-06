@@ -1,33 +1,42 @@
 VERSION 5.00
 Begin VB.Form frmOption 
    BorderStyle     =   3  'Fixed Dialog
-   Caption         =   "配置"
-   ClientHeight    =   1275
+   Caption         =   "Config"
+   ClientHeight    =   1305
    ClientLeft      =   2565
    ClientTop       =   1500
-   ClientWidth     =   7710
+   ClientWidth     =   8010
+   BeginProperty Font 
+      Name            =   "Courier New"
+      Size            =   9
+      Charset         =   0
+      Weight          =   400
+      Underline       =   0   'False
+      Italic          =   0   'False
+      Strikethrough   =   0   'False
+   EndProperty
    Icon            =   "frmOption.frx":0000
    KeyPreview      =   -1  'True
    LinkTopic       =   "Form1"
    MaxButton       =   0   'False
    MinButton       =   0   'False
-   ScaleHeight     =   1275
-   ScaleWidth      =   7710
+   ScaleHeight     =   1305
+   ScaleWidth      =   8010
    ShowInTaskbar   =   0   'False
    StartUpPosition =   2  '屏幕中心
    Begin TkinterDesigner.xpcmdbutton cmdOptionCancel 
       Height          =   375
       Left            =   5640
-      TabIndex        =   11
+      TabIndex        =   5
       Top             =   720
       Width           =   1695
       _ExtentX        =   2990
       _ExtentY        =   661
-      Caption         =   "取消(&C)"
+      Caption         =   "Cancel(&C)"
       BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
-         Name            =   "宋体"
+         Name            =   "Courier New"
          Size            =   9
-         Charset         =   134
+         Charset         =   0
          Weight          =   400
          Underline       =   0   'False
          Italic          =   0   'False
@@ -37,16 +46,16 @@ Begin VB.Form frmOption
    Begin TkinterDesigner.xpcmdbutton cmdOptionOK 
       Height          =   375
       Left            =   3000
-      TabIndex        =   10
+      TabIndex        =   4
       Top             =   720
       Width           =   1695
       _ExtentX        =   2990
       _ExtentY        =   661
-      Caption         =   "确定(&O)"
+      Caption         =   "Ok(&O)"
       BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
-         Name            =   "宋体"
+         Name            =   "Courier New"
          Size            =   9
-         Charset         =   134
+         Charset         =   0
          Weight          =   400
          Underline       =   0   'False
          Italic          =   0   'False
@@ -56,16 +65,16 @@ Begin VB.Form frmOption
    Begin TkinterDesigner.xpcmdbutton cmdOptionApply 
       Height          =   375
       Left            =   360
-      TabIndex        =   9
+      TabIndex        =   3
       Top             =   720
       Width           =   1695
       _ExtentX        =   2990
       _ExtentY        =   661
-      Caption         =   "应用(&A)"
+      Caption         =   "Apply(&A)"
       BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
-         Name            =   "宋体"
+         Name            =   "Courier New"
          Size            =   9
-         Charset         =   134
+         Charset         =   0
          Weight          =   400
          Underline       =   0   'False
          Italic          =   0   'False
@@ -75,16 +84,16 @@ Begin VB.Form frmOption
    Begin TkinterDesigner.xpcmdbutton cmdPythonExe 
       Height          =   255
       Left            =   7080
-      TabIndex        =   8
+      TabIndex        =   2
       Top             =   120
-      Width           =   495
-      _ExtentX        =   873
+      Width           =   735
+      _ExtentX        =   1296
       _ExtentY        =   450
       Caption         =   "..."
       BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
-         Name            =   "宋体"
+         Name            =   "Courier New"
          Size            =   9
-         Charset         =   134
+         Charset         =   0
          Weight          =   400
          Underline       =   0   'False
          Italic          =   0   'False
@@ -92,74 +101,14 @@ Begin VB.Form frmOption
       EndProperty
    End
    Begin VB.ComboBox cmbPythonExe 
-      Height          =   300
+      Height          =   345
       Left            =   1440
       TabIndex        =   1
       Top             =   120
       Width           =   5535
    End
-   Begin VB.PictureBox picOptions 
-      BorderStyle     =   0  'None
-      Height          =   3780
-      Index           =   3
-      Left            =   -20000
-      ScaleHeight     =   3780
-      ScaleWidth      =   5685
-      TabIndex        =   4
-      TabStop         =   0   'False
-      Top             =   480
-      Width           =   5685
-      Begin VB.Frame fraSample4 
-         Caption         =   "示例 4"
-         Height          =   1785
-         Left            =   2100
-         TabIndex        =   7
-         Top             =   840
-         Width           =   2055
-      End
-   End
-   Begin VB.PictureBox picOptions 
-      BorderStyle     =   0  'None
-      Height          =   3780
-      Index           =   2
-      Left            =   -20000
-      ScaleHeight     =   3780
-      ScaleWidth      =   5685
-      TabIndex        =   3
-      TabStop         =   0   'False
-      Top             =   480
-      Width           =   5685
-      Begin VB.Frame fraSample3 
-         Caption         =   "示例 3"
-         Height          =   1785
-         Left            =   1545
-         TabIndex        =   6
-         Top             =   675
-         Width           =   2055
-      End
-   End
-   Begin VB.PictureBox picOptions 
-      BorderStyle     =   0  'None
-      Height          =   3780
-      Index           =   1
-      Left            =   -20000
-      ScaleHeight     =   3780
-      ScaleWidth      =   5685
-      TabIndex        =   2
-      TabStop         =   0   'False
-      Top             =   480
-      Width           =   5685
-      Begin VB.Frame fraSample2 
-         Caption         =   "示例 2"
-         Height          =   1785
-         Left            =   645
-         TabIndex        =   5
-         Top             =   300
-         Width           =   2055
-      End
-   End
    Begin VB.Label lblPythonExe 
-      Caption         =   "Python主文件"
+      Caption         =   "Python EXE"
       Height          =   255
       Left            =   120
       TabIndex        =   0
@@ -195,11 +144,11 @@ Private Function ApplySetting() As Boolean
     sExe = Trim$(cmbPythonExe.Text)
     If Len(sExe) Then
         If Dir(sExe) = "" Then
-            MsgBox L_F("l_msgFileNotExist", "{0} 文件不存在！", sExe), vbInformation
+            MsgBox L_F("l_msgFileNotExist", "File '{0}' not exist!", sExe), vbInformation
             Exit Function
         End If
     Else
-        MsgBox L("l_msgFileFieldNull", "文件不能为空！"), vbInformation
+        MsgBox L("l_msgFileFieldNull", "File can't be null."), vbInformation
         Exit Function
     End If
     
@@ -211,7 +160,7 @@ End Function
 
 Private Sub cmdPythonExe_Click()
     Dim sF As String
-    sF = FileDialog(Me, False, L("l_fdOpen", "请选择文件"), "python(w).exe|python*.exe", cmbPythonExe.Text)
+    sF = FileDialog(Me, False, L("l_fdOpen", "Please Choose file:"), "python(w).exe|python*.exe", cmbPythonExe.Text)
     If Len(sF) Then
         cmbPythonExe.Text = sF
     End If

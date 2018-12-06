@@ -138,21 +138,21 @@ Public Function Tips(sAttr As String) As String
     Tips = sAttr & vbCrLf
     Select Case sAttr:
     Case "from_":
-        Tips = Tips & L("l_TipFrom", "设置最小值。")
+        Tips = Tips & L("l_TipFrom", "A float or integer value that defines one end of the scale's range.")
     Case "to":
-        Tips = Tips & L("l_TipTo", "设置最大值。")
+        Tips = Tips & L("l_TipTo", "A float or integer value that defines one end of the scale's range.")
     Case "resolution":
-        Tips = Tips & L("l_TipResolution", "设置步距值。")
+        Tips = Tips & L("l_TipResolution", "The smallest increment of the scale's value.")
     Case "showvalue":
-        Tips = Tips & L("l_TipShowValue", "是否将当前值以文字形式显示在上方，默认为1。")
+        Tips = Tips & L("l_TipShowValue", "The value of the scale is displayed in text form by the slider when set to 1(default).")
     Case "digits":
-        Tips = Tips & L("l_TipDigits", "控制浮点数的显示位数。")
+        Tips = Tips & L("l_TipDigits", "How many digits to use for display.")
     Case "sliderlength":
-        Tips = Tips & L("l_TipSliderLen", "滑动指示块的长度，默认为30像素。")
+        Tips = Tips & L("l_TipSliderLen", "Normally the slider is 30 pixels along the length of the scale. You can change the value.")
     Case "sliderrelief":
-        Tips = Tips & L("l_TipSliderRelief", "滑动指示块的外观效果，可选值有：FLAT, GROOVE, RAISED, RIDGE, SOLID, SUNKEN。")
+        Tips = Tips & L("l_TipSliderRelief", "Relief of the slider. They are: FLAT, GROOVE, RAISED, RIDGE, SOLID, SUNKEN")
     Case "tickinterval":
-        Tips = Tips & L("l_TipTickInterval", "滑动槽中是否显示周期定位点，默认不显示，如果要显示，这个值设置为多少步长一个点，可以为小数。")
+        Tips = Tips & L("l_TipTickInterval", "To display periodic scale values, set this option to a number, and ticks will be displayed on multiples of that value.")
     Case Else:
         Tips = m_Base.Tips(sAttr)
     End Select
@@ -247,7 +247,7 @@ Public Function Deserializer(vSer As clsSerialization)
 End Function
 
 Public Property Get Description() As String
-    Description = L("l_DescScale", "滑动条对象，对应到Tkinter的Scale控件。")
+    Description = L("l_DescScale", "Scale widget.")
 End Property
 
 Public Property Let ScaleMode(nV As Long)

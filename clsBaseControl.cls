@@ -55,7 +55,7 @@ Public Sub toStringStructure(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBu
             If Not sOut.ExistString(Space(4) & Dic("variable") & " = StringVar()") Then
                 sOut.Append Space(4) & Dic("variable") & " = StringVar()"
             End If
-        ElseIf m_Type = "Checkbutton" Then '单选按钮的variable使用IntVar比较好
+        ElseIf m_Type = "Checkbutton" Then '多选按钮的variable使用IntVar比较好
             sOut.Append Space(4) & Dic("variable") & " = IntVar(value=" & m_Value & ")"
         Else
             sOut.Append Space(4) & Dic("variable") & " = StringVar(value=" & U(m_Value) & ")"
@@ -73,10 +73,10 @@ Public Sub toStringStructure(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBu
     End If
     
     If Len(Dic("columns")) Then
-        sOut.Append Space(4) & Dic("columns") & " = []  " & L("l_cmtTodoCols", "#TODO在这里添加标题列表，第一列固定为树形显示")
+        sOut.Append Space(4) & Dic("columns") & " = []  " & L("l_cmtTodoCols", "#TODO Add list of titles here, first column fixed for tree view.")
     End If
     If Len(Dic("displaycolumns")) And InStr(1, Dic("displaycolumns"), "#all") <= 0 Then
-        sOut.Append Space(4) & Dic("displaycolumns") & "[]    " & L("l_cmtTodoDisCols", "#TODO在这里添加显示标题列表，第一列固定为树形显示")
+        sOut.Append Space(4) & Dic("displaycolumns") & "[]    " & L("l_cmtTodoDisCols", "#TODO Add list of titles will be displayed, first column fixed for tree view.")
     End If
     
     '组合框将displayrows转换为height属性
@@ -104,6 +104,22 @@ Public Sub toStringStructure(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBu
     If Len(Dic("textvariable")) Then
         sOut.Append Space(4) & m_Name & ".setText = lambda x: " & Dic("textvariable") & ".set(x)"
         sOut.Append Space(4) & m_Name & ".text = lambda : " & Dic("textvariable") & ".get()"
+    End If
+    
+    '如果需要，给实例添加几个简单的“封装方法”方便访问variable，比如CheckButton的setValue/value方法
+    If Len(Dic("variable")) Then
+        If m_Type = "Radiobutton" Then '单选按钮
+            If Len(Dic("value")) Then
+                sOut.Append Space(4) & m_Name & ".setValue = lambda x: " & Dic("variable") & ".set(" & Dic("value") & " if x else '')"
+                sOut.Append Space(4) & m_Name & ".value = lambda : 1 if " & Dic("variable") & ".get() == " & Dic("value") & " else 0"
+            Else
+                sOut.Append Space(4) & m_Name & ".setValue = lambda x: " & Dic("variable") & ".set(x)"
+                sOut.Append Space(4) & m_Name & ".value = lambda : " & Dic("variable") & ".get()"
+            End If
+        ElseIf m_Type = "Checkbutton" Then  '多选按钮
+            sOut.Append Space(4) & m_Name & ".setValue = lambda x: self." & Dic("variable") & ".set(x)"
+            sOut.Append Space(4) & m_Name & ".value = lambda : self." & Dic("variable") & ".get()"
+        End If
     End If
     
     '放置控件
@@ -209,7 +225,7 @@ Public Sub toStringOOP(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder,
             If Not sOut.ExistString(Space(8) & "self." & Dic("variable") & " = StringVar()") Then
                 sOut.Append Space(8) & "self." & Dic("variable") & " = StringVar()"
             End If
-        ElseIf m_Type = "Checkbutton" Then '单选按钮的variable使用IntVar比较好
+        ElseIf m_Type = "Checkbutton" Then '多选按钮的variable使用IntVar比较好
             sOut.Append Space(8) & "self." & Dic("variable") & " = IntVar(value=" & m_Value & ")"
         Else
             sOut.Append Space(8) & "self." & Dic("variable") & " = StringVar(value=" & U(m_Value) & ")"
@@ -227,10 +243,10 @@ Public Sub toStringOOP(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder,
     End If
     
     If Len(Dic("columns")) Then
-        sOut.Append Space(8) & "self." & Dic("columns") & " = []    " & L("l_cmtTodoCols", "#TODO在这里添加标题列表，第一列固定为树形显示")
+        sOut.Append Space(8) & "self." & Dic("columns") & " = []    " & L("l_cmtTodoCols", "#TODO Add list of titles here, first column fixed for tree view.")
     End If
     If Len(Dic("displaycolumns")) And InStr(1, Dic("displaycolumns"), "#all") <= 0 Then
-        sOut.Append Space(8) & "self." & Dic("displaycolumns") & " = []    " & L("l_cmtTodoDisCols", "#TODO在这里添加显示标题列表，第一列固定为树形显示")
+        sOut.Append Space(8) & "self." & Dic("displaycolumns") & " = []    " & L("l_cmtTodoDisCols", "#TODO Add list of titles will be displayed, first column fixed for tree view.")
     End If
     
     '组合框将displayrows转换为height属性
@@ -254,10 +270,26 @@ Public Sub toStringOOP(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder,
     '创建本控件实例
     sOut.Append Space(8) & "self." & m_Name & " = " & m_Type & "(self." & m_Parent & IIf(Len(extra), ", ", "") & extra & ")"
     
-    '如果需要，给实例添加几个简单的“封装方法”方便访问variable，比如Entry的setText/text方法
+    '如果需要，给实例添加几个简单的“封装方法”方便访问textvariable，比如Entry的setText/text方法
     If Len(Dic("textvariable")) Then
         sOut.Append Space(8) & "self." & m_Name & ".setText = lambda x: self." & Dic("textvariable") & ".set(x)"
         sOut.Append Space(8) & "self." & m_Name & ".text = lambda : self." & Dic("textvariable") & ".get()"
+    End If
+    
+    '如果需要，给实例添加几个简单的“封装方法”方便访问variable，比如CheckButton的setValue/value方法
+    If Len(Dic("variable")) Then
+        If m_Type = "Radiobutton" Then '单选按钮
+            If Len(Dic("value")) Then
+                sOut.Append Space(8) & "self." & m_Name & ".setValue = lambda x: self." & Dic("variable") & ".set(" & Dic("value") & " if x else '')"
+                sOut.Append Space(8) & "self." & m_Name & ".value = lambda : 1 if self." & Dic("variable") & ".get() == " & Dic("value") & " else 0"
+            Else
+                sOut.Append Space(8) & "self." & m_Name & ".setValue = lambda x: self." & Dic("variable") & ".set(x)"
+                sOut.Append Space(8) & "self." & m_Name & ".value = lambda : self." & Dic("variable") & ".get()"
+            End If
+        ElseIf m_Type = "Checkbutton" Then  '多选按钮
+            sOut.Append Space(8) & "self." & m_Name & ".setValue = lambda x: self." & Dic("variable") & ".set(x)"
+            sOut.Append Space(8) & "self." & m_Name & ".value = lambda : self." & Dic("variable") & ".get()"
+        End If
     End If
     
     '放置控件
@@ -584,81 +616,81 @@ Public Function Tips(sAttr As String) As String
     Tips = sAttr & vbCrLf
     Select Case sAttr:
     Case "text", "label":
-        Tips = Tips & L("l_TipText", "控件的显示文本。")
+        Tips = Tips & L("l_TipText", "Text displayed on the widget.")
     Case "x", "y":
-        Tips = Tips & L("l_TipXY", "控件的放置位置。")
+        Tips = Tips & L("l_TipXY", "Position of widget.")
     Case "width":
-        Tips = Tips & L("l_TipWidth", "控件的宽度。")
+        Tips = Tips & L("l_TipWidth", "Width of widget.")
     Case "height":
-        Tips = Tips & L("l_TipHeight", "控件的高度。")
+        Tips = Tips & L("l_TipHeight", "Height of widget.")
     Case "relx", "rely":
-        Tips = Tips & L("l_TipRelXY", "控件相对于父窗口的位置，值范围为0-1。")
+        Tips = Tips & L("l_TipRelXY", "Relative position of widget. value between 0 and 1.")
     Case "relwidth":
-        Tips = Tips & L("l_TipRelWidth", "控件相对于父窗口的宽度，值范围为0-1。")
+        Tips = Tips & L("l_TipRelWidth", "Relative width of widget. value between 0 and 1.")
     Case "relheight":
-        Tips = Tips & L("l_TipRelHeight", "控件相对于父窗口的高度，值范围为0-1。")
+        Tips = Tips & L("l_TipRelHeight", "Relative height of widget. value between 0 and 1.")
     Case "fg":
-        Tips = Tips & L("l_TipFg", "前景色，格式为#RGB或red等单词，比如'#FFEA00'。")
+        Tips = Tips & L("l_TipFg", "Normal foreground (text) color. format is #RRGGBB, for example : #FF0000.")
     Case "bg":
-        Tips = Tips & L("l_TipBg", "背景色，格式为#RGB或red等单词，比如'#FFEA00'。")
+        Tips = Tips & L("l_TipBg", "Normal background color. format is #RRGGBB, for example : #FF0000.")
     Case "bd":
-        Tips = Tips & L("l_TipBd", "边框宽度，单位为像素。")
+        Tips = Tips & L("l_TipBd", "Width of the border around the outside of widget.")
     Case "anchor":
-        Tips = Tips & L("l_TipAnchor", "控件内文字的对齐方式，可能值为：\n'w'|'n'|'s'|'e'|'nw'|'ne'|'sw'|'se'|'center'.")
+        Tips = Tips & L("l_TipAnchor", "Controls where the text is positioned.\nThey are: 'w'|'n'|'s'|'e'|'nw'|'ne'|'sw'|'se'|'center'.")
     Case "relief":
-        Tips = Tips & L("l_TipRelief", "外观效果，可选值有：FLAT, GROOVE, RAISED, RIDGE, SOLID, SUNKEN。")
+        Tips = Tips & L("l_TipRelief", "Refers to certain simulated 3-D effects around the outside of widget.\nThey are: FLAT, GROOVE, RAISED, RIDGE, SOLID, SUNKEN.")
     Case "overrelief":
-        Tips = Tips & L("l_TipOverRelief", "鼠标悬停在控件上的外观效果，可选值有：FLAT, GROOVE, RAISED, RIDGE, SOLID, SUNKEN。")
+        Tips = Tips & L("l_TipOverRelief", "The relief style to be used while the mouse is on the widget.\nThey are: FLAT, GROOVE, RAISED, RIDGE, SOLID, SUNKEN.")
     Case "takefocus":
-        Tips = Tips & L("l_TipTakeFocus", "是否允许TAB选择控件。设置为1为允许，设置为0则TAB跳过此控件。")
+        Tips = Tips & L("l_TipTakeFocus", "Normally, keyboard focus does visit widget.\nSet to zero to prevent focus from visiting the widget.")
     Case "state":
-        Tips = Tips & L("l_TipState", "控件状态，可选值有：'normal', 'disabled'")
+        Tips = Tips & L("l_TipState", "State of the widget. They are 'normal', 'disabled'")
     Case "underline":
-        Tips = Tips & L("l_TipUnderline", "在哪个字母上添加下划线，做为快捷方式的表示，第一个字母索引为0。")
+        Tips = Tips & L("l_TipUnderline", "If nonnegative, the corresponding text character will be underlined, index of first char is 0.")
     Case "justify":
-        Tips = Tips & L("l_TipJustify", "控制多行字符的对齐方式，可能值为：" & vbCrLf & "left, right, center。")
+        Tips = Tips & L("l_TipJustify", "How the (Multiline) text are justified: 'left','right','center'")
     Case "padding":
-        Tips = Tips & L("l_TipPadding", "控件内部额外间距，一般不需要设置。如果需要设置，请提供'左 上 右 下'四个值，或三个值'左 上 右'(下=上)，两个值'左 上'(右=左,下=上)，一个值'左'(上=下=右=左)。")
+        Tips = Tips & L("l_TipPadding", "Specifies the amount of extra space to add around the outside of the widget.")
     Case "orient":
-        Tips = Tips & L("l_TipOrient", "控件方向类型，全大写不用括号，小写则需要括号括起来，可选值有：'horizontal', 'vertical'。")
+        Tips = Tips & L("l_TipOrient", "One of 'horizontal' or 'vertical'. Specifies the orientation of the widget.")
     Case "cursor":
-        Tips = Tips & L("l_TipCursor", "鼠标指针。可以使用tk内置的指针，或在文件名前增加一个@符号使用外部指针，如'@custom.cur'。")
+        Tips = Tips & L("l_TipCursor", "cursor of widget. Choose a curor embeddin in tk, or add a prefix '@' in a filename to use a custom cursor, for example '@custom.cur'.")
     Case "variable":
-        Tips = Tips & L("l_TipVariable", "控件值和一个变量绑定，通过变量可以获取或设置控件的值。\n如果需要这个特性，这个属性设置为变量名。")
+        Tips = Tips & L("l_TipVariable", "The control variable that tracks the current state/value of the widget.")
     Case "textvariable":
-        Tips = Tips & L("l_TipTextVariable", "将显示文本和一个变量绑定，变量变化时控件的显示文本将改变，反正亦然。\n如果需要这个特性，这个属性设置为变量名。")
+        Tips = Tips & L("l_TipTextVariable", "The control variable that tracks the current text displayed of the widget.")
     Case "command":
-        Tips = Tips & L("l_TipCommand", "触发事件处理函数。触发不带参数。也可以设置为top.destroy等tk方法或使用lambda函数。")
+        Tips = Tips & L("l_TipCommand", "A procedure to be called when the widget is activated or clicked. can be set to 'top.destroy' and other method of tk or lambda function too.")
     Case "bindcommand":
-        Tips = Tips & L("l_TipBindCommand", "使用bind()绑定的事件处理列表，绑定多个则使用逗号分隔(比如：<Control-C>,<F8>,<Alt-A>)。\n双击文本框查看详情。")
+        Tips = Tips & L("l_TipBindCommand", "Used to attach events binding to a widget. for example:<Control-C>,<F8>,<Alt-A>.")
     Case "font":
-        Tips = Tips & L("l_TipFont", "文字字体属性。是一个元组。\n元组前两个元素为：字体名,字体大小,之后的几个元素可选：'bold', 'italic', 'underline', 'overstrike'")
+        Tips = Tips & L("l_TipFont", "Font to be used for widget. is a tuple, the first two elements is name, size, the following are some of 'bold', 'italic', 'underline', 'overstrike'.")
     Case "xscrollcommand":
-        Tips = Tips & L("l_TipXScrlCmd", "水平滚动事件处理，如果需要水平滚动，设置这个值为水平滚动条的set方法。")
+        Tips = Tips & L("l_TipXScrlCmd", "If widget is scrollable, this attribute should be the .set() method of the horizontal scrollbar.")
     Case "yscrollcommand":
-        Tips = Tips & L("l_TipYScrlCmd", "上下滚动事件处理，如果需要上下滚动，设置这个值为垂直滚动条的set方法。")
+        Tips = Tips & L("l_TipYScrlCmd", "If widget is scrollable, this attribute should be the .set() method of the vertical scrollbar.")
     Case "xscrollincrement":
-        Tips = Tips & L("l_TipXScrlIncre", "水平每次滚动增量，默认为0，可以随意滚动，可以设置为一个大于零的整数。")
+        Tips = Tips & L("l_TipXScrlIncre", "Default is 0, If set a positive value, widget can be positioned only on multiples of that distance.")
     Case "yscrollincrement":
-        Tips = Tips & L("l_TipYScrlIncre", "上下每次滚动增量，默认为0，可以随意滚动，可以设置为一个大于零的整数。")
+        Tips = Tips & L("l_TipYScrlIncre", "Default is 0, If set a positive value, widget can be positioned only on multiples of that distance.")
     Case "scrollregion"
-        Tips = Tips & L("l_TipScrlregion", "控件滚动范围（可以理解为控件实际上有多大），格式：(w,n,e,s)。\n如果要设置Canvas可以滚动，则必须设置此属性。")
+        Tips = Tips & L("l_TipScrlregion", "A tuple (w, n, e, s) that defnes over how large an area the canvas can be scrolled.")
     Case "confine"
-        Tips = Tips & L("l_TipConfine", "是否限制在scrollregion内滚动，默认为true。")
+        Tips = Tips & L("l_TipConfine", "If true (the default), the canvas cannot be scrolled outside of the scrollregion.")
     Case "highlightbackground"
-        Tips = Tips & L("l_TipHlbg", "控件失去焦点时边框的颜色。")
+        Tips = Tips & L("l_TipHlbg", "Color of the focus highlight when the widget does not have focus.")
     Case "highlightcolor"
-        Tips = Tips & L("l_TipHlColor", "控件选中状态时边框的颜色。")
+        Tips = Tips & L("l_TipHlColor", "Color shown in the focus highlight.")
     Case "highlightthickness"
-        Tips = Tips & L("l_TipHlThickness", "焦点状态边框宽度，默认为1。")
+        Tips = Tips & L("l_TipHlThickness", "Thickness of the focus highlight. The default value is 1.")
     Case "selectbackground"
-        Tips = Tips & L("l_TipSltbg", "控件内选中项的背景色。")
+        Tips = Tips & L("l_TipSltbg", "The background color to use displaying selected items.")
     Case "selectborderwidth"
-        Tips = Tips & L("l_TipSltbd", "控件内选中项的边框宽度。")
+        Tips = Tips & L("l_TipSltbd", "The width of the border to use around selected items.")
     Case "selectforeground"
-        Tips = Tips & L("l_TipSltfg", "控件内选中项的前景色。")
+        Tips = Tips & L("l_TipSltfg", "The foreground color to use displaying selected items.")
     Case Else:
-        Tips = Tips & L("l_TipUnknown", "未知属性。")
+        Tips = Tips & L("l_TipUnknown", "Unknown Attribute")
     End Select
     
 End Function

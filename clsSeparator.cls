@@ -207,7 +207,7 @@ Public Function Deserializer(vSer As clsSerialization)
 End Function
 
 Public Property Get Description() As String
-    Description = L("l_DescSeparator", "分隔条对象，对应到Tkinter.ttk的Separator控件，只支持水平线和垂直线。")
+    Description = L("l_DescSeparator", "Separator widget. It only supports horizontal or vertical style.")
 End Property
 
 Public Property Let ScaleMode(nV As Long)

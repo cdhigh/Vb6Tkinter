@@ -104,7 +104,7 @@ End Function
 Public Function Tips(sAttr As String) As String
     
     If sAttr = "labelanchor" Then
-        Tips = sAttr & vbCrLf & L("l_TipLblAnchor", "边框上文字的位置，默认为左上角。\n可选值有：'nw','wn','en','n','ne','w','e','ws','es','sw','s','se'")
+        Tips = sAttr & vbCrLf & L("l_TipLblAnchor", "Specifies the position of the label on the widget's border.\nThey are 'nw','wn','en','n','ne','w','e','ws','es','sw','s','se'")
     Else
         Tips = m_Base.Tips(sAttr)
     End If
@@ -210,7 +210,7 @@ Public Function Deserializer(vSer As clsSerialization)
 End Function
 
 Public Property Get Description() As String
-    Description = L("l_DescLabelFrame", "框架对象，可以作为其他控件的容器，对应到Tkinter的LabelFrame控件或Frame。")
+    Description = L("l_DescLabelFrame", "LabelFrame or Frame widget.")
 End Property
 
 Public Property Let ScaleMode(nV As Long)

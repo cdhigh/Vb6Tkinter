@@ -206,7 +206,7 @@ Public Function Deserializer(vSer As clsSerialization)
 End Function
 
 Public Property Get Description() As String
-    Description = L("l_DescCheckbutton", "多选框对象，对应到Tkinter的Checkbutton控件。")
+    Description = L("l_DescCheckbutton", "Checkbutton widget.")
 End Property
 
 Public Property Let ScaleMode(nV As Long)

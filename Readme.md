@@ -42,24 +42,23 @@
 10. 一般的GUI框架都会将UI部分和逻辑代码部分分别放在不同的文件中，在逻辑代码文件中导入UI文件，实现修改UI不影响逻辑代码。因为对于实现简单的程序来说，我偏爱单文件，所以我将UI类和逻辑代码类都放在同一个文件中，在修改界面后，你可以直接覆盖对应的Application_ui类即可实现界面的变更，不过如果增加了新的事件回调函数，需要在子类Application中增加才行。
 
 # 目前支持的控件列表
-1. Label
-    标签条在VB和Python中基本一样。如果不启用ttk，则在文本中插入\n来换行，
-    如果启用了ttk，则只支持单行文本(多行可以使用Message控件实现)。
-2. TextBox
+1. Label    
+    标签条在VB和Python中基本一样。可以在文本中插入\n来换行，如果启用ttk，还可以设置wraplength属性。
+2. TextBox    
     Python文本框有两种：Entry和Text，如果VB的TextBox的MultiLine=False，则
     生成Entry，否则生成Text。
-3. Frame
+3. Frame    
     对应Python的LabelFrame控件，做为其他控件的容器，或做为界面元素视觉分类。
-4. CommandButton
+4. CommandButton    
     对应Python的Button，没有太多区别。
     为了代码简洁，窗体的退出按钮可以设置Cancel属性为True，然后程序自动生成
     对应Tkinter的destroy回调，这样就不需要再实现一个回调函数。
     在VB里面字母前增加一个"&"符号可以直接绑定一个快捷键Alt+对应字母，
     TkinterDesigner也支持此设置，自动生成对应的事件绑定代码。
     其他控件比如CheckBox等有"标题"属性的控件一样如此处理。
-5. CheckBox
+5. CheckBox    
     多选按钮对应Python的Checkbutton。
-6. OptionButton
+6. OptionButton    
     单选按钮对应Python的Radiobutton。
     tkinter中Radiobutton的分组方法和VB有些不一样（分组意味着组内的单选按钮自动
     互斥，用户选择一个则其他的自动取消）。在VB中，如果你使用Frame将几个
@@ -70,49 +69,49 @@
     在对应的Radiobutton被选择后，variable变量自动设置为对应的value值，读取即可
     知道哪个Radiobutton被选中了，反之设置variable变量会导致对应的Radiobutton
     被选中。
-7. ComboBox
+7. ComboBox    
     组合框在Tkinter中没有对应的控件，比较类似的只有OptionMenu，类似ComboBox
     的Style=2 (Dropdown List)时的表现，一个下拉列表，只能在列表中选择一个值，
     不能直接输入。所以建议在VB的ComboBox中写下所有的下拉列表值。
     如果启用了TTK主题扩展库支持，则直接对应到TTK的Combobox，外形和行为基本
     一致。
-8. ListBox
+8. ListBox    
     列表框对应Python的Listbox，行为也类似，可以在设计阶段设置初始列表。
     如果需要滚动，则在适当位置创建滚动条，如果滚动条紧靠着列表框的右边或下边，
     并且长度(水平滚动条)或高度(垂直滚动条)差不多，则滚动条和列表框自动绑定，
     如果没有自动绑定，则可以在Addin界面选择其xscrollcommand或yscrollcommand
     属性为对应滚动条的.set方法。
-9. HScrollBar, VScrollBar
+9. HScrollBar, VScrollBar    
     滚动条在Python中为Scrollbar，通过设置orient来控制水平还是垂直。
-10. Slider
+10. Slider    
     类似对应Python中的Scale。
-11. PictureBox
+11. PictureBox    
     简单对应到Python中的Canvas，用做其他控件的容器或画图容器使用。
     如果需要滚动，则在适当位置创建滚动条，如果滚动条紧靠着图像框的右边或下边，
     并且长度(水平滚动条)或高度(垂直滚动条)差不多，则滚动条和图像框自动绑定，
     如果没有自动绑定，可以在Addin界面选择其xscrollcommand和yscrollcommand
     属性为对应滚动条的.set方法。
-12. Menu
+12. Menu    
     可以使用VB的菜单编辑器来设计Python的菜单。
     在VB中的菜单标题为"-"是分隔条。
     也可以在正常的菜单标题中增加(&+字母)的方式添加Alt快捷键。
     除Alt快捷快捷键外，在VB菜单编辑器中选择菜单对应的快捷键则会直接显示快捷键
     信息在菜单标题后面，并自动注册对应的bind命令。
-13. Line
+13. Line    
     可以用于组织复杂界面，仅支持水平或垂直线。
     
 	> 以下的控件需要在VB的'控件工具箱'中按右键添加'部件'，选择“Microsoft Windows Common Controls 6.0”
 	
-14. ProgressBar
+14. ProgressBar    
     对应到Python的Progressbar，需要启用TTK主题扩展（默认）
-15. TreeView
+15. TreeView    
     对应到Python的Treeview，树形显示控件，可以选择是否显示标题行,
     需要启用TTK主题扩展（默认）
     如果需要滚动，则在适当位置创建滚动条，如果滚动条紧靠着TreeView的右边或下边，
     并且长度(水平滚动条)或高度(垂直滚动条)差不多，则滚动条和TreeView自动绑定，
     如果没有自动绑定，可以在Addin界面选择其xscrollcommand和yscrollcommand
     属性为对应滚动条的.set方法。
-16. TabStrip
+16. TabStrip    
     选项卡控件，对应到Python的Notebook，需要启用TTK主题扩展（默认）。
     如果要布局各个页面内的控件，按以下步骤：
     1.每个选项页对应一个Frame或PictureBox，命名为：TabStrip的名字
@@ -121,8 +120,8 @@
     2.然后在PictureBox/Frame内摆放你需要的其他控件，生成代码后此容器内自动添加
     到对应的选项页，TkinterDesigner会在后台为您做这一切。
     标签页对应的PictureBox/Frame可以放置在窗体的可视范围外，也就是说设计好
-    对应的选项页后，缩小IDE中的窗体为你需要的大小。
-    注意：
+    对应的选项页后，缩小IDE中的窗体为你需要的大小。    
+    注意：    
     * 你需要使用相对坐标，PictureBox或Frame容器的大小请和TabStrip内部大小一致或
     接近，否则选项页内的控件将会通过拉伸或收缩来适配可伸缩来适配可用空间，这样有些
     控件看起来会比较怪。如果使用绝对坐标，则PictureBox/Frame可以不用和TabStrip
@@ -131,7 +130,7 @@
     所以还是建议如果有TabStrip控件的话，使用绝对坐标。
     * Frame和PictureBox均可作为容器，如果使用Frame作为容器，则其标题可以作为选项页
     标题，如果你没有设置选项页标题的话。（选项卡控件的标题设置优先）
-17. CommonDialog
+17. CommonDialog    
     这个控件也算支持，如果VB窗体中有这个控件，则在Python代码中导入
     filedialog、simpledialog、colorchooser这三个模块，这三个模块提供简单的
     文件选择、输入框、颜色选择对话框功能。
@@ -159,9 +158,8 @@
   ttk主题扩展看起来很漂亮，在不同操作系统下界面呈现为本地化风格，建议使用，    
   只是要注意以下几个ttk的BUG：    
 1. TTK的Entry和Combobox控件背景色设置无效（可以设置，不报错，但是界面不变）。
-2. tkinter的Label控件可以通过插入'\n'来换行，但是ttk的Label只能通过wraplength属性来换行。
-3. LabelFrame和Notebook控件的字体单独设置无效，但是可以设置ttk的全局字体属性来改变，比如：self.style.configure('.', font=('宋体',12))。
-4. Python 2.7.3附带的ttk中的Treeview字体设置无效，但3.2.3及之后的的Treeview的字体设置有效。
+2. LabelFrame和Notebook控件的字体单独设置无效，但是可以设置ttk的全局字体属性来改变，比如：self.style.configure('.', font=('宋体',12))。
+3. Python 2.7.3附带的ttk中的Treeview字体设置无效，但3.2.3及之后的的Treeview的字体设置有效。
 
 # 版本历史
 *  v1.6.1

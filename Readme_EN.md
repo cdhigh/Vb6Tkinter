@@ -23,45 +23,45 @@ The addin will generate python code of GUI framework for you. the only thing you
 5. Enjoy TkinterDesigner.
 
 # List of VB Controls Supported
-1. Label
+1. Label    
     Has same appearance and behavior in Tkinter.
-2. TextBox
+2. TextBox    
     If the property MultiLine=False, the addin generate code for widget
     'Entry' of Tkinter, otherwise for widget 'Text'.
-3. Frame
+3. Frame    
     Similar to widget LabelFrame of Tkinter. It can be container of other
     widget.
-4. CommandButton
+4. CommandButton    
     It represent the widget Button of Tkinter.
     You can also add a '&' befor a corresponding letter to make a keyboard
     shortcut like 'Alt-letter', the addin generate code for shortcurts too.
-5. CheckBox
+5. CheckBox    
     Similar to widget Checkbutton.
-6. OptionButton
+6. OptionButton    
     Similar to widget Radiobutton.
-7. ComboBox
+7. ComboBox    
     If the menu 'Use TTK library' checked, it translate to widget Combobox
     of TTK, otherwise, it translate to widget OptionMenu of Tkinter.
-8. ListBox
+8. ListBox    
     Similar to widget Listbox of tkinter. you can add list of text in IDE.
-9. HScrollBar, VScrollBar
+9. HScrollBar, VScrollBar    
     The widget Scrollbar of tkinter.
-10. Slider
+10. Slider    
     Similar to widget Scale of tkinter.
-11. PictureBox
+11. PictureBox    
     It tranlate to Canvas.
-12. Menu
+12. Menu    
     Has same appearance and behavior in Tkinter.
     you can create a separator by setting the caption of menuitem to '-'.
     Add a keyboard shortcut by using format of '&+letter'.
     
 > Adding the component 'Microsoft Windows Common Controls 6.0' to toolbox of VB IDE to support the other controls.
 
-13. ProgressBar
+13. ProgressBar    
     Similar to widget Progressbar of TTK library.
-14. TreeView
+14. TreeView    
     Similar to widget Treeview of TTK library.
-15. TabStrip
+15. TabStrip    
     Similar to widget Notebook of TTK libray.
     If you want to design the tabs of Notebook in VB IDE, please use a
     PictureBox or Frame as container for widgets, you have to name the 
@@ -71,7 +71,7 @@ The addin will generate python code of GUI framework for you. the only thing you
     Create a PictureBox named 'TabStrip1\__Tab1' as container for Tab1 of 
     Notebook widget.
 
-16. CommonDialog
+16. CommonDialog    
     if the form has this control, then the addin will create code for 
     import modules filedialog, simpledialog, colorchooser.    
 

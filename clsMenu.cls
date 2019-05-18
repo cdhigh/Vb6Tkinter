@@ -106,6 +106,16 @@ Public Function GetAttrValueList(sAttr As String, ByRef sa() As String) As Long
     End If
 End Function
 
+'判断此控件是否存在对应的属性
+Public Function hasAttribute(sAttr As String) As Boolean
+    hasAttribute = m_Base.hasAttribute(sAttr)
+End Function
+
+'获取此控件对应的当前设定的属性值，没有则返回空串
+Public Function GetAttrCurrentValue(sAttr As String) As String
+    GetAttrCurrentValue = m_Base.GetAttrCurrentValue(sAttr)
+End Function
+
 Public Function Tips(sAttr As String) As String
     
     If sAttr = "tearoff" Then

@@ -74,6 +74,7 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
     m_dicTotal("sliderrelief") = "RAISED"
     m_dicTotal("tickinterval") = 0
     m_dicTotal("font") = ""
+    m_dicTotal("tooltip") = o.Properties("ToolTipText")
     m_dicTotal("takefocus") = IIf(o.Properties("TabStop"), 1, 0)
     m_dicTotal("cursor") = m_Base.GetCursorName(o.Properties("MousePointer"))
     m_dicTotal("command") = o.Properties("Name") & "_Cmd"
@@ -94,6 +95,7 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
     m_Base("from_") = m_dicTotal("from_")
     m_Base("to") = m_dicTotal("to")
     m_Base("resolution") = m_dicTotal("resolution")
+    If m_dicTotal("tooltip") <> "" Then m_Base("tooltip") = m_dicTotal("tooltip")
     If m_dicTotal("takefocus") = 0 Then m_Base("takefocus") = m_dicTotal("takefocus")
     If m_dicTotal("cursor") <> "" Then m_Base("cursor") = m_dicTotal("cursor")
     If m_dicTotal("bindcommand") <> "" Then m_Base("bindcommand") = m_dicTotal("bindcommand")
@@ -132,6 +134,16 @@ Public Function GetAttrValueList(sAttr As String, ByRef sa() As String) As Long
     Else
         GetAttrValueList = m_Base.GetAttrValueList(sAttr, sa)
     End If
+End Function
+
+'判断此控件是否存在对应的属性
+Public Function hasAttribute(sAttr As String) As Boolean
+    hasAttribute = m_Base.hasAttribute(sAttr)
+End Function
+
+'获取此控件对应的当前设定的属性值，没有则返回空串
+Public Function GetAttrCurrentValue(sAttr As String) As String
+    GetAttrCurrentValue = m_Base.GetAttrCurrentValue(sAttr)
 End Function
 
 Public Function Tips(sAttr As String) As String

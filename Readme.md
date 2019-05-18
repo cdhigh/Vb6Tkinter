@@ -1,4 +1,4 @@
-﻿Readme of english version refers to [Readme_EN.md](https://github.com/cdhigh/tkinter-designer/blob/master/Readme_EN.md)
+Readme of english version refers to [Readme_EN.md](https://github.com/cdhigh/tkinter-designer/blob/master/Readme_EN.md)
 --------------------------------
 # 简介
 这是一个VB6的ADDIN（外接程序），用于使用VB6开发工具直接拖放控件，直接可视化完成Python的TKinter的GUI布局和设计，可以在VB界面上设置控件的一些属性，最终自动生成必要的代码（包括回调函数框架），代码生成后仅需要在对应的回调函数中增加相应的逻辑功能代码即可。
@@ -12,7 +12,7 @@
 * 适用于界面不太复杂的小程序开发，界面复杂的还是适用wxPython/PyQt等框架吧。
 * 因为TKinter为Python标准库，使用TKinter完成的Python程序可以称为"绿色软件"，不需要目标机器上安装wxPython/PyQt等框架，只要有Python的机器就能运行。即使使用pyinstaller/cx_freeze等打包成exe，最终文件也不会很大。
 * 如果软件逻辑不是很复杂，通常一个*.py搞定，不像其他一些辅助框架，需要几个文件。    
-  > （如果不希望py直接解析运行时弹出黑漆漆的命令行窗口，后缀名请改为pyw）     
+  > （如果不希望py直接解释运行时弹出黑漆漆的命令行窗口，后缀名请改为pyw）     
 
 # 使用方法简介
 1. 首先注册此插件，可以使用自带的安装程序，或自己手动完成。   
@@ -139,10 +139,12 @@
 # 本应用对tkinter的扩展和"封装"
 1. tkinter没有Statusbar控件，所以我使用Label实现了一个简单的Statusbar，在VB窗体中添加Statusbar后会插入这部分实现代码。   
    （VB需要先添加“Microsoft Windows Common Controls 6.0”部件才有Statusbar）
-2. 隐藏反人类的TK控件设置和获取控件显示值的机制（textvariable），给Entry/Label/Button/Checkbutton/Radiobutton控件
+2. tkinter控件没有Tooltip(鼠标悬停提示)属性，所以我实现了一个简单的Tooltip类给tkinter控件加上Tooltip功能，设置VB控件的
+   ToolTipText属性即自动给对应的控件创建一个Tooltip类。ToolTipText支持自动换行，如果要手动控制换行，也可以使用\n。
+3. 隐藏反人类的TK控件设置和获取控件显示值的机制（textvariable），给Entry/Label/Button/Checkbutton/Radiobutton控件
    添加更符合直觉的setText()/text()方法，可以直接设置和获取其控件显示的文本值。    
    （CheckBCheckbutton/Radiobutton默认不添加，需要在tkinter-designer将textvariable打勾，因为很少需要运行时修改这两个控件的文本。）
-3. 同样类似第二条，给Checkbutton/Radiobutton添加setValue()/value()方法，参数为1/0。    
+4. 同样类似第二条，给Checkbutton/Radiobutton添加setValue()/value()方法，参数为1/0。    
    `self.Text1.setText('new text')`    
    `print(self.text())`    
    `print(self.Check1.value())`    
@@ -150,7 +152,7 @@
    `print(Option1.value())`   
 
 # 其他建议
-1. 不支持使用控件数组，界面可以显示，但是后面的同名控件名会覆盖前面定义的。
+1. 不支持使用控件数组，界面可以显示，但是后面的同名控件名会覆盖前面定义的，导致在代码中无法再和此控件互动。
 2. 窗体的ScaleMode建议保持默认值(vbTwips)，如果要设置为其他值，则Frame控件内就不要再放Frame控件了，否则其内部的控件布局错误。
 3. 如果需要简体汉字界面，则需要Language.lng文件在TkinterDesigner.dll同一目录。
 
@@ -162,6 +164,8 @@
 3. Python 2.7.3附带的ttk中的Treeview字体设置无效，但3.2.3及之后的的Treeview的字体设置有效。
 
 # 版本历史
+*  v1.6.2
+    1. 支持ToolTipText属性，实现鼠标悬停弹出提示框功能，tkiner没有Tooltip功能，自己实现了一个Tooltip类来支持。
 *  v1.6.1
     1. 给Checkbutton/Radiobutton添加setValue()/value()函数，参数为整型1/0。
 *  v1.6

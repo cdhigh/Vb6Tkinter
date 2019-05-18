@@ -78,9 +78,10 @@ The addin will generate python code of GUI framework for you. the only thing you
 # Extends to tkinter
 1. Added a Statusbar widget.  
    (Statusbar in component "Microsoft Windows Common Controls 6.0" in VB IDE)
-2. Added More intuitive setText()/text() methods to Entry/Label/Button/Checkbutton/Radiobutton.    
+2. Added a Tooltip class to implement a Tooltip hover box for almost all widgets, supports wrap automatic or wrap manual(using '\n').
+3. Added More intuitive setText()/text() methods to Entry/Label/Button/Checkbutton/Radiobutton.    
    (not apply to CheckBCheckbutton/Radiobutton by default, please select 'textvariable' in tkinter-designer.)
-3. Similar to 2, Added setValue()/value() to Checkbutton/Radiobutton, parameter is 1/0.   
+4. Similar to 2, Added setValue()/value() to Checkbutton/Radiobutton, parameter is 1/0.   
    `self.Text1.setText('new text')`    
    `print(self.text())`    
    `print(self.Check1.value())`    
@@ -88,6 +89,8 @@ The addin will generate python code of GUI framework for you. the only thing you
    `print(Option1.value())`    
 
 # History
+* v1.6.2
+    1. Added feature of Tooltip.
 * v1.6.1
     1. Added setValue()/value() to Checkbutton/Radiobutton.
 * v1.6

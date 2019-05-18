@@ -58,6 +58,23 @@ Public Function GetAttrValueList(sAttr As String, ByRef sa() As String) As Long
     End If
 End Function
 
+'判断此控件是否存在对应的属性
+Public Function hasAttribute(sAttr As String) As Boolean
+    If m_usettk Then
+        hasAttribute = m_Combobox.hasAttribute(sAttr)
+    Else
+        hasAttribute = m_OptionMenu.hasAttribute(sAttr)
+    End If
+End Function
+
+'获取此控件对应的当前设定的属性值，没有则返回空串
+Public Function GetAttrCurrentValue(sAttr As String) As String
+    If m_usettk Then
+        GetAttrCurrentValue = m_Combobox.GetAttrCurrentValue(sAttr)
+    Else
+        GetAttrCurrentValue = m_OptionMenu.GetAttrCurrentValue(sAttr)
+    End If
+End Function
 
 Public Function Tips(sAttr As String) As String
     If m_usettk Then

@@ -102,9 +102,15 @@ Public Function UnQuote(s As String) As String
     End If
 End Function
 
-'自动将字符串使用单引号括起来
+'自动将字符串使用单引号或双引号括起来
 Public Function Quote(s As String) As String
-    Quote = IIf(isQuoted(s), s, "'" & s & "'")
+    If isQuoted(s) Then
+        Quote = s
+    ElseIf InStr(1, s, "'") >= 1 Then '字符串里面有单引号，则使用双引号括起来
+        Quote = Chr$(34) & s & Chr$(34)
+    Else
+        Quote = "'" & s & "'"
+    End If
 End Function
 
 '直接去掉字符串的第一个字符和最后一个字符（假定为引号）

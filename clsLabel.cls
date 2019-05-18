@@ -46,6 +46,7 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
     m_dicTotal("relwidth") = Format(o.Properties("Width") / parentWidth, "0.###")
     m_dicTotal("relheight") = Format(o.Properties("Height") / parentHeight, "0.###")
     m_dicTotal("text") = Replace(o.Properties("Caption"), "&", "")
+    m_dicTotal("tooltip") = o.Properties("ToolTipText")
     m_dicTotal("relief") = IIf(o.Properties("BorderStyle"), "SUNKEN", "FLAT")
     m_dicTotal("fg") = TranslateColor(o.Properties("ForeColor"))
     m_dicTotal("bg") = TranslateColor(o.Properties("BackColor"))
@@ -72,6 +73,7 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
     m_Base("relheight") = m_dicTotal("relheight")
     m_Base("text") = m_dicTotal("text")
     m_Base("textvariable") = m_dicTotal("textvariable")
+    If m_dicTotal("tooltip") <> "" Then m_Base("tooltip") = m_dicTotal("tooltip")
     If o.Properties("ForeColor") <> vbButtonText Then m_Base("fg") = m_dicTotal("fg")
     If o.Properties("BackColor") <> vbButtonFace Then m_Base("bg") = m_dicTotal("bg")
     If m_dicTotal("relief") <> "FLAT" Then m_Base("relief") = m_dicTotal("relief")
@@ -107,6 +109,16 @@ End Sub
 '输出：sa()可选值列表数组
 Public Function GetAttrValueList(sAttr As String, ByRef sa() As String) As Long
     GetAttrValueList = m_Base.GetAttrValueList(sAttr, sa)
+End Function
+
+'判断此控件是否存在对应的属性
+Public Function hasAttribute(sAttr As String) As Boolean
+    hasAttribute = m_Base.hasAttribute(sAttr)
+End Function
+
+'获取此控件对应的当前设定的属性值，没有则返回空串
+Public Function GetAttrCurrentValue(sAttr As String) As String
+    GetAttrCurrentValue = m_Base.GetAttrCurrentValue(sAttr)
 End Function
 
 Public Function Tips(sAttr As String) As String

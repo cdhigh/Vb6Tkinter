@@ -46,6 +46,7 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
     m_dicTotal("relwidth") = Format(o.Properties("Width") / parentWidth, "0.###")
     m_dicTotal("relheight") = Format(o.Properties("Height") / parentHeight, "0.###")
     m_dicTotal("text") = Replace(o.Properties("Caption"), "&", "")
+    m_dicTotal("tooltip") = o.Properties("ToolTipText")
     m_dicTotal("fg") = ""
     m_dicTotal("bg") = TranslateColor(o.Properties("BackColor"))
     m_dicTotal("bd") = "1"
@@ -75,6 +76,7 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
     m_Base("text") = m_dicTotal("text")
     m_Base("textvariable") = m_dicTotal("textvariable")
     m_Base("command") = m_dicTotal("command")
+    If m_dicTotal("tooltip") <> "" Then m_Base("tooltip") = m_dicTotal("tooltip")
     If o.Properties("BackColor") <> vbButtonFace Then m_Base("bg") = m_dicTotal("bg")
     If m_dicTotal("state") <> "'normal'" Then m_Base("state") = m_dicTotal("state")
     If m_dicTotal("font") <> "(" & U(GetDefaultFontName()) & ",9)" Then m_Base("font") = m_dicTotal("font")
@@ -104,11 +106,21 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
     End If
 End Sub
 
-'设置属性值的可能值列表
+'返回属性值的可能值列表
 '返回值：0-没有可选值，1-有一个严格限制的可选值列表，2-除提供的可选值列表外，还可以手动输入其他值
 '输出：sa()可选值列表数组
 Public Function GetAttrValueList(sAttr As String, ByRef sa() As String) As Long
     GetAttrValueList = m_Base.GetAttrValueList(sAttr, sa)
+End Function
+
+'判断此控件是否存在对应的属性
+Public Function hasAttribute(sAttr As String) As Boolean
+    hasAttribute = m_Base.hasAttribute(sAttr)
+End Function
+
+'获取此控件对应的当前设定的属性值，没有则返回空串
+Public Function GetAttrCurrentValue(sAttr As String) As String
+    GetAttrCurrentValue = m_Base.GetAttrCurrentValue(sAttr)
 End Function
 
 Public Function Tips(sAttr As String) As String

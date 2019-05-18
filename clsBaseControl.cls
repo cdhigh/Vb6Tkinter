@@ -21,7 +21,7 @@ Private m_dic As Dictionary                                                     
 Private m_Type As String                                                        '直接对应到PYTHON的控件类型
 Private m_Name As String                                                        '控件名
 Private m_Parent As String
-Private m_Value As String                                                       ' 控件值（如果与的话）
+Private m_Value As String                                                       ' 控件值（如果有的话）
 Private m_StyleName As String                                                   '样式基类
 Private m_ScaleMode As Long
 
@@ -120,6 +120,11 @@ Public Sub toStringStructure(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBu
             sOut.Append Space(4) & m_Name & ".setValue = lambda x: self." & Dic("variable") & ".set(x)"
             sOut.Append Space(4) & m_Name & ".value = lambda : self." & Dic("variable") & ".get()"
         End If
+    End If
+    
+    '如果设置了tooltip提示文本，则创建Tooltip实例
+    If Len(Dic("tooltip")) Then
+        sOut.Append Space(4) & "gComps['" & m_Name & "Tooltip" & "'] = Tooltip(" & m_Name & ", " & Quote(Dic("tooltip")) & ")"
     End If
     
     '放置控件
@@ -292,6 +297,11 @@ Public Sub toStringOOP(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder,
         End If
     End If
     
+    '如果设置了tooltip提示文本，则创建Tooltip实例
+    If Len(Dic("tooltip")) Then
+        sOut.Append Space(8) & "self." & m_Name & "Tooltip = Tooltip(self." & m_Name & ", " & Quote(Dic("tooltip")) & ")"
+    End If
+    
     '放置控件
     sOut.Append Space(8) & "self." & m_Name & ".place(" & GetPositionParams(rel) & ")"
     
@@ -455,15 +465,16 @@ End Function
 
 '判断一个属性是否是额外参数，会根据TTK来判断更多的属性
 Private Function isExtra(ByVal sK As String, usettk As Boolean) As Boolean
-    Const EXTRA_STRING As String = ",x,y,relx,rely,width,height,relwidth,relheight,command,bindcommand,xscrollcommand," & _
-        "yscrollcommand,postcommand,font,textvariable,variable,listvariable,values,displayrows,columns,displaycolumns,"
-    Const EXTRA_STRING_TTK As String = EXTRA_STRING & ",fg,bg,bd,relief,activerelief,overrelief,anchor,jump,indicatoron,resolution,digits," & _
+    '在这两个字符串列表中属性都不是额外参数，除此之外的是额外参数
+    Const NOT_EXTRA_STRING As String = ",x,y,relx,rely,width,height,relwidth,relheight,command,bindcommand,xscrollcommand," & _
+        "yscrollcommand,postcommand,font,textvariable,variable,listvariable,values,displayrows,columns,displaycolumns,tooltip,"
+    Const NOT_EXTRA_STRING_TTK As String = NOT_EXTRA_STRING & ",fg,bg,bd,relief,activerelief,overrelief,anchor,jump,indicatoron,resolution,digits," & _
         "sliderlength,sliderrelief,showvalue,tickinterval,"
     
     If usettk Then
-        isExtra = (InStr(1, EXTRA_STRING_TTK, "," & sK & ",") <= 0)
+        isExtra = (InStr(1, NOT_EXTRA_STRING_TTK, "," & sK & ",") <= 0)
     Else
-        isExtra = (InStr(1, EXTRA_STRING, "," & sK & ",") <= 0)
+        isExtra = (InStr(1, NOT_EXTRA_STRING, "," & sK & ",") <= 0)
     End If
 End Function
 
@@ -543,7 +554,7 @@ Public Function IsExistCommand(dMethods As Dictionary, sCmd As String) As Boolea
     If dMethods.Exists(m_Name) Then IsExistCommand = (InStr(1, dMethods.Item(m_Name), "," & m_Name & "_" & sCmd & ",") > 0)
 End Function
 
-'设置/获取字典的值
+'设置/获取字典的值，Dic()为clsBaseControl的默认属性'Attribute Dic.VB_UserMemId = 0'
 Public Property Get Dic(ByVal sKey As String) As String
 Attribute Dic.VB_UserMemId = 0
     If m_dic.Exists(sKey) Then Dic = m_dic(sKey)
@@ -556,6 +567,24 @@ End Property
 Public Sub Remove(ByVal sKey As String)
     m_dic.Remove (sKey)
 End Sub
+
+'判断此控件是否存在对应的属性
+Public Function hasAttribute(sAttr As String) As Boolean
+    If m_dic.Exists(sAttr) Then
+        hasAttribute = True
+    Else
+        hasAttribute = False
+    End If
+End Function
+
+'获取此控件对应的当前设定的属性值，没有则返回空串
+Public Function GetAttrCurrentValue(sAttr As String) As String
+    If m_dic.Exists(sAttr) Then
+        GetAttrCurrentValue = m_dic(sAttr) & "" '连接空串是为了能自动转换其他类型为字符串
+    Else
+        GetAttrCurrentValue = ""
+    End If
+End Function
 
 '将用户选择的配置更新到对象中，参数为使用"|"分割的很多对属性/值对
 Public Sub SetConfig(sAttrs As String)
@@ -689,6 +718,8 @@ Public Function Tips(sAttr As String) As String
         Tips = Tips & L("l_TipSltbd", "The width of the border to use around selected items.")
     Case "selectforeground"
         Tips = Tips & L("l_TipSltfg", "The foreground color to use displaying selected items.")
+    Case "tooltip"
+        Tips = Tips & L("l_TipTooltip", "The tooltip text of the widget.")
     Case Else:
         Tips = Tips & L("l_TipUnknown", "Unknown Attribute")
     End Select

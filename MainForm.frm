@@ -544,7 +544,7 @@ End Sub
 '更新各个列表，创建对应的控件类实例, 返回False表示初始化失败，True表示成功
 Private Function ResetLstComps(frm As Object) As Long
     
-    Dim Obj As Object, ObjClsModule As Object, i As Long, s As String, j As Long, Idx As Long
+    Dim Obj As Object, ObjClsModule As Object, i As Long, s As String, j As Long, idx As Long
     Dim nScaleMode As Long, nScaleWidth As Long, nScaleHeight As Long
     Dim CodeMember As Member, CodeMembers As Members, dMethods As New Dictionary
     Dim ctlsIgnored As String
@@ -576,9 +576,9 @@ Private Function ResetLstComps(frm As Object) As Long
         If Not CodeMembers Is Nothing Then
             For Each CodeMember In CodeMembers
                 If CodeMember.Type = vbext_mt_Method Then
-                    Idx = InStrRev(CodeMember.Name, "_")
-                    If Idx > 1 Then
-                        s = Left$(CodeMember.Name, Idx - 1)
+                    idx = InStrRev(CodeMember.Name, "_")
+                    If idx > 1 Then
+                        s = Left$(CodeMember.Name, idx - 1)
                         If dMethods.Exists(s) Then
                             dMethods.Item(s) = dMethods.Item(s) & "," & CodeMember.Name & "," '使用逗号做为分隔符方便查找
                         Else
@@ -670,7 +670,7 @@ End Function
 
 '生成一个控件字符实例对象:输入ctlobj:控件对象，clsobj:对应的字符串对象
 Private Function CreateObj(ByRef ctlobj As Object, ByRef clsobj As Object) As Object
-    Dim o As Object, sName As String, Idx As Long
+    Dim o As Object, sName As String, idx As Long
     
     Select Case ctlobj.ClassName:
         Case "Label"
@@ -694,11 +694,11 @@ Private Function CreateObj(ByRef ctlobj As Object, ByRef clsobj As Object) As Ob
             Set clsobj = New clsScale
         Case "Frame"
             '判断是否是TabStrip控件的一页
-            Idx = InStr(2, ctlobj.Properties("Name"), "__Tab") '从2开始至少保证__Tab前有一个字符
-            If Idx > 1 And Not m_curFrm Is Nothing Then
+            idx = InStr(2, ctlobj.Properties("Name"), "__Tab") '从2开始至少保证__Tab前有一个字符
+            If idx > 1 And Not m_curFrm Is Nothing Then
                 '循环查询是否有合适的TabStrip控件
                 Set clsobj = Nothing
-                sName = Left$(ctlobj.Properties("Name"), Idx - 1)
+                sName = Left$(ctlobj.Properties("Name"), idx - 1)
                 For Each o In m_curFrm.Designer.VBControls
                     If o.ClassName = "TabStrip" And o.Properties("Name") = sName Then
                         Set clsobj = New clsNotebookTab  '使用Tab类来代替Frame
@@ -711,11 +711,11 @@ Private Function CreateObj(ByRef ctlobj As Object, ByRef clsobj As Object) As Ob
             End If
         Case "PictureBox"
             '判断是否是TabStrip控件的一页
-            Idx = InStr(2, ctlobj.Properties("Name"), "__Tab") '从2开始至少保证__Tab前有一个字符
-            If Idx > 1 And Not m_curFrm Is Nothing Then
+            idx = InStr(2, ctlobj.Properties("Name"), "__Tab") '从2开始至少保证__Tab前有一个字符
+            If idx > 1 And Not m_curFrm Is Nothing Then
                 '循环查询是否有合适的TabStrip控件
                 Set clsobj = Nothing
-                sName = Left$(ctlobj.Properties("Name"), Idx - 1)
+                sName = Left$(ctlobj.Properties("Name"), idx - 1)
                 For Each o In m_curFrm.Designer.VBControls
                     If o.ClassName = "TabStrip" And o.Properties("Name") = sName Then
                         Set clsobj = New clsNotebookTab  '使用Tab类来代替PictureBox
@@ -780,7 +780,7 @@ End Sub
 '整理选项卡控件和其内部控件的父子关系
 Private Sub ArrangeNotebookAndSubWidgets()
 
-    Dim i As Long, j As Long, k As Long, L As Long, Idx As Long, ctlNum As Long
+    Dim i As Long, j As Long, k As Long, L As Long, idx As Long, ctlNum As Long
     Dim sTabName As String, sNbName As String, sTmp As String
     
     If UBound(g_Comps) <= 0 Then  ' 0固定为顶层窗体
@@ -791,9 +791,9 @@ Private Sub ArrangeNotebookAndSubWidgets()
     For i = 1 To ctlNum
         If TypeName(g_Comps(i)) = "clsNotebookTab" Then
             sTabName = g_Comps(i).Name
-            Idx = InStr(2, sTabName, "__Tab")
-            If Idx > 1 Then
-                sNbName = Left$(sTabName, Idx - 1) ' Notebook控件名
+            idx = InStr(2, sTabName, "__Tab")
+            If idx > 1 Then
+                sNbName = Left$(sTabName, idx - 1) ' Notebook控件名
                 For j = 1 To ctlNum
                     If TypeName(g_Comps(j)) = "clsNotebook" And g_Comps(j).Name = sNbName Then
                         '获取TAB号
@@ -1048,6 +1048,14 @@ Private Sub CmdGenCode_Click()
         End If
     Next
     
+    '如果有控件设置了ToolTipText，则先输出Tooptip的自定义类定义
+    For i = 1 To UBound(g_Comps)  '0固定为窗体，不用判断
+        If g_Comps(i).hasAttribute("tooltip") And g_Comps(i).GetAttrCurrentValue("tooltip") <> "" Then
+            CreateTooltipClassCode strHead
+            Exit For
+        End If
+    Next
+    
     If OutOOP Then
         strCmd.Append vbCrLf
         strCmd.Append "class Application(Application_ui):"
@@ -1121,6 +1129,71 @@ Private Sub CmdGenCode_Click()
     strCmd.Reset
     
     g_bUnicodePrefixU = bUnicodePrefix    '恢复UNICODE前缀模式
+    
+End Sub
+
+'输入自定义的Tooltip类
+'因为VB不允许太多的续行符，所以分成三部分，在程序中再连接起来
+'此控件的使用方法：
+'  self.t = Tooltip(self.widget, 'tooltip text')
+Private Sub CreateTooltipClassCode(ByRef strOut As cStrBuilder)
+    Const strCls1 As String = "class Tooltip:" & vbCrLf & _
+"    def __init__(self, widget, text, bg='#FFFFEA', pad=(5, 3, 5, 3), waittime=500, wraplength=300):" & vbCrLf & _
+"        self.waittime = waittime" & vbCrLf & _
+"        self.wraplength = wraplength" & vbCrLf & _
+"        self.widget = widget" & vbCrLf & _
+"        self.text = text" & vbCrLf & _
+"        self.widget.bind('<Enter>', self.onEnter)" & vbCrLf & _
+"        self.widget.bind('<Leave>', self.onLeave)" & vbCrLf & _
+"        self.widget.bind('<ButtonPress>', self.onLeave)" & vbCrLf & _
+"        self.bg = bg" & vbCrLf & _
+"        self.pad = pad" & vbCrLf & _
+"        self.id_ = None" & vbCrLf & _
+"        self.tw = None" & vbCrLf & vbCrLf & _
+"    def onEnter(self, event=None):" & vbCrLf & _
+"        self.schedule()" & vbCrLf & vbCrLf & _
+"    def onLeave(self, event=None):" & vbCrLf & _
+"        self.unschedule()" & vbCrLf & _
+"        self.Hide()" & vbCrLf & vbCrLf & _
+"    def schedule(self):" & vbCrLf & _
+"        self.unschedule()" & vbCrLf & _
+"        self.id_ = self.widget.after(self.waittime, self.Show)" & vbCrLf
+
+    Const strCls2 As String = vbCrLf & _
+"    def unschedule(self):" & vbCrLf & _
+"        id_ = self.id_" & vbCrLf & _
+"        self.id_ = None" & vbCrLf & _
+"        if id_:" & vbCrLf & _
+"            self.widget.after_cancel(id_)" & vbCrLf & vbCrLf & _
+"    def Show(self):" & vbCrLf & _
+"        def tip_pos_calculator(widget, label, pad=(5, 3, 5, 3), tip_delta=(15, 10)):" & vbCrLf & _
+"            s_width, s_height = widget.winfo_screenwidth(), widget.winfo_screenheight()" & vbCrLf & _
+"            width, height = (pad[0] + label.winfo_reqwidth() + pad[2], pad[1] + label.winfo_reqheight() + pad[3])" & vbCrLf & _
+"            mouse_x, mouse_y = widget.winfo_pointerxy()" & vbCrLf & _
+"            x1, y1 = mouse_x + tip_delta[0], mouse_y + tip_delta[1]" & vbCrLf & _
+"            if x1 + width > s_width:" & vbCrLf & _
+"                x1 = mouse_x - tip_delta[0] - width" & vbCrLf & _
+"            if y1 + height > s_height - 30:" & vbCrLf & _
+"                y1 = mouse_y - tip_delta[1] - height" & vbCrLf & _
+"                if y1 < 0:" & vbCrLf & _
+"                    Y1 = 0" & vbCrLf & _
+"            return x1, y1" & vbCrLf & vbCrLf & _
+"        self.Hide()" & vbCrLf & _
+"        self.tw = Toplevel(self.widget)" & vbCrLf & _
+"        self.tw.wm_overrideredirect(True)" & vbCrLf & _
+"        label = Label(self.tw, text=self.text, justify=LEFT, background=self.bg, relief=RAISED, borderwidth=1, wraplength=self.wraplength)" & vbCrLf & _
+"        label.pack(ipadx=1)"
+
+    Const strCls3 As String = vbCrLf & _
+"        x, y = tip_pos_calculator(self.widget, label, self.pad)" & vbCrLf & _
+"        self.tw.wm_geometry('+%d+%d' % (x, y))" & vbCrLf & vbCrLf & _
+"    def Hide(self):" & vbCrLf & _
+"        tw = self.tw" & vbCrLf & _
+"        if tw:" & vbCrLf & _
+"            tw.destroy()" & vbCrLf & _
+"        self.tw = None" & vbCrLf & vbCrLf
+
+    strOut.Append strCls1 & strCls2 & strCls3
     
 End Sub
 
@@ -1319,16 +1392,16 @@ Private Sub LstComps_Click()
 End Sub
 
 '在对象中获取配置信息到列表框
-Private Sub FetchCfgFromCls(Idx As Long)
+Private Sub FetchCfgFromCls(idx As Long)
     
     Dim nRow As Long, cfg As Variant, cItms As Collection
     
-    If Idx < 0 Or Idx > UBound(g_Comps) Then Exit Sub
+    If idx < 0 Or idx > UBound(g_Comps) Then Exit Sub
     
     LstCfg.Redraw = False
     If LstCfg.ItemCount > 0 Then LstCfg.TopRow = 0  '这个操作是为了规避GridOcx的滚动条BUG，就是切换控件后有部分项目无法完整显示
     LstCfg.Clear
-    Set cItms = g_Comps(Idx).Allitems()
+    Set cItms = g_Comps(idx).Allitems()
     For Each cfg In cItms
         nRow = LstCfg.AddItem(Left(cfg, InStr(1, cfg, "|") - 1))
         LstCfg.CellText(nRow, 1) = Mid(cfg, InStr(1, cfg, "|") + 1, InStrRev(cfg, "|") - InStr(1, cfg, "|") - 1)
@@ -1339,10 +1412,10 @@ Private Sub FetchCfgFromCls(Idx As Long)
 End Sub
 
 '更新配置到实例对象,idx表示当前在LstCfg上显示的属性是属于哪个控件的。
-Private Sub UpdateCfgtoCls(Idx As Long)
+Private Sub UpdateCfgtoCls(idx As Long)
     Dim s As String, i As Long
     
-    If Idx < 0 Or Idx > UBound(g_Comps) Then Exit Sub
+    If idx < 0 Or idx > UBound(g_Comps) Then Exit Sub
     
     LstCfg.UpdateIfPending
     LstCfg.Refresh
@@ -1354,7 +1427,7 @@ Private Sub UpdateCfgtoCls(Idx As Long)
         End If
     Next
     
-    If Len(s) Then g_Comps(Idx).SetConfig s
+    If Len(s) Then g_Comps(idx).SetConfig s
     
 End Sub
 

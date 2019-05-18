@@ -65,7 +65,7 @@ Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, re
         sOut.Append "    " & m_Name & ".title(" & U(m_Title) & ")"
         If m_StartupPosition = "Manual" Then  '手工指定窗口初始位置
             sOut.Append "    " & m_Name & ".geometry('" & m_Geometry & CoordinateOnStart() & "')"
-        ElseIf m_StartupPosition = "Center" Then
+        ElseIf m_StartupPosition <> "Center" Then
             sOut.Append "    " & m_Name & ".geometry('" & m_Geometry & "')"
         End If
         If Not m_Resizable Then sOut.Append "    " & m_Name & ".resizable(0,0)"
@@ -266,7 +266,7 @@ End Function
 '创建对象后要马上调用这个函数初始化各参数, 窗体大小以像素为单位
 Public Sub InitConfig(o As Object, nWidth As Long, nHeight As Long, dMethods As Dictionary)
     
-    Dim s As String, cAttr As String, cValue As String, sa() As String, i As Long, Idx As Long
+    Dim s As String, cAttr As String, cValue As String, sa() As String, i As Long, idx As Long
     
     '获取窗体所在目录
     On Error Resume Next
@@ -315,10 +315,10 @@ Public Sub InitConfig(o As Object, nWidth As Long, nHeight As Long, dMethods As 
         If UCase(sa(0)) = "P" Then
             For i = 1 To UBound(sa)
                 s = sa(i)
-                Idx = InStr(2, s, "=")
-                If Idx > 0 Then '有值
-                    cAttr = Left$(s, Idx - 1)
-                    cValue = Mid$(s, Idx + 1)
+                idx = InStr(2, s, "=")
+                If idx > 0 Then '有值
+                    cAttr = Left$(s, idx - 1)
+                    cValue = Mid$(s, idx + 1)
                     Select Case cAttr
                     Case "topmost"
                         m_Topmost = IIf((cValue = "0" Or UCase(cValue) = "FALSE"), False, True)
@@ -363,6 +363,16 @@ Public Function GetAttrValueList(sAttr As String, ByRef sa() As String) As Long
     Else
         GetAttrValueList = 0
     End If
+End Function
+
+'判断此控件是否存在对应的属性
+Public Function hasAttribute(sAttr As String) As Boolean
+    hasAttribute = m_Base.hasAttribute(sAttr)
+End Function
+
+'获取此控件对应的当前设定的属性值，没有则返回空串
+Public Function GetAttrCurrentValue(sAttr As String) As String
+    GetAttrCurrentValue = m_Base.GetAttrCurrentValue(sAttr)
 End Function
 
 Public Function Tips(sAttr As String) As String

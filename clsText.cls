@@ -96,6 +96,7 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
                         IIf(o.Properties("Font")("Bold"), ",'bold'", "") & IIf(o.Properties("Font")("Italic"), ",'italic'", "") & _
                         IIf(o.Properties("Font")("Underline"), ",'underline'", "") & IIf(o.Properties("Font")("Strikethrough"), ",'overstrike')", ")")
     m_dicTotal("takefocus") = IIf(o.Properties("TabStop"), 1, 0)
+    m_dicTotal("tooltip") = o.Properties("ToolTipText")
     m_dicTotal("cursor") = m_Base.GetCursorName(o.Properties("MousePointer"))
     m_dicTotal("xscrollcommand") = ""
     m_dicTotal("yscrollcommand") = ""
@@ -110,6 +111,7 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
     m_Base("rely") = m_dicTotal("rely")
     m_Base("relwidth") = m_dicTotal("relwidth")
     m_Base("relheight") = m_dicTotal("relheight")
+    If m_dicTotal("tooltip") <> "" Then m_Base("tooltip") = m_dicTotal("tooltip")
     If o.Properties("ForeColor") <> vbWindowText Then m_Base("fg") = m_dicTotal("fg")
     If o.Properties("BackColor") <> vbWindowBackground Then m_Base("bg") = m_dicTotal("bg")
     If m_dicTotal("state") <> "'normal'" Then m_Base("state") = m_dicTotal("state")
@@ -169,6 +171,16 @@ Public Function GetAttrValueList(sAttr As String, ByRef sa() As String) As Long
     Else
         GetAttrValueList = m_Base.GetAttrValueList(sAttr, sa)
     End If
+End Function
+
+'判断此控件是否存在对应的属性
+Public Function hasAttribute(sAttr As String) As Boolean
+    hasAttribute = m_Base.hasAttribute(sAttr)
+End Function
+
+'获取此控件对应的当前设定的属性值，没有则返回空串
+Public Function GetAttrCurrentValue(sAttr As String) As String
+    GetAttrCurrentValue = m_Base.GetAttrCurrentValue(sAttr)
 End Function
 
 Public Function Tips(sAttr As String) As String

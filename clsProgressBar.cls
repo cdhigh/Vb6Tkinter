@@ -48,6 +48,7 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
     m_dicTotal("maximum") = o.Properties("Max")
     m_dicTotal("value") = 0
     m_dicTotal("variable") = m_Base.Name & "Var"
+    m_dicTotal("tooltip") = o.Properties("ToolTipText")
     m_dicTotal("takefocus") = 0
     m_dicTotal("cursor") = m_Base.GetCursorName(o.Properties("MousePointer"))
     
@@ -63,6 +64,7 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
     m_Base("orient") = m_dicTotal("orient")
     m_Base("maximum") = m_dicTotal("maximum")
     m_Base("variable") = m_dicTotal("variable")
+    If m_dicTotal("tooltip") <> "" Then m_Base("tooltip") = m_dicTotal("tooltip")
     If m_dicTotal("cursor") <> "" Then m_Base("cursor") = m_dicTotal("cursor")
     
     '使用控件的tag属性保存一些额外默认要保存的属性，
@@ -95,6 +97,16 @@ Public Function GetAttrValueList(sAttr As String, ByRef sa() As String) As Long
     Else
         GetAttrValueList = m_Base.GetAttrValueList(sAttr, sa)
     End If
+End Function
+
+'判断此控件是否存在对应的属性
+Public Function hasAttribute(sAttr As String) As Boolean
+    hasAttribute = m_Base.hasAttribute(sAttr)
+End Function
+
+'获取此控件对应的当前设定的属性值，没有则返回空串
+Public Function GetAttrCurrentValue(sAttr As String) As String
+    GetAttrCurrentValue = m_Base.GetAttrCurrentValue(sAttr)
 End Function
 
 Public Function Tips(sAttr As String) As String

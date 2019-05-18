@@ -77,6 +77,11 @@ Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, re
     If oop Then
         sOut.Append Space(8) & "self." & m_Base.Name & " = Statusbar(self." & m_Base.Parent & _
             IIf(Len(m_Base("panelwidths")), ", panelwidths=" & m_Base("panelwidths"), "") & ")"
+        
+        If Len(m_Base("tooltip")) Then
+            sOut.Append Space(8) & "self." & m_Base.Name & "Tooltip = Tooltip(self." & m_Base.Name & ", " & Quote(m_Base("tooltip")) & ")"
+        End If
+        
         If Len(m_Base("side")) Then
             sOut.Append Space(8) & "self." & m_Base.Name & ".pack(side=" & m_Base("side") & ", fill=X)"
         ElseIf rel Then
@@ -89,6 +94,11 @@ Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, re
     Else
         sOut.Append Space(4) & m_Base.Name & " = Statusbar(" & m_Base.Parent & _
             IIf(Len(m_Base("panelwidths")), ", panelwidths=" & m_Base("panelwidths"), "") & ")"
+        
+        If Len(m_Base("tooltip")) Then
+            sOut.Append Space(4) & "gComps['" & m_Base.Name & "Tooltip'] = Tooltip(" & m_Base.Name & ", " & Quote(m_Base("tooltip")) & ")"
+        End If
+        
         If Len(m_Base("side")) Then
             sOut.Append Space(4) & m_Base.Name & ".pack(side=" & m_Base("side") & ", fill=X)"
         ElseIf rel Then
@@ -106,7 +116,7 @@ End Sub
 Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dMethods As Dictionary)
     
     Dim i As Long, nCnt As Long, s As String, Panels As IPanels
-    Dim sa() As String, Idx As Long
+    Dim sa() As String, idx As Long
     
     m_Base.Name = o.Properties("Name")
     
@@ -123,6 +133,10 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
         m_Base("side") = "TOP"
     ElseIf o.Properties("Align") = vbAlignBottom Then
         m_Base("side") = "BOTTOM"
+    End If
+    
+    If o.Properties("ToolTipText") <> "" Then
+        m_Base("tooltip") = o.Properties("ToolTipText")
     End If
     
     m_Base("panelwidths") = ""
@@ -146,9 +160,9 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
         If sa(0) = "p" Or sa(0) = "P" Then
             For i = 1 To UBound(sa)
                 s = sa(i)
-                Idx = InStr(2, s, "=")
-                If Idx > 0 Then '有值
-                    m_Base(Left$(s, Idx - 1)) = Mid$(s, Idx + 1)
+                idx = InStr(2, s, "=")
+                If idx > 0 Then '有值
+                    m_Base(Left$(s, idx - 1)) = Mid$(s, idx + 1)
                 End If
             Next
         End If
@@ -165,6 +179,16 @@ Public Function GetAttrValueList(sAttr As String, ByRef sa() As String) As Long
     Else
         GetAttrValueList = m_Base.GetAttrValueList(sAttr, sa)
     End If
+End Function
+
+'判断此控件是否存在对应的属性
+Public Function hasAttribute(sAttr As String) As Boolean
+    hasAttribute = m_Base.hasAttribute(sAttr)
+End Function
+
+'获取此控件对应的当前设定的属性值，没有则返回空串
+Public Function GetAttrCurrentValue(sAttr As String) As String
+    GetAttrCurrentValue = m_Base.GetAttrCurrentValue(sAttr)
 End Function
 
 Public Function Tips(sAttr As String) As String

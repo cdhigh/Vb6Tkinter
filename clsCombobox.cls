@@ -58,8 +58,10 @@ End Sub
 Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dMethods As Dictionary)
     
     Dim i As Long, oList As Object, sList As String
-    Dim s As String, sa() As String, Idx As Long
-
+    Dim s As String, sa() As String, idx As Long
+    
+    m_Base.SetVbWidgetInstance o
+    
     m_Base.Name = o.Properties("Name")
     
     '保存下拉选项值
@@ -71,7 +73,7 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
         sList = sList & U(oList.IndexedValue(i)) & ","
         i = i + 1
     Loop
-    m_List = sList & IIf(sList = "[", "'Add items in design or code!',]", "]")
+    m_List = sList & IIf(sList = "[", "'Add items in designer or code!',]", "]")
     
     m_dicTotal("x") = m_Base.toPixelX(o.Properties("Left"))
     m_dicTotal("y") = m_Base.toPixelY(o.Properties("Top"))
@@ -129,10 +131,10 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
         If sa(0) = "p" Or sa(0) = "P" Then
             For i = 1 To UBound(sa)
                 s = sa(i)
-                Idx = InStr(2, s, "=")
-                If Idx > 0 Then '有值
-                    m_dicTotal(Left$(s, Idx - 1)) = Mid$(s, Idx + 1)
-                    m_Base(Left$(s, Idx - 1)) = m_dicTotal(Left$(s, Idx - 1))
+                idx = InStr(2, s, "=")
+                If idx > 0 Then '有值
+                    m_dicTotal(Left$(s, idx - 1)) = Mid$(s, idx + 1)
+                    m_Base(Left$(s, idx - 1)) = m_dicTotal(Left$(s, idx - 1))
                 ElseIf Len(s) > 0 And Len(m_dicTotal(s)) > 0 Then '仅有属性，则判断属性是否合法
                     m_Base(s) = m_dicTotal(s)
                 End If

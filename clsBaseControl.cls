@@ -24,6 +24,7 @@ Private m_Parent As String
 Private m_Value As String                                                       ' 控件值（如果有的话）
 Private m_StyleName As String                                                   '样式基类
 Private m_ScaleMode As Long
+Private m_vbWidgetInstance As Object                                            'VB控件的引用
 
 '输出PYTHON代码,
 'sCmdFunc: 输出参数，事件处理回调代码;
@@ -52,8 +53,9 @@ Public Sub toStringStructure(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBu
     End If
     If Len(Dic("variable")) Then
         If m_Type = "Radiobutton" Then  '一组单选按钮的variable都是同一个，不要重复创建
-            If Not sOut.ExistString(Space(4) & Dic("variable") & " = StringVar()") Then
-                sOut.Append Space(4) & Dic("variable") & " = StringVar()"
+            sTmp = Space(4) & Dic("variable") & " = StringVar()"
+            If Not sOut.ExistString(sTmp) Then
+                sOut.Append sTmp
             End If
         ElseIf m_Type = "Checkbutton" Then '多选按钮的variable使用IntVar比较好
             sOut.Append Space(4) & Dic("variable") & " = IntVar(value=" & m_Value & ")"
@@ -112,6 +114,9 @@ Public Sub toStringStructure(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBu
             If Len(Dic("value")) Then
                 sOut.Append Space(4) & m_Name & ".setValue = lambda x: " & Dic("variable") & ".set(" & Dic("value") & " if x else '')"
                 sOut.Append Space(4) & m_Name & ".value = lambda : 1 if " & Dic("variable") & ".get() == " & Dic("value") & " else 0"
+                If m_vbWidgetInstance.Properties("Value") And Len(Dic("value")) Then '默认选择其中之一
+                    sOut.Append Space(4) & m_Name & ".setValue(1)"
+                End If
             Else
                 sOut.Append Space(4) & m_Name & ".setValue = lambda x: " & Dic("variable") & ".set(x)"
                 sOut.Append Space(4) & m_Name & ".value = lambda : " & Dic("variable") & ".get()"
@@ -227,8 +232,9 @@ Public Sub toStringOOP(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder,
     End If
     If Len(Dic("variable")) Then
         If m_Type = "Radiobutton" Then  '一组单选按钮的variable都是同一个，不要重复创建
-            If Not sOut.ExistString(Space(8) & "self." & Dic("variable") & " = StringVar()") Then
-                sOut.Append Space(8) & "self." & Dic("variable") & " = StringVar()"
+            sTmp = Space(8) & "self." & Dic("variable") & " = StringVar()"
+            If Not sOut.ExistString(sTmp) Then
+                sOut.Append sTmp
             End If
         ElseIf m_Type = "Checkbutton" Then '多选按钮的variable使用IntVar比较好
             sOut.Append Space(8) & "self." & Dic("variable") & " = IntVar(value=" & m_Value & ")"
@@ -287,6 +293,9 @@ Public Sub toStringOOP(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder,
             If Len(Dic("value")) Then
                 sOut.Append Space(8) & "self." & m_Name & ".setValue = lambda x: self." & Dic("variable") & ".set(" & Dic("value") & " if x else '')"
                 sOut.Append Space(8) & "self." & m_Name & ".value = lambda : 1 if self." & Dic("variable") & ".get() == " & Dic("value") & " else 0"
+                If m_vbWidgetInstance.Properties("Value") And Len(Dic("value")) Then '默认选择其中之一
+                    sOut.Append Space(8) & "self." & m_Name & ".setValue(1)"
+                End If
             Else
                 sOut.Append Space(8) & "self." & m_Name & ".setValue = lambda x: self." & Dic("variable") & ".set(x)"
                 sOut.Append Space(8) & "self." & m_Name & ".value = lambda : self." & Dic("variable") & ".get()"
@@ -866,6 +875,11 @@ Public Function GetCursorName(nCursor As Long) As String
 End Function
 
 'For latin, decimal 123,45 changed to 123.45
-Function Commas2Points(ByVal InS As String) As String
+Public Function Commas2Points(ByVal InS As String) As String
     Commas2Points = Replace(InS, ",", ".")
 End Function
+
+'设置VB控件的引用
+Public Sub SetVbWidgetInstance(ByRef o As Object)
+    Set m_vbWidgetInstance = o
+End Sub

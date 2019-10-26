@@ -193,6 +193,8 @@ Public Sub InitConfig(o As Object, Optional parentWidth As Long, Optional parent
     
     Dim s As String
     
+    m_Base.SetVbWidgetInstance o
+    
     m_Base.Name = o.Properties("Name")
     
     m_Visible = o.Properties("Visible")

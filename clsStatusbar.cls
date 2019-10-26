@@ -118,6 +118,8 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
     Dim i As Long, nCnt As Long, s As String, Panels As IPanels
     Dim sa() As String, idx As Long
     
+    m_Base.SetVbWidgetInstance o
+    
     m_Base.Name = o.Properties("Name")
     
     m_Base("x") = m_Base.toPixelX(o.Properties("Left"))

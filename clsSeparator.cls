@@ -33,7 +33,9 @@ End Sub
 Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, Optional dMethods As Dictionary)
     
     Dim W As Long, H As Long, X1 As Long, X2 As Long, Y1 As Long, Y2 As Long
-    Dim s As String, sa() As String, i As Long, Idx As Long
+    Dim s As String, sa() As String, i As Long, idx As Long
+    
+    m_Base.SetVbWidgetInstance o
     
     m_Base.Name = o.Properties("Name")
     
@@ -96,10 +98,10 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, Op
         If sa(0) = "p" Or sa(0) = "P" Then
             For i = 1 To UBound(sa)
                 s = sa(i)
-                Idx = InStr(2, s, "=")
-                If Idx > 0 Then '有值
-                    m_dicTotal(Left$(s, Idx - 1)) = Mid$(s, Idx + 1)
-                    m_Base(Left$(s, Idx - 1)) = m_dicTotal(Left$(s, Idx - 1))
+                idx = InStr(2, s, "=")
+                If idx > 0 Then '有值
+                    m_dicTotal(Left$(s, idx - 1)) = Mid$(s, idx + 1)
+                    m_Base(Left$(s, idx - 1)) = m_dicTotal(Left$(s, idx - 1))
                 ElseIf Len(s) > 0 And Len(m_dicTotal(s)) > 0 Then '仅有属性，则判断属性是否合法
                     m_Base(s) = m_dicTotal(s)
                 End If

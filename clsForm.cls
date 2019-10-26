@@ -268,6 +268,8 @@ Public Sub InitConfig(o As Object, nWidth As Long, nHeight As Long, dMethods As 
     
     Dim s As String, cAttr As String, cValue As String, sa() As String, i As Long, idx As Long
     
+    m_Base.SetVbWidgetInstance o
+    
     '获取窗体所在目录
     On Error Resume Next
     s = o.FileNames(1)

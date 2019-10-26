@@ -89,6 +89,8 @@ The addin will generate python code of GUI framework for you. the only thing you
    `print(Option1.value())`    
 
 # History
+* v1.6.3
+    1. Can set 'checked' for one of Radiobuttons by default.
 * v1.6.2
     1. Added feature of Tooltip.
 * v1.6.1

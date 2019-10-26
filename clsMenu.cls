@@ -78,6 +78,8 @@ End Sub
 '创建对象后要马上调用这个函数初始化各参数
 Public Sub InitConfig(Optional o As Object, Optional parentWidth As Long, Optional parentHeight As Long, Optional dMethods As Dictionary)
     
+    m_Base.SetVbWidgetInstance o
+    
     m_Base("tearoff") = "0"
     
     '这些是所有的默认值

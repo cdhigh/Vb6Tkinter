@@ -532,6 +532,8 @@ Public Function GetBindCommandStr(dMethods As Dictionary) As String
     '这几个控件的Click事件由command属性设置比较好，不需要bind
     If m_Type = "Button" Or m_Type = "Checkbutton" Or m_Type = "Radiobutton" Then
         If InStr(1, s, "," & m_Name & "_MouseDown,") > 0 Then sOut.Append "<Button-1>"
+    ElseIf m_Type = "Listbox" Then
+        If InStr(1, s, "," & m_Name & "_Click,") > 0 Then sOut.Append "<<ListboxSelect>>"
     Else
         If InStr(1, s, "," & m_Name & "_Click,") > 0 Or InStr(1, s, "," & m_Name & "_MouseDown,") > 0 Then sOut.Append "<Button-1>"
     End If
@@ -800,14 +802,14 @@ Private Sub Class_Initialize()
 End Sub
 
 '构建一个函数空骨架; FuncName: 函数名，Params: 参数，sbody: 函数体
-Public Function CreateFuncDef(FuncName As String, Optional sparams As String = "", Optional sbody As String = "") As String
-    If Len(FuncName) = 0 Then Exit Function
-    CreateFuncDef = "def " & FuncName & "(" & sparams & "):" & vbCrLf
+Public Function CreateFuncDef(funcName As String, Optional sparams As String = "", Optional sbody As String = "") As String
+    If Len(funcName) = 0 Then Exit Function
+    CreateFuncDef = "def " & funcName & "(" & sparams & "):" & vbCrLf
     If Len(sbody) Then
         CreateFuncDef = CreateFuncDef & sbody & vbCrLf
     Else
     #If DebugVer Then
-        CreateFuncDef = CreateFuncDef & Space(4) & "print('" & FuncName & "')" & vbCrLf
+        CreateFuncDef = CreateFuncDef & Space(4) & "print('" & funcName & "')" & vbCrLf
     #Else
         CreateFuncDef = CreateFuncDef & Space(4) & "#TODO, Please finish the function here!" & vbCrLf
         CreateFuncDef = CreateFuncDef & Space(4) & "pass" & vbCrLf
@@ -816,14 +818,14 @@ Public Function CreateFuncDef(FuncName As String, Optional sparams As String = "
 End Function
 
 '构建一个函数空骨架（面向对象代码）; FuncName: 函数名，Params: 参数，sbody: 函数体
-Public Function CreateFuncDefOOP(FuncName As String, Optional sparams As String = "", Optional sbody As String = "") As String
-    If Len(FuncName) = 0 Then Exit Function
-    CreateFuncDefOOP = "    def " & FuncName & "(self" & IIf(Len(sparams), ", ", "") & sparams & "):" & vbCrLf
+Public Function CreateFuncDefOOP(funcName As String, Optional sparams As String = "", Optional sbody As String = "") As String
+    If Len(funcName) = 0 Then Exit Function
+    CreateFuncDefOOP = "    def " & funcName & "(self" & IIf(Len(sparams), ", ", "") & sparams & "):" & vbCrLf
     If Len(sbody) Then
         CreateFuncDefOOP = CreateFuncDefOOP & sbody & vbCrLf
     Else
     #If DebugVer Then
-        CreateFuncDefOOP = CreateFuncDefOOP & Space(8) & "print('" & FuncName & "')" & vbCrLf
+        CreateFuncDefOOP = CreateFuncDefOOP & Space(8) & "print('" & funcName & "')" & vbCrLf
     #Else
         CreateFuncDefOOP = CreateFuncDefOOP & Space(8) & "#TODO, Please finish the function here!" & vbCrLf
         CreateFuncDefOOP = CreateFuncDefOOP & Space(8) & "pass" & vbCrLf

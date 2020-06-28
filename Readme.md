@@ -165,6 +165,8 @@ Readme of english version refers to [Readme_EN.md](https://github.com/cdhigh/tki
 3. Python 2.7.3附带的ttk中的Treeview字体设置无效，但3.2.3及之后的的Treeview的字体设置有效。
 
 # 版本历史
+*  v1.6.4
+    1. Listbox在VB中有Click函数的话，自动生成 <<ListboxSelect>> 绑定。
 *  v1.6.3
     1. 支持设计时在窗体上设置分组中其中一个Radiobutton的选中状态。
 *  v1.6.2

@@ -89,6 +89,8 @@ The addin will generate python code of GUI framework for you. the only thing you
    `print(Option1.value())`    
 
 # History
+*  v1.6.4
+    1. Auto generate <<ListboxSelect>> bind command for Listbox if Click method found in VB code.
 * v1.6.3
     1. Can set 'checked' for one of Radiobuttons by default.
 * v1.6.2

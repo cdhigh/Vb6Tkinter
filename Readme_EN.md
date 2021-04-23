@@ -89,6 +89,8 @@ The addin will generate python code of GUI framework for you. the only thing you
    `print(Option1.value())`    
 
 # History
+*  v1.6.5
+    1. Save generated code to file directly when size is larger than 65k.
 *  v1.6.4
     1. Auto generate <<ListboxSelect>> bind command for Listbox if Click method found in VB code.
 * v1.6.3

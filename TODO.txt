@@ -1,0 +1,1 @@
+在窗口去掉LEFT/TOP后还生成 self.master.geometry('XXXxYYY+0+0')

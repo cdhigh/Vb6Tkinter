@@ -50,18 +50,10 @@ Begin VB.Form FrmMain
       TabIndex        =   0
       Top             =   120
       Width           =   2295
-      _ExtentX        =   4048
-      _ExtentY        =   873
-      Caption         =   "Refresh Forms(&R)"
-      BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
-         Name            =   "Courier New"
-         Size            =   9
-         Charset         =   0
-         Weight          =   400
-         Underline       =   0   'False
-         Italic          =   0   'False
-         Strikethrough   =   0   'False
-      EndProperty
+      _extentx        =   4048
+      _extenty        =   873
+      caption         =   "Refresh Forms(&R)"
+      font            =   "MainForm.frx":0592
    End
    Begin MSComctlLib.StatusBar stabar 
       Align           =   2  'Align Bottom
@@ -94,9 +86,9 @@ Begin VB.Form FrmMain
    End
    Begin VB.ComboBox cmbFrms 
       Height          =   345
-      ItemData        =   "MainForm.frx":0592
+      ItemData        =   "MainForm.frx":05BE
       Left            =   120
-      List            =   "MainForm.frx":0594
+      List            =   "MainForm.frx":05C0
       Style           =   2  'Dropdown List
       TabIndex        =   5
       Top             =   840
@@ -134,17 +126,9 @@ Begin VB.Form FrmMain
       TabIndex        =   8
       Top             =   840
       Width           =   6015
-      _ExtentX        =   10610
-      _ExtentY        =   12091
-      BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
-         Name            =   "Courier New"
-         Size            =   9
-         Charset         =   0
-         Weight          =   400
-         Underline       =   0   'False
-         Italic          =   0   'False
-         Strikethrough   =   0   'False
-      EndProperty
+      _extentx        =   10610
+      _extenty        =   12091
+      font            =   "MainForm.frx":05C2
    End
    Begin VB.TextBox TxtCode 
       BeginProperty Font 
@@ -170,18 +154,10 @@ Begin VB.Form FrmMain
       TabIndex        =   1
       Top             =   120
       Width           =   2295
-      _ExtentX        =   4048
-      _ExtentY        =   873
-      Caption         =   "Generate Code(&G)"
-      BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
-         Name            =   "Courier New"
-         Size            =   9
-         Charset         =   0
-         Weight          =   400
-         Underline       =   0   'False
-         Italic          =   0   'False
-         Strikethrough   =   0   'False
-      EndProperty
+      _extentx        =   4048
+      _extenty        =   873
+      caption         =   "Generate Code(&G)"
+      font            =   "MainForm.frx":05EE
    End
    Begin TkinterDesigner.xpcmdbutton CmdCopyToClipboard 
       Height          =   495
@@ -189,18 +165,10 @@ Begin VB.Form FrmMain
       TabIndex        =   2
       Top             =   120
       Width           =   2295
-      _ExtentX        =   4048
-      _ExtentY        =   873
-      Caption         =   "Copy to Clipboard(&C)"
-      BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
-         Name            =   "Courier New"
-         Size            =   9
-         Charset         =   0
-         Weight          =   400
-         Underline       =   0   'False
-         Italic          =   0   'False
-         Strikethrough   =   0   'False
-      EndProperty
+      _extentx        =   4048
+      _extenty        =   873
+      caption         =   "Copy to Clipboard(&C)"
+      font            =   "MainForm.frx":061A
    End
    Begin TkinterDesigner.xpcmdbutton CmdSaveToFile 
       Height          =   495
@@ -208,18 +176,10 @@ Begin VB.Form FrmMain
       TabIndex        =   3
       Top             =   120
       Width           =   2295
-      _ExtentX        =   4048
-      _ExtentY        =   873
-      Caption         =   "Save to File(&F)"
-      BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
-         Name            =   "Courier New"
-         Size            =   9
-         Charset         =   0
-         Weight          =   400
-         Underline       =   0   'False
-         Italic          =   0   'False
-         Strikethrough   =   0   'False
-      EndProperty
+      _extentx        =   4048
+      _extenty        =   873
+      caption         =   "Save to File(&F)"
+      font            =   "MainForm.frx":0646
    End
    Begin TkinterDesigner.xpcmdbutton CmdQuit 
       Height          =   495
@@ -227,18 +187,10 @@ Begin VB.Form FrmMain
       TabIndex        =   4
       Top             =   120
       Width           =   2295
-      _ExtentX        =   4048
-      _ExtentY        =   873
-      Caption         =   "Quit(&Q)"
-      BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
-         Name            =   "Courier New"
-         Size            =   9
-         Charset         =   0
-         Weight          =   400
-         Underline       =   0   'False
-         Italic          =   0   'False
-         Strikethrough   =   0   'False
-      EndProperty
+      _extentx        =   4048
+      _extenty        =   873
+      caption         =   "Quit(&Q)"
+      font            =   "MainForm.frx":0672
    End
    Begin VB.Menu mnuFile 
       Caption         =   "File(&F)"
@@ -949,7 +901,7 @@ End Sub
 Private Sub CmdGenCode_Click()
     
     Dim i As Long, cnt As Long, o As Object
-    Dim strHead As New cStrBuilder, strOut As New cStrBuilder, strCmd As New cStrBuilder, s As String
+    Dim strHead As New cStrBuilder, strOut As New cStrBuilder, strCmd As New cStrBuilder, s As String, finalCode As String, sF As String
     Dim OutOnlyV3 As Boolean, OutOOP As Boolean, OutRelPos As Boolean, usettk As Boolean
     Dim bUnicodePrefix As Boolean  '临时保存UNICODE前缀方式
     Dim aCompsSorted() As Object '用于排序的代码输出
@@ -1113,7 +1065,7 @@ Private Sub CmdGenCode_Click()
         strCmd.Append vbCrLf
         'strCmd.Append "    try: " & WTOP & ".destroy()"
         'strCmd.Append "    except: pass" & vbCrLf
-        TxtCode.Text = strHead.toString(vbCrLf) & strOut.toString(vbCrLf) & strCmd.toString(vbCrLf)
+        finalCode = strHead.toString(vbCrLf) & strOut.toString(vbCrLf) & strCmd.toString(vbCrLf)
     Else
         strOut.Append "    " & WTOP & ".mainloop()"
         'strOut.Append "    try: " & WTOP & ".destroy()"
@@ -1121,7 +1073,22 @@ Private Sub CmdGenCode_Click()
         strOut.Append vbCrLf & vbCrLf
         strOut.Append "if __name__ == ""__main__"":"
         strOut.Append "    main(sys.argv)" & vbCrLf
-        TxtCode.Text = strHead.toString(vbCrLf) & strCmd.toString(vbCrLf) & strOut.toString(vbCrLf)
+        finalCode = strHead.toString(vbCrLf) & strCmd.toString(vbCrLf) & strOut.toString(vbCrLf)
+    End If
+    
+    'VB的TEXTBOX最多支持65K文本
+    If Len(finalCode) > 65000 Then
+        MsgBox L("l_msgCodeTooBig", "Size of generated code is too big to load into TextBox, please choose a file to save it."), vbInformation
+        sF = FileDialog(Me, True, L("l_fdSave", "Save file to:"), "*.py", m_prevsf)
+        
+        If Len(sF) > 0 Then
+            If Len(FileExt(sF)) = 0 Then sF = sF & ".py"  '如果文件名没有扩展名，自动添加.py扩展名
+            Utf8File_Write_VB sF, finalCode
+            m_prevsf = sF
+        End If
+        TxtCode.Text = ""
+    Else
+        TxtCode.Text = finalCode
     End If
     
     strOut.Reset

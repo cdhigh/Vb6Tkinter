@@ -33,6 +33,8 @@ Private m_ScaleMode As Long
 Private m_IconFilesInPath As String '在窗体所在目录下所有的图标文件，使用逗号分隔
 Private m_StartupPosition As String
 
+Const defaultIconName As String = "icon.gif" '如果存在此文件名，则自动做为窗体图标
+
 '输出PYTHON代码,
 'sCmdFunc: 输出参数，事件处理回调代码;
 'rel:是否使用相对坐标,
@@ -296,6 +298,16 @@ Public Sub InitConfig(o As Object, nWidth As Long, nHeight As Long, dMethods As 
         m_IconFile = m_IconFilesInPath
     Else
         m_IconFile = ""
+        
+        '如果有一个命名为 icon.gif 的图像文件，则自动选择此文件
+        sa = Split(m_IconFilesInPath, ",")
+        For i = 0 To UBound(sa)
+            s = sa(i)
+            If (Len(s) > Len(defaultIconName)) And (Right(LCase(s), Len(defaultIconName)) = defaultIconName) Then
+                m_IconFile = s
+                Exit For
+            End If
+        Next
     End If
     m_Bindcommand = ""
     m_Topmost = False

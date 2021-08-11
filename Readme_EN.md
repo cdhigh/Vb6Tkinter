@@ -81,14 +81,16 @@ The addin will generate python code of GUI framework for you. the only thing you
 2. Added a Tooltip class to implement a Tooltip hover box for almost all widgets, supports wrap automatic or wrap manual(using '\n').
 3. Added More intuitive setText()/text() methods to Entry/Label/Button/Checkbutton/Radiobutton.    
    (not apply to CheckBCheckbutton/Radiobutton by default, please select 'textvariable' in tkinter-designer.)
-4. Similar to 2, Added setValue()/value() to Checkbutton/Radiobutton, parameter is 1/0.   
+4. Similar to 3, Added setValue()/value() to Checkbutton/Radiobutton, parameter is 1/0.   
    `self.Text1.setText('new text')`    
-   `print(self.text())`    
+   `print(self.Text1.text())`    
    `print(self.Check1.value())`    
    `self.Option1.setValue(1)`    
-   `print(Option1.value())`    
+   `print(self.Option1.value())`    
 
 # History
+*  v1.6.6
+    1. If a file named "icon.gif" is found in the same directory, it will be automatically set as the form icon.
 *  v1.6.5
     1. Save generated code to file directly when size is larger than 65k.
 *  v1.6.4

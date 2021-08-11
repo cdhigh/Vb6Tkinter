@@ -145,12 +145,12 @@ Readme of english version refers to [Readme_EN.md](https://github.com/cdhigh/tki
 3. 隐藏反人类的TK控件设置和获取控件显示值的机制（需要通过控件变量textvariable），给Entry/Label/Button/Checkbutton/Radiobutton控件
    添加更符合直觉的 setText()/text() 方法，可以直接设置和获取其控件显示的文本值。    
    （Checkbutton/Radiobutton默认不添加，如需要，可以在tkinter-designer将textvariable打勾，因为很少需要运行时修改这两个控件的文本。）
-4. 同样类似第二条，给Checkbutton/Radiobutton添加 setValue()/value() 方法，参数为1/0。    
+4. 同样类似第三条，给Checkbutton/Radiobutton添加 setValue()/value() 方法，参数为1/0。    
    `self.Text1.setText('new text')`    
-   `print(self.text())`    
+   `print(self.Text1.text())`    
    `print(self.Check1.value())`    
    `self.Option1.setValue(1)`    
-   `print(Option1.value())`   
+   `print(self.Option1.value())`   
 
 # 其他建议
 1. 不支持使用控件数组，界面可以显示，但是后面的同名控件名会覆盖前面定义的，导致在代码中无法再和此控件互动。
@@ -165,6 +165,8 @@ Readme of english version refers to [Readme_EN.md](https://github.com/cdhigh/tki
 3. Python 2.7.3附带的ttk中的Treeview字体设置无效，但3.2.3及之后的的Treeview的字体设置有效。
 
 # 版本历史
+*  v1.6.6
+    1. 如果目录下存在 icon.gif 文件，则自动用做窗体图标(编码为base64嵌入代码)。
 *  v1.6.5
     1. 如果生成的代码超过65k，则不显示在文本框中，直接要求保存到磁盘文件。
 *  v1.6.4

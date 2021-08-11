@@ -1,5 +1,5 @@
 VERSION 5.00
-Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.0#0"; "MSCOMCTL.OCX"
+Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.0#0"; "mscomctl32.ocx"
 Begin VB.Form FrmMain 
    Caption         =   "Tkinter Designer - cdhigh@sohu.com"
    ClientHeight    =   8130
@@ -50,10 +50,18 @@ Begin VB.Form FrmMain
       TabIndex        =   0
       Top             =   120
       Width           =   2295
-      _extentx        =   4048
-      _extenty        =   873
-      caption         =   "Refresh Forms(&R)"
-      font            =   "MainForm.frx":0592
+      _ExtentX        =   4048
+      _ExtentY        =   873
+      Caption         =   "Refresh Forms(&R)"
+      BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
+         Name            =   "Courier New"
+         Size            =   9
+         Charset         =   0
+         Weight          =   400
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
    End
    Begin MSComctlLib.StatusBar stabar 
       Align           =   2  'Align Bottom
@@ -86,9 +94,9 @@ Begin VB.Form FrmMain
    End
    Begin VB.ComboBox cmbFrms 
       Height          =   345
-      ItemData        =   "MainForm.frx":05BE
+      ItemData        =   "MainForm.frx":0592
       Left            =   120
-      List            =   "MainForm.frx":05C0
+      List            =   "MainForm.frx":0594
       Style           =   2  'Dropdown List
       TabIndex        =   5
       Top             =   840
@@ -126,9 +134,17 @@ Begin VB.Form FrmMain
       TabIndex        =   8
       Top             =   840
       Width           =   6015
-      _extentx        =   10610
-      _extenty        =   12091
-      font            =   "MainForm.frx":05C2
+      _ExtentX        =   10610
+      _ExtentY        =   12091
+      BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
+         Name            =   "Courier New"
+         Size            =   9
+         Charset         =   0
+         Weight          =   400
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
    End
    Begin VB.TextBox TxtCode 
       BeginProperty Font 
@@ -154,10 +170,18 @@ Begin VB.Form FrmMain
       TabIndex        =   1
       Top             =   120
       Width           =   2295
-      _extentx        =   4048
-      _extenty        =   873
-      caption         =   "Generate Code(&G)"
-      font            =   "MainForm.frx":05EE
+      _ExtentX        =   4048
+      _ExtentY        =   873
+      Caption         =   "Generate Code(&G)"
+      BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
+         Name            =   "Courier New"
+         Size            =   9
+         Charset         =   0
+         Weight          =   400
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
    End
    Begin TkinterDesigner.xpcmdbutton CmdCopyToClipboard 
       Height          =   495
@@ -165,10 +189,18 @@ Begin VB.Form FrmMain
       TabIndex        =   2
       Top             =   120
       Width           =   2295
-      _extentx        =   4048
-      _extenty        =   873
-      caption         =   "Copy to Clipboard(&C)"
-      font            =   "MainForm.frx":061A
+      _ExtentX        =   4048
+      _ExtentY        =   873
+      Caption         =   "Copy to Clipboard(&C)"
+      BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
+         Name            =   "Courier New"
+         Size            =   9
+         Charset         =   0
+         Weight          =   400
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
    End
    Begin TkinterDesigner.xpcmdbutton CmdSaveToFile 
       Height          =   495
@@ -176,10 +208,18 @@ Begin VB.Form FrmMain
       TabIndex        =   3
       Top             =   120
       Width           =   2295
-      _extentx        =   4048
-      _extenty        =   873
-      caption         =   "Save to File(&F)"
-      font            =   "MainForm.frx":0646
+      _ExtentX        =   4048
+      _ExtentY        =   873
+      Caption         =   "Save to File(&F)"
+      BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
+         Name            =   "Courier New"
+         Size            =   9
+         Charset         =   0
+         Weight          =   400
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
    End
    Begin TkinterDesigner.xpcmdbutton CmdQuit 
       Height          =   495
@@ -187,10 +227,18 @@ Begin VB.Form FrmMain
       TabIndex        =   4
       Top             =   120
       Width           =   2295
-      _extentx        =   4048
-      _extenty        =   873
-      caption         =   "Quit(&Q)"
-      font            =   "MainForm.frx":0672
+      _ExtentX        =   4048
+      _ExtentY        =   873
+      Caption         =   "Quit(&Q)"
+      BeginProperty Font {0BE35203-8F91-11CE-9DE3-00AA004BB851} 
+         Name            =   "Courier New"
+         Size            =   9
+         Charset         =   0
+         Weight          =   400
+         Underline       =   0   'False
+         Italic          =   0   'False
+         Strikethrough   =   0   'False
+      EndProperty
    End
    Begin VB.Menu mnuFile 
       Caption         =   "File(&F)"
@@ -255,7 +303,6 @@ Begin VB.Form FrmMain
       End
       Begin VB.Menu mnuV2andV3Code 
          Caption         =   "Compatible Code for Python 2.x/3.x(&C)"
-         Checked         =   -1  'True
       End
       Begin VB.Menu mnuUseTtk 
          Caption         =   "Use TTK Themed Library(&T)"
@@ -1166,7 +1213,10 @@ End Sub
 
 Private Sub CmdRefsFormsList_Click()
     
-    Dim frm As Object, nScaleMode As Long
+    Dim frm As Object, nScaleMode As Long, emptyForms() As String, emptyFormsCount As Integer, frmName As String, idx As Integer
+    
+    emptyFormsCount = 0
+    ReDim emptyForms(emptyFormsCount) As String
     
     cmbFrms.Clear
     LstComps.Clear
@@ -1192,11 +1242,25 @@ Private Sub CmdRefsFormsList_Click()
             If nScaleMode <> vbTwips And nScaleMode <> vbPoints And nScaleMode <> vbPixels Then
                 MsgBox L_F("l_msgFailedScaleMode", "Found form'{0}', but its ScaleMode={1}, now can only support mode 1/2/3.", _
                          frm.Properties("Name"), nScaleMode), vbInformation
+            ElseIf frm.Designer.VBControls.Count = 0 Then '没有控件的空窗体放到组合框列表后面
+                emptyFormsCount = emptyFormsCount + 1
+                ReDim Preserve emptyForms(emptyFormsCount) As String
+                emptyForms(emptyFormsCount - 1) = frm.Name
             Else
                 cmbFrms.AddItem frm.Name
             End If
         End If
     Next
+    
+    '在列表后添加没有控件的窗体
+    If emptyFormsCount > 0 Then
+        For idx = 0 To UBound(emptyForms)
+            frmName = emptyForms(idx)
+            If Len(frmName) > 0 Then
+                cmbFrms.AddItem frmName
+            End If
+        Next
+    End If
     
     If cmbFrms.ListCount >= 1 Then
         cmbFrms.ListIndex = 0      '触发cmbFrms_Click

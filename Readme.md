@@ -84,25 +84,25 @@ Readme of english version refers to [Readme_EN.md](https://github.com/cdhigh/tki
     属性为对应滚动条的.set方法。
 9. HScrollBar, VScrollBar    
     滚动条在Python中为Scrollbar，通过设置orient来控制水平还是垂直。
-10. Slider    
-    类似对应Python中的Scale。
-11. PictureBox    
+10. PictureBox    
     简单对应到Python中的Canvas，用做其他控件的容器或画图容器使用。
     如果需要滚动，则在适当位置创建滚动条，如果滚动条紧靠着图像框的右边或下边，
     并且长度(水平滚动条)或高度(垂直滚动条)差不多，则滚动条和图像框自动绑定，
     如果没有自动绑定，可以在Addin界面选择其xscrollcommand和yscrollcommand
     属性为对应滚动条的.set方法。
-12. Menu    
+11. Menu    
     可以使用VB的菜单编辑器来设计Python的菜单。
     在VB中的菜单标题设置为"-"则创建分隔条。
     也可以在正常的菜单标题中增加(&+字母)的方式添加 'Alt快捷键'。
     除 'Alt快捷键' 外，在VB菜单编辑器中选择菜单对应的快捷键则会直接显示快捷键
     信息在菜单标题后面，并自动注册对应的bind命令。
-13. Line    
+12. Line    
     可以用于组织复杂界面，仅支持水平或垂直线。
     
 	> 以下的控件需要在VB的'控件工具箱'中按右键添加'部件'，选择“Microsoft Windows Common Controls 6.0”
-	
+
+13. Slider    
+    类似对应Python中的Scale。
 14. ProgressBar    
     对应到Python的Progressbar，需要启用TTK主题扩展（默认）
 15. TreeView    
@@ -165,6 +165,9 @@ Readme of english version refers to [Readme_EN.md](https://github.com/cdhigh/tki
 3. Python 2.7.3附带的ttk中的Treeview字体设置无效，但3.2.3及之后的的Treeview的字体设置有效。
 
 # 版本历史
+*  v1.6.7
+    1. 如窗体设置为屏幕中心，将设置窗体位置代码移动到初始化函数开头，避免启动时窗体有一个移动过程。
+    2. 删除生成的代码中的部分提示信息。
 *  v1.6.6
     1. 如果目录下存在 icon.gif 文件，则自动用做窗体图标(编码为base64嵌入代码)。
 *  v1.6.5

@@ -73,7 +73,7 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
         sList = sList & U(oList.IndexedValue(i)) & ","
         i = i + 1
     Loop
-    m_List = sList & IIf(sList = "[", "'Add items in designer or code!',]", "]")
+    m_List = sList & IIf(sList = "[", "'',]", "]")
     
     m_dicTotal("x") = m_Base.toPixelX(o.Properties("Left"))
     m_dicTotal("y") = m_Base.toPixelY(o.Properties("Top"))

@@ -160,7 +160,7 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
     Loop
     If numList = 0 Then
         ReDim m_List(0) As String
-        m_List(0) = "Add Items in designer or code!"
+        m_List(0) = "" 'Add Items in designer or code!
     End If
     
     m_dicTotal("x") = m_Base.toPixelX(o.Properties("Left"))

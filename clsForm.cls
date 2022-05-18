@@ -42,6 +42,11 @@ Const defaultIconName As String = "icon.gif" '如果存在此文件名，则自动做为窗体图
 'usettk:是否使用TTK主题扩展
 Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, rel As Boolean, oop As Boolean, usettk As Boolean)
     
+     '如果需要窗体在屏幕中间，计算相对位置，这句话要放在最前面，避免窗口启动后先有一个小框再移动到屏幕正中
+    If m_StartupPosition = "Center" Then
+        CenterWindow sOut, oop
+    End If
+    
     If oop Then
         sOut.Append "        self.master.title(" & U(m_Title) & ")"
         If m_StartupPosition = "Manual" Then  '手工指定窗口初始位置
@@ -86,10 +91,6 @@ Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, re
     ProcessIcon sOut, oop  '处理窗体图标
     ProcessBindCommand sOut, sCmdFunc, oop ' 处理bindcommand
     ProcessProtocol sOut, sCmdFunc, oop '窗口消息拦截，如果有的话
-    
-    If m_StartupPosition = "Center" Then
-        CenterWindow sOut, oop  '如果需要窗体在屏幕中间
-    End If
     
     If Not oop Then
         sOut.Append "    gComps['" & m_Name & "'] = " & m_Name & vbCrLf

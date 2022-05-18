@@ -49,17 +49,17 @@ Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, re
     End If
     
     '增加几行示例代码，更形象，生手也可以很快上手使用
-    If oop Then
-        sOut.Append vbCrLf & Space(8) & "self." & m_Base.Name & ".insert('', 'end', 'TOP', text='Sample', open=True)  " & L("l_cmtTreeviewSample", "#The four lines of sample code hereinafter.")
-        sOut.Append Space(8) & "self." & m_Base.Name & ".insert('', 'end', 'TOP2', text='TOP2')"
-        sOut.Append Space(8) & "self." & m_Base.Name & ".insert('TOP', 'end', 'TOP.1', text='Sample.1')"
-        sOut.Append Space(8) & "self." & m_Base.Name & ".insert('TOP', 'end', 'TOP.2', text='Sample.2')"
-    Else
-        sOut.Append vbCrLf & Space(4) & m_Base.Name & ".insert('', 'end', 'TOP', text='Sample', open=True)  " & L("l_cmtTreeviewSample", "#The four lines of sample code hereinafter.")
-        sOut.Append Space(4) & m_Base.Name & ".insert('', 'end', 'TOP2', text='TOP2')"
-        sOut.Append Space(4) & m_Base.Name & ".insert('TOP', 'end', 'TOP.1', text='Sample.1')"
-        sOut.Append Space(4) & m_Base.Name & ".insert('TOP', 'end', 'TOP.2', text='Sample.2')"
-    End If
+    'If oop Then
+    '    sOut.Append vbCrLf & Space(8) & "self." & m_Base.Name & ".insert('', 'end', 'TOP', text='Sample', open=True)  " & L("l_cmtTreeviewSample", "#The four lines of sample code hereinafter.")
+    '    sOut.Append Space(8) & "self." & m_Base.Name & ".insert('', 'end', 'TOP2', text='TOP2')"
+    '    sOut.Append Space(8) & "self." & m_Base.Name & ".insert('TOP', 'end', 'TOP.1', text='Sample.1')"
+    '    sOut.Append Space(8) & "self." & m_Base.Name & ".insert('TOP', 'end', 'TOP.2', text='Sample.2')"
+    'Else
+    '    sOut.Append vbCrLf & Space(4) & m_Base.Name & ".insert('', 'end', 'TOP', text='Sample', open=True)  " & L("l_cmtTreeviewSample", "#The four lines of sample code hereinafter.")
+    '    sOut.Append Space(4) & m_Base.Name & ".insert('', 'end', 'TOP2', text='TOP2')"
+    '    sOut.Append Space(4) & m_Base.Name & ".insert('TOP', 'end', 'TOP.1', text='Sample.1')"
+    '    sOut.Append Space(4) & m_Base.Name & ".insert('TOP', 'end', 'TOP.2', text='Sample.2')"
+    'End If
     
 End Sub
 

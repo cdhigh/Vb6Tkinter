@@ -1,5 +1,5 @@
 VERSION 5.00
-Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.0#0"; "mscomctl32.ocx"
+Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.2#0"; "MSCOMCTL.OCX"
 Begin VB.Form FrmMain 
    Caption         =   "Tkinter Designer - cdhigh@sohu.com"
    ClientHeight    =   8130
@@ -1521,7 +1521,7 @@ End Sub
 
 Private Sub mnuCopyToClipUiOnly_Click()
     
-    Dim s As String, nui As Long, napp As Long
+    Dim s As String, nui As Long, napp As Long, idx As Long
     
     '分析代码，仅提取Application_ui(),使用正则表达式也可以，但是这里使用简单字符串分析
     s = TxtCode.Text
@@ -1529,7 +1529,7 @@ Private Sub mnuCopyToClipUiOnly_Click()
     napp = InStr(1, s, "class Application(Application_ui):")
     If nui > 0 And napp > 0 Then
         Clipboard.Clear
-        Clipboard.SetText Mid(s, nui, napp - nui)
+        Clipboard.SetText Mid(s, nui, napp - nui - 2) '删除一个回车换行
     Else
         MsgBox L("l_msgNoClsUi", "Class 'Application_ui' no founded in code!"), vbInformation
     End If

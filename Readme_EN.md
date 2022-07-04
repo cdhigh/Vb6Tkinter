@@ -89,6 +89,8 @@ The addin will generate python code of GUI framework for you. the only thing you
    `print(self.Option1.value())`    
 
 # History
+*  v1.6.8
+    1. Translate the click event of Notebook widget to the <<NotebookTabChanged>> event.
 *  v1.6.7
     1. If the form is set to the center of the screen, move the code for setting the position of the form to the beginning of the initialization function to avoid a moving process of the form at startup.
     2. Remove some hints in generated code.

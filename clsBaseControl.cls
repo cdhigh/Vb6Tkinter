@@ -534,7 +534,7 @@ Public Function GetBindCommandStr(dMethods As Dictionary) As String
         If InStr(1, s, "," & m_Name & "_MouseDown,") > 0 Then sOut.Append "<Button-1>"
     ElseIf m_Type = "Listbox" Then
         If InStr(1, s, "," & m_Name & "_Click,") > 0 Then sOut.Append "<<ListboxSelect>>"
-    Else
+    ElseIf m_Type <> "Notebook" Then
         If InStr(1, s, "," & m_Name & "_Click,") > 0 Or InStr(1, s, "," & m_Name & "_MouseDown,") > 0 Then sOut.Append "<Button-1>"
     End If
     
@@ -555,7 +555,7 @@ Public Function GetBindCommandStr(dMethods As Dictionary) As String
         If InStr(1, s, "," & m_Name & "_Collapse,") > 0 Then sOut.Append "<<TreeviewClose>>"
         If InStr(1, s, "," & m_Name & "_Expand,") > 0 Then sOut.Append "<<TreeviewOpen>>"
     ElseIf m_Type = "Notebook" Then
-        If InStr(1, s, "," & m_Name & "_BeforeClick,") > 0 Then sOut.Append "<<NotebookTabChanged>>"
+        If (InStr(1, s, "," & m_Name & "_BeforeClick,") > 0) Or (InStr(1, s, "," & m_Name & "_Click,") > 0) Then sOut.Append "<<NotebookTabChanged>>"
     End If
     
     GetBindCommandStr = sOut.toString(",")

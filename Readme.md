@@ -156,6 +156,8 @@ Readme of english version refers to [Readme_EN.md](https://github.com/cdhigh/tki
 1. 不支持使用控件数组，界面可以显示，但是后面的同名控件名会覆盖前面定义的，导致在代码中无法再和此控件互动。
 2. 窗体的ScaleMode建议保持默认值(vbTwips)，如果要设置为其他值，则Frame控件内就不要再放Frame控件了，否则其内部的控件布局错误。
 3. 如果需要简体汉字界面，则需要Language.lng文件在TkinterDesigner.dll同一目录。
+4. 此插件支持更多的一些便捷特性，分散在版本历史中，这里就不一一列举了，有需要的可以去了解。
+
 
 # ttk库额外说明
   ttk主题扩展看起来很漂亮，在不同操作系统下界面呈现为本地化风格，建议使用，    
@@ -165,6 +167,8 @@ Readme of english version refers to [Readme_EN.md](https://github.com/cdhigh/tki
 3. Python 2.7.3附带的ttk中的Treeview字体设置无效，但3.2.3及之后的的Treeview的字体设置有效。
 
 # 版本历史
+*  v1.6.8
+    1. Notebook控件的鼠标点击事件对应到 <<NotebookTabChanged>> 事件
 *  v1.6.7
     1. 如窗体设置为屏幕中心，将设置窗体位置代码移动到初始化函数开头，避免启动时窗体有一个移动过程。
     2. 删除生成的代码中的部分提示信息。

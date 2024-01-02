@@ -30,7 +30,7 @@ Begin VB.Form frmEncodeAFile
       Top             =   720
       Width           =   975
    End
-   Begin TkinterDesigner.xpcmdbutton cmdCancelEncode 
+   Begin Vb6Tkinter.xpcmdbutton cmdCancelEncode 
       Height          =   495
       Left            =   10320
       TabIndex        =   6
@@ -49,7 +49,7 @@ Begin VB.Form frmEncodeAFile
          Strikethrough   =   0   'False
       EndProperty
    End
-   Begin TkinterDesigner.xpcmdbutton cmdSaveBase64Result 
+   Begin Vb6Tkinter.xpcmdbutton cmdSaveBase64Result 
       Height          =   495
       Left            =   5640
       TabIndex        =   5
@@ -68,7 +68,7 @@ Begin VB.Form frmEncodeAFile
          Strikethrough   =   0   'False
       EndProperty
    End
-   Begin TkinterDesigner.xpcmdbutton cmdBase64It 
+   Begin Vb6Tkinter.xpcmdbutton cmdBase64It 
       Height          =   495
       Left            =   960
       TabIndex        =   4
@@ -97,7 +97,7 @@ Begin VB.Form frmEncodeAFile
       Top             =   1200
       Width           =   12975
    End
-   Begin TkinterDesigner.xpcmdbutton cmdChooseSourceToEncode 
+   Begin Vb6Tkinter.xpcmdbutton cmdChooseSourceToEncode 
       Height          =   375
       Left            =   12480
       TabIndex        =   2

@@ -24,7 +24,7 @@ Begin VB.Form frmOption
    ScaleWidth      =   8010
    ShowInTaskbar   =   0   'False
    StartUpPosition =   2  'ÆÁÄ»ÖÐÐÄ
-   Begin TkinterDesigner.xpcmdbutton cmdOptionCancel 
+   Begin Vb6Tkinter.xpcmdbutton cmdOptionCancel 
       Height          =   375
       Left            =   5640
       TabIndex        =   5
@@ -43,7 +43,7 @@ Begin VB.Form frmOption
          Strikethrough   =   0   'False
       EndProperty
    End
-   Begin TkinterDesigner.xpcmdbutton cmdOptionOK 
+   Begin Vb6Tkinter.xpcmdbutton cmdOptionOK 
       Height          =   375
       Left            =   3000
       TabIndex        =   4
@@ -62,7 +62,7 @@ Begin VB.Form frmOption
          Strikethrough   =   0   'False
       EndProperty
    End
-   Begin TkinterDesigner.xpcmdbutton cmdOptionApply 
+   Begin Vb6Tkinter.xpcmdbutton cmdOptionApply 
       Height          =   375
       Left            =   360
       TabIndex        =   3
@@ -81,7 +81,7 @@ Begin VB.Form frmOption
          Strikethrough   =   0   'False
       EndProperty
    End
-   Begin TkinterDesigner.xpcmdbutton cmdPythonExe 
+   Begin Vb6Tkinter.xpcmdbutton cmdPythonExe 
       Height          =   255
       Left            =   7080
       TabIndex        =   2

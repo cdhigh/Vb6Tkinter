@@ -1,94 +1,193 @@
-# Introduce
-The program is a addin of VB6(Visual Basic 6), It allows you design your GUI layout of Tkinter (standard GUI library of Python) in VB6 Integrated Development Environment.
+# Introduction  
+
+The program is an addin for VB6, It allows you design your GUI layout of Tkinter (standard GUI library of Python) in VB6 Integrated Development Environment.
 The addin will generate python code of GUI framework for you. the only thing you need to do is that add your logical code in Callback of GUI framework.
 
-![screenshot](https://raw.githubusercontent.com/cdhigh/tkinter-designer/master/Setup/Screenshots/TkinterDesigner_ScrPrnt_EN.JPG)
+![screenshot](https://raw.githubusercontent.com/cdhigh/vb6tkinter/master/Setup/Screenshots/Vb6Tkinter_ScrPrnt_EN.png)
+   
+   
+This tool supports the majority of TKinter widgets, making it suitable for most GUI requirements.
+(List of widgets can be found in the section "List of VB Controls Supported" below).
 
-# Install and Usage
-1. Install VB6 (You can install VB6 Lite or nano version).
-    (if your os is windows 7 or later, please install VB6 SP6 version and 
-    overwrite VB6.EXE using Vb6_SP6_Fix_for_Win7.exe)
-    
-2. Download Tkinter Designer from github.
-    [https://github.com/cdhigh/tkinter-designer](https://github.com/cdhigh/tkinter-designer)
-    
-3. Copy directory 'Bin' to other directory you want, execute 'Setup for TkinterDesigner.exe' to register TkinterDesigner.dll.   Or you can do it manual.
-    1. run regsvr32 /s diretory\TkinerDesigner.dll   
-    2. Add a line to sector [Add-Ins32] of C:\Windows\VBADDIN.INI:   
-       `TkinterDesigner.Connect=3`
 
-4. Open VB6, create a standard EXE project, design your layout firstly,
-    and than click the icon 'Tkinter Designer' in toolbox of VB6.
-    
-5. Enjoy TkinterDesigner.
 
-# List of VB Controls Supported
-1. Label    
-    Has same appearance and behavior in Tkinter.
-2. TextBox    
-    If the property MultiLine=False, the addin generate code for widget
-    'Entry' of Tkinter, otherwise for widget 'Text'.
-3. Frame    
-    Similar to widget LabelFrame of Tkinter. It can be container of other
-    widget.
-4. CommandButton    
-    It represent the widget Button of Tkinter.
-    You can also add a '&' befor a corresponding letter to make a keyboard
-    shortcut like 'Alt-letter', the addin generate code for shortcurts too.
-5. CheckBox    
-    Similar to widget Checkbutton.
-6. OptionButton    
-    Similar to widget Radiobutton.
-7. ComboBox    
-    If the menu 'Use TTK library' checked, it translate to widget Combobox
-    of TTK, otherwise, it translate to widget OptionMenu of Tkinter.
-8. ListBox    
-    Similar to widget Listbox of tkinter. you can add list of text in IDE.
-9. HScrollBar, VScrollBar    
-    The widget Scrollbar of tkinter.
-10. Slider    
-    Similar to widget Scale of tkinter.
-11. PictureBox    
-    It tranlate to Canvas.
-12. Menu    
-    Has same appearance and behavior in Tkinter.
-    you can create a separator by setting the caption of menuitem to '-'.
-    Add a keyboard shortcut by using format of '&+letter'.
-    
-> Adding the component 'Microsoft Windows Common Controls 6.0' to toolbox of VB IDE to support the other controls.
 
-13. ProgressBar    
-    Similar to widget Progressbar of TTK library.
-14. TreeView    
-    Similar to widget Treeview of TTK library.
-15. TabStrip    
-    Similar to widget Notebook of TTK libray.
-    If you want to design the tabs of Notebook in VB IDE, please use a
-    PictureBox or Frame as container for widgets, you have to name the 
-    PictureBox or Frame following format:
-    "Name of TabStrip" + "\__Tab" + sequence number(start in 1)
-    For example, if name of TabStrip is 'TabStrip1'(by default), you can
-    Create a PictureBox named 'TabStrip1\__Tab1' as container for Tab1 of 
-    Notebook widget.
+# Target user   
 
-16. CommonDialog    
-    if the form has this control, then the addin will create code for 
-    import modules filedialog, simpledialog, colorchooser.    
+Suitable for those who have learned TKinter and prefer not to manually write GUI code, without relying on third-party tools or frameworks like wxPython/PyQt.   
+Ideal for small program development with relatively simple UI; for complex interfaces, frameworks like wxPython/PyQt are more suitable.   
+As TKinter is part of the Python standard library, programs developed with TKinter can be considered "green software" or "portable software", They don't require the installation of third-party frameworks like wxPython/PyQt on the target machine. as long as Python is present, the program can run. Even when packaged into executables using tools like pyinstaller/cx_freeze, the final files remain relatively small.   
+If software logic is not overly complex, typically handled with a single .py file.
+(If you don't want a command prompt window to pop up during direct interpretation of the .py file, change the extension to .pyw)
 
-# Extends to tkinter
-1. Added a Statusbar widget.  
-   (Statusbar in component "Microsoft Windows Common Controls 6.0" in VB IDE)
-2. Added a Tooltip class to implement a Tooltip hover box for almost all widgets, supports wrap automatic or wrap manual(using '\n').
-3. Added More intuitive setText()/text() methods to Entry/Label/Button/Checkbutton/Radiobutton.    
-   (not apply to CheckBCheckbutton/Radiobutton by default, please select 'textvariable' in tkinter-designer.)
-4. Similar to 3, Added setValue()/value() to Checkbutton/Radiobutton, parameter is 1/0.   
-   `self.Text1.setText('new text')`    
-   `print(self.Text1.text())`    
-   `print(self.Check1.value())`    
-   `self.Option1.setValue(1)`    
-   `print(self.Option1.value())`    
 
-# History
+
+
+# Installation   
+
+There are two methods, choose either:    
+1. Integrated Installation:    
+  Download the pre-integrated and pre-patched VB6 nano installer at <https://github.com/cdhigh/Vb6Tkinter/releases>, Double-click to execute the installation, Do not need the operations in the following section.   
+
+2. Standalone Installation:    
+2.1. Download the addin from <https://github.com/cdhigh/Vb6Tkinter/releases> extract it to a directory. 
+2.2. Install VB6 independently, either the complete version or a lite/nano version.    
+  2.2.1. In Windows 7 and newer, please install VB6 SP6 version and overwrite VB6.EXE using Vb6_SP6_Fix_for_Win7.zip.   
+  2.2.2. In Windows 10 and newer, please apply VB6_AppCompat.   
+2.3. Register the addin using the provided registration tool "Setup for Vb6Tkinter.exe" or manually:   
+  2.3.1. Run `regsvr32 /s directory\Vb6Tkinter.dll`.    
+  2.3.2. Add a line in the [Add-Ins32] section of C:\Windows\VBADDIN.INI:   
+         `Vb6Tkinter.Connect=3`  
+  
+3. Once the addin have been installed and registered, future updates can be done by simply downloading the new versions of Vb6Tkinter.dll/Vb6Tkinter.lng and overwriting the existing files.   
+
+
+
+
+# Usage   
+
+1. Open VB6 and create a new standard EXE project. Design your GUI layout on the form. This task should be easy even for those without experience in VB6. Don't forget to set the corresponding control properties. If you prefer a non-resizable window, consider changing the VB6 form's "BorderStyle" property to "Fixed Single" or "Fixed Dialog".   
+
+2. If the addin is registered properly, you should now see a new icon (an orange-red feather) on the VB toolbar. If not, navigate to "Add-Ins" | "Add-In Manager" and launch Vb6Tkinter from there. The Vb6Tkinter icon and menu should appear accordingly.   
+
+3. After launching Vb6Tkinter, click the "Refresh Forms" button to display all forms and controls in the current project.   
+
+4. Review each control's properties, checking the desired options. If needed, double-click on a property in the list to modify its value. Typically, there's no need for additional modifications to control properties. Vb6Tkinter try it's best to translate VB control properties into Tkinter properties, covering aspects like font, color, initial value, appearance, and state. It even includes settings for buttons and menu shortcuts. If certain properties lack a direct correspondence, adjustments may be necessary within the Vb6Tkinter interface.   
+
+5. Click the "Generate Code" button to produce code in the code preview window. You can either double-click on the code preview window to view it in detail or make direct modifications to the code.    
+
+6. Once confirmed, copy the code to the clipboard or save it to a file. Layouts can utilize percentage-based (relative) or absolute coordinate-based (pixel) positioning. The advantage of percentage positioning is that controls can adjust relative to changes in the main interface size. For a fixed layout, opt for absolute coordinate positioning. Note: If altering a previously designed UI, consider outputting only the ui class to avoid affecting existing external logic code.   
+
+7. In the case of multiple GUI dialog/form application, add forms within the VB project. This allows you to select which form to generate code.   
+
+8. Regarding structured code, if you need to reference and modify other widgets values in Python, use the global dictionary gComps. This dictionary stores all GUI elements and some corresponding control variables. Access widgets directly using code like gComps["Text1Var"].set("new Text"). For object-oriented code, access widgets directly in the derived class Application using self.widgetName.
+
+9. GUI frameworks typically segregate UI and logic code into different files. In logic code files, import the UI file to ensure UI modifications don't impact the logic. While many prefer this separation, for simpler programs, I've chosen to keep both the UI class and logic code class in the same file. After modifying the interface, overwrite the corresponding Application_ui class to implement interface changes. If new event callback functions are added, remember to include them in the subclass Application.   
+
+
+
+
+
+# List of VB Controls Supported   
+
+1. **Form**   
+    The VB6 window (Form) corresponds to Tkinter's Frame, serving as the main interface presentation. For a more polished appearance, it's recommended to set the VB6 Form's BorderStyle property to "Fixed Single" or "Fixed Dialog."   
+
+2. **Label**   
+    Label in VB and Python is essentially the same. Line breaks can be achieved by inserting "\n" in the text, and with ttk enabled(default), the wraplength property becomes available.   
+
+3. **TextBox**   
+    Python offers two types of text boxes: Entry and Text. If VB's TextBox has property MultiLine=False, it generates an Entry; otherwise, it produces a Text.    
+
+4. **Frame**   
+    Corresponding to Python's LabelFrame widget, the Frame acts as a container for other controls or visually classifies interface elements.  
+
+5. **CommandButton**
+    Corresponding to Python's Button with minimal differences. For concise code, setting the Cancel property to True for the form's exit button generates the Tkinter destroy callback, eliminating the need for a separate callback function. In VB, prefixing a letter with "&" directly binds a shortcut key 'Alt + corresponding letter'(forexample &A). Vb6Tkinter supports this, automatically generating the associated event binding code. The same approach applies to other controls with a "Caption" property, such as CheckBox.   
+
+6. **CheckBox**
+    The CheckBox corresponds to Python's Checkbutton.   
+
+7. **OptionButton**
+    The OptionButton corresponds to Python's Radiobutton. The grouping method for Radiobuttons in tkinter differs slightly from VB (grouping implies mutual exclusivity; selecting one automatically deselects others). In VB, placing several OptionButtons within a Frame automatically groups them, a feature supported by Vb6Tkinter. For manual handling, set the variable property of Radiobuttons in the same group to the same variable. Ensure that the value property of each Radiobutton is unique (default is the control name). Setting different values (e.g., 1/2/3 or "man"/"woman") ensures that when a Radiobutton is selected, the variable is set to the corresponding value. Reading the variable indicates the selected Radiobutton, and vice versa, setting the variable selects the corresponding Radiobutton.   
+
+8. **ComboBox**   
+    There is no direct equivalent for ComboBox in Tkinter legacy. The closest match is OptionMenu, behaving similarly to a VB ComboBox with Style=2 (Dropdown List)—a list where you can only choose from provided values and cannot input directly. Hence, it's advisable to list all dropdown values in VB's ComboBox. If TTK theme extension library support is enabled (default enabled), it directly corresponds to TTK's Combobox with a similar appearance and behavior.
+
+9. **ListBox**   
+    The ListBox corresponds to Python's Listbox, behaving similarly, and allowing the setting of an initial list during design. If scrolling is required, create a scrollbar at an appropriate position. If the scrollbar is close to the right or bottom of the ListBox, and the length (horizontal scrollbar) or height (vertical scrollbar) is roughly similar, the scrollbar and ListBox are automatically bound. If not automatically bound, you can select its xscrollcommand or yscrollcommand properties in the Addin interface to correspond to the set method of the respective scrollbar.   
+
+10. **HScrollBar, VScrollBar**   
+    Scrollbars in Python are Scrollbar, with orientation controlled by the orient property.  
+
+11. **PictureBox**   
+    Roughly corresponds to Canvas in Python, serving as a container for other controls or as a drawing container. If scrolling is needed, create a scrollbar at an appropriate position. If the scrollbar is close to the right or bottom of the PictureBox, and the length (horizontal scrollbar) or height (vertical scrollbar) is roughly similar, the scrollbar and PictureBox are automatically bound. If not automatically bound, you can choose its xscrollcommand and yscrollcommand properties in the Addin interface to correspond to the set method of the respective scrollbar.  
+
+12. **Menu**  
+    You can use VB's menu editor to design menus in Python. In VB, setting the menu title to "-" creates a separator. You can also add Alt shortcuts to normal menu titles using the format (&+letter). Apart from Alt shortcuts, choosing a shortcut key for the menu in the VB menu editor will display the shortcut key information directly after the menu title and automatically bind the corresponding command.   
+
+13. **Line**  
+    This can be used to organize complex interfaces and supports only horizontal or vertical lines.  
+
+  > *Adding the component 'Microsoft Windows Common Controls 6.0' to toolbox of VB IDE to support the following controls.*
+
+14. **Slider**  
+    Similar to Python's Scale, it corresponds to the Slider control in VB. To use, add it from the 'Control Toolbox' in VB by right-clicking, selecting 'Components,' and choosing "Microsoft Windows Common Controls 6.0."   
+
+15. **ProgressBar**  
+    Corresponds to Python's Progressbar. Enable TTK theme extension (default) and add it from the 'Control Toolbox' in VB by right-clicking, selecting 'Components,' and choosing "Microsoft Windows Common Controls 6.0."   
+
+16. **TreeView**  
+    Corresponds to Python's Treeview, a tree-like display control. You can choose whether to display header rows. Enable TTK theme extension (default) and add it from the 'Control Toolbox' in VB by right-clicking, selecting 'Components,' and choosing "Microsoft Windows Common Controls 6.0." If scrolling is required, create a scrollbar at an appropriate position. If the scrollbar is close to the right or bottom of the TreeView, and the length (horizontal scrollbar) or height (vertical scrollbar) is roughly similar, the scrollbar and TreeView are automatically bound. If not, you can select its xscrollcommand and yscrollcommand properties in the Addin interface to correspond to the set method of the respective scrollbar.  
+
+17. **TabStrip**   
+    The TabStrip control, corresponding to Python's Notebook, requires TTK theme extension (default). To layout controls within each page:    
+   1. Each tab corresponds to a Frame or PictureBox, named: TabStrip's name + `__Tab` (double underscore) + a number starting from 1 (e.g., if the TabStrip's name is TabStrip1, you can create a PictureBox named `TabStrip1__Tab1`).
+   2. Place other controls you need within the PictureBox/Frame. After generating the code, this container is automatically added to the corresponding tab. Vb6Tkinter handles this behind the scenes.
+   Tab pages' PictureBox/Frame can be placed outside the visible range of the form. Once you've designed the corresponding tab, resize the form in the IDE to your desired size.
+   Note:
+    - If using relative coordinates, make sure the PictureBox or Frame container's size matches or is close to the size inside the TabStrip. Otherwise, the controls inside the tab may stretch or shrink to fit the available space, leading to an odd appearance. If using absolute coordinates, the PictureBox/Frame doesn't need to be the same size as the TabStrip, and the controls inside will be placed with the top-left corner of the TabStrip as the origin, maintaining the same proportions as designed. Therefore, it's recommended to use absolute coordinates if you have a TabStrip control.
+
+18. **CommonDialog**  
+    This control is also supported. If your VB form contains this control, you can import the filedialog, simpledialog, and colorchooser modules in Python. These modules provide simple file selection, input box, and color selection dialog functions. Add the "Microsoft Common Dialog Control 6.0" from the 'Control Toolbox' in VB by right-clicking, selecting 'Components,' and choosing "Microsoft Windows Common Controls 6.0."  
+
+
+
+
+
+# Extensions and "Wrappings" for Tkinter
+1. Since tkinter lacks a Statusbar control, I have implemented a simple Statusbar using a Label. After adding a Statusbar to the VB form, the corresponding implementation code will be inserted. (VB needs to add the "Microsoft Windows Common Controls 6.0" component to have a Statusbar).  
+
+2. As tkinter widgets do not have a Tooltip property, I have implemented a basic Tooltip class to add Tooltip functionality to tkinter controls. Setting the ToolTipText property of VB controls will automatically create a Tooltip class for the corresponding widget. ToolTipText supports automatic line breaks, and if manual control is needed, '\n' can be used.  
+
+3. The application hides the counterintuitive TK control setting and retrieving mechanism for displaying values (requires the use of control variable textvariable). For Entry/Label/Button/Checkbutton/Radiobutton controls, more intuitive `setText()` and `text()` methods have been added for directly setting and retrieving the displayed text values of the controls. (Checkbutton/Radiobutton are not added by default. If needed, you can check the textvariable in Vb6Tkinter, as these two controls rarely require runtime modification of text).
+
+4. Similar to the third point, `setValue()` and `value()` methods have been added for Checkbutton/Radiobutton, with parameters 1/0.  
+   ```
+   self.Text1.setText('new text')
+   print(self.Text1.text())
+   print(self.Check1.value())
+   self.Option1.setValue(1)
+   print(self.Option1.value())
+   ```  
+ 
+ 
+ 
+ 
+# Other tips  
+1. One of the features I love most about the VB IDE's form designer is the "Format" menu. By selecting multiple controls, you can easily set their size, alignment, and relative positions using this menu. Leveraging this functionality in UI design is not only effortless but also results in a more aesthetically pleasing UI.   
+  * Align: Left, top, etc.   
+  * Make same size: width, height, both the same.  
+  * Horizontal Spacing: Equal, increase, decrease, etc.  
+  * Vertical Spacing: Equal, increase, decrease, etc.  
+  * Center in Form: Horizontally, vertically.  
+
+2. The addin does not support the use of control arrays. While the UI can display them, subsequent controls with the same name will overwrite the previously defined ones, making it impossible to interact with these controls in the code.
+
+3. It is recommended to keep the default value (vbTwips) for the ScaleMode property of VB forms. If you need to set it to another value, avoid placing Frame controls inside other Frame controls, as this may lead to layout errors for the controls within.
+
+4. For a Simplified Chinese addin interface, the Vb6Tkinter.lng file should be in the same directory as Vb6Tkinter.dll.
+
+5. The addin offers additional convenient features scattered throughout its version changelog. Here, we won't list them all, but those interested can explore them as needed. 
+ 
+
+ 
+# Additional Explanation for the ttk Library   
+The standard built-in ttk themes extension provides native style on different operating systems. It is recommended for use, but be aware of the following ttk bugs:
+
+1. Setting the background color for TTK's Entry and Combobox controls is ineffective (you can set it without errors, but the interface remains unchanged).  
+2. Individually setting the font for LabelFrame and Notebook controls has no effect, but you can use ttk's global font attributes to change it, for example: `self.style.configure('.', font=('Arial', 12))`.  
+3. Font settings for Treeview in ttk accompanying Python 2.7.3 are ineffective, but they work for Treeview in version 3.2.3 and later.  
+
+
+
+
+# Changelog    
+*  v1.7
+    1. Rename the add-in from TkinterDesigner to Vb6Tkinter.
+    2. Add check update feature.
+    3. If only Python3 code is required, generate better Python3-style code.
+    4. By default, disable the option "Compatibile with Python 2/3 code".
 *  v1.6.8
     1. Translate the click event of Notebook widget to the <<NotebookTabChanged>> event.
 *  v1.6.7

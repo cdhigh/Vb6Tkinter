@@ -1,7 +1,7 @@
 VERSION 5.00
 Object = "{831FDD16-0C5C-11D2-A9FC-0000F8754DA1}#2.2#0"; "MSCOMCTL.OCX"
 Begin VB.Form FrmMain 
-   Caption         =   "Tkinter Designer - cdhigh@sohu.com"
+   Caption         =   "Vb6Tkinter https://github.com/cdhigh"
    ClientHeight    =   8130
    ClientLeft      =   45
    ClientTop       =   675
@@ -44,7 +44,7 @@ Begin VB.Form FrmMain
       Visible         =   0   'False
       Width           =   1095
    End
-   Begin TkinterDesigner.xpcmdbutton CmdRefsFormsList 
+   Begin Vb6Tkinter.xpcmdbutton CmdRefsFormsList 
       Height          =   495
       Left            =   120
       TabIndex        =   0
@@ -128,7 +128,7 @@ Begin VB.Form FrmMain
       Top             =   1200
       Width           =   2415
    End
-   Begin TkinterDesigner.GridOcx LstCfg 
+   Begin Vb6Tkinter.GridOcx LstCfg 
       Height          =   6855
       Left            =   2640
       TabIndex        =   8
@@ -164,7 +164,7 @@ Begin VB.Form FrmMain
       Top             =   840
       Width           =   4095
    End
-   Begin TkinterDesigner.xpcmdbutton CmdGenCode 
+   Begin Vb6Tkinter.xpcmdbutton CmdGenCode 
       Height          =   495
       Left            =   2760
       TabIndex        =   1
@@ -183,7 +183,7 @@ Begin VB.Form FrmMain
          Strikethrough   =   0   'False
       EndProperty
    End
-   Begin TkinterDesigner.xpcmdbutton CmdCopyToClipboard 
+   Begin Vb6Tkinter.xpcmdbutton CmdCopyToClipboard 
       Height          =   495
       Left            =   5340
       TabIndex        =   2
@@ -202,7 +202,7 @@ Begin VB.Form FrmMain
          Strikethrough   =   0   'False
       EndProperty
    End
-   Begin TkinterDesigner.xpcmdbutton CmdSaveToFile 
+   Begin Vb6Tkinter.xpcmdbutton CmdSaveToFile 
       Height          =   495
       Left            =   7950
       TabIndex        =   3
@@ -221,7 +221,7 @@ Begin VB.Form FrmMain
          Strikethrough   =   0   'False
       EndProperty
    End
-   Begin TkinterDesigner.xpcmdbutton CmdQuit 
+   Begin Vb6Tkinter.xpcmdbutton CmdQuit 
       Height          =   495
       Left            =   10560
       TabIndex        =   4
@@ -332,6 +332,15 @@ Begin VB.Form FrmMain
       Begin VB.Menu mnuEncodeAFile 
          Caption         =   "Encode File to Base64(&B)"
       End
+      Begin VB.Menu mnuSeparator6 
+         Caption         =   "-"
+      End
+      Begin VB.Menu mnuCheckUpdate 
+         Caption         =   "Check Update(&U)"
+      End
+      Begin VB.Menu mnuAbout 
+         Caption         =   "About(&A)"
+      End
    End
    Begin VB.Menu mnuLanguage 
       Caption         =   "Language(&L)"
@@ -368,8 +377,9 @@ Private Declare Function GetSystemDefaultLCID Lib "kernel32" () As Long
 Private Sub Form_Load()
     
     Dim s As String
-    
     ReDim g_Comps(0) As Object
+    
+    g_AppVerString = App.Major & "." & App.Minor & IIf(App.Revision > 0, "." & App.Revision, "")
     g_DefaultFontName = ""
     m_HasCommonDialog = False
     m_TxtCodeExpanded = False
@@ -391,14 +401,14 @@ Private Sub Form_Load()
     LstCfg.SelectBackColor = &HFCC597 'vbHighlight
     LstCfg.Redraw = True
     
-    m_BriefCaption = "Tkinter Designer - cdhigh@sohu.com - v" & App.Major & "." & App.Minor & IIf(App.Revision > 0, "." & App.Revision, "")
+    m_BriefCaption = "Vb6Tkinter v" & g_AppVerString
     #If DebugVer Then
         m_BriefCaption = m_BriefCaption & " [Debug Mode] "
     #End If
     Me.Caption = m_BriefCaption
     
     mnuOopCode.Checked = GetSetting(App.Title, "Settings", "OopCode", "1") = "1"
-    mnuV2andV3Code.Checked = GetSetting(App.Title, "Settings", "V2andV3Code", "1") = "1"
+    mnuV2andV3Code.Checked = GetSetting(App.Title, "Settings", "V2andV3Code", "0") = "1"
     mnuUseTtk.Checked = GetSetting(App.Title, "Settings", "UseTtk", "1") = "1"
     mnuRelPos.Checked = GetSetting(App.Title, "Settings", "RelPos", "1") = "1"
     mnuUnicodePrefixU.Checked = GetSetting(App.Title, "Settings", "UnicodePrefix", "0") = "1"
@@ -495,7 +505,7 @@ Private Sub cmbFrms_Click()
     '查找到对应的窗体引用
     Set m_curFrm = Nothing
     If Len(cmbFrms.Text) Then
-        For Each frm In VBE.ActiveVBProject.VBComponents
+        For Each frm In VbeInst.ActiveVBProject.VBComponents
             If frm.Type = vbext_ct_VBForm And frm.Name = cmbFrms.Text Then
                 Set m_curFrm = frm
                 Exit For
@@ -992,24 +1002,25 @@ Private Sub CmdGenCode_Click()
     '在输出代码前先更新一下当前显示的数据
     UpdateCfgtoCls LstComps.ListIndex
     
-    strHead.Append "#!/usr/bin/env python"
-    strHead.Append "#-*- coding:utf-8 -*-" & vbCrLf
-    strHead.Append "import os, sys"
-    
     If OutOnlyV3 Then                                                           '输出仅针对PYTHON 3.X的代码
+        strHead.Append "#!/usr/bin/env python3"
+        strHead.Append "#-*- coding:utf-8 -*-" & vbCrLf
+        strHead.Append "import os, sys"
         strHead.Append "from tkinter import *"
         strHead.Append "from tkinter.font import Font"
         If usettk Then strHead.Append "from tkinter.ttk import *"
         strHead.Append "#Usage:showinfo/warning/error,askquestion/okcancel/yesno/retrycancel"
         strHead.Append "from tkinter.messagebox import *"
-        strHead.Append "#Usage:f=tkFileDialog.askopenfilename(initialdir='E:/Python')"
-        strHead.Append IIf(m_HasCommonDialog, "", "#") & "import tkinter.filedialog as tkFileDialog"
-        strHead.Append IIf(m_HasCommonDialog, "", "#") & "import tkinter.simpledialog as tkSimpleDialog  #askstring()"
+        strHead.Append IIf(m_HasCommonDialog, "", "#") & "from tkinter import filedialog  #.askopenfilename()"
+        strHead.Append IIf(m_HasCommonDialog, "", "#") & "from tkinter import simpledialog  #.askstring()"
         If m_HasCommonDialog Then
-            strHead.Append "import tkinter.colorchooser as tkColorChooser  #askcolor()"
+            strHead.Append "from tkinter import colorchooser  #.askcolor()"
         End If
         strHead.Append vbCrLf
     Else
+        strHead.Append "#!/usr/bin/env python"
+        strHead.Append "#-*- coding:utf-8 -*-" & vbCrLf
+        strHead.Append "import os, sys"
         strHead.Append "if sys.version_info[0] == 2:"
         strHead.Append "    from Tkinter import *"
         strHead.Append "    from tkFont import Font"
@@ -1042,7 +1053,7 @@ Private Sub CmdGenCode_Click()
     '如果存在状态栏控件，则先输出状态栏控件的类定义
     For i = 1 To UBound(g_Comps)  '0固定为窗体，不用判断
         If TypeName(g_Comps(i)) = "clsStatusbar" Then
-            strHead.Append g_Comps(i).WidgetCode()
+            strHead.Append g_Comps(i).WidgetCode(OutOnlyV3)
             Exit For
         End If
     Next
@@ -1060,12 +1071,20 @@ Private Sub CmdGenCode_Click()
         strCmd.Append "class Application(Application_ui):"
         strCmd.Append "    " & L("l_cmtClsApp", "#The class will implement callback function for events and your logical code.")
         strCmd.Append "    def __init__(self, master=None):"
-        strCmd.Append "        Application_ui.__init__(self, master)" & vbCrLf
+        If OutOnlyV3 Then
+            strCmd.Append "        super().__init__(master)" & vbCrLf
+        Else
+            strCmd.Append "        Application_ui.__init__(self, master)" & vbCrLf
+        End If
         
         strOut.Append "class Application_ui(Frame):"
         strOut.Append "    " & L("l_cmtClsUi", "#The class will create all widgets for UI.")
         strOut.Append "    def __init__(self, master=None):"
-        strOut.Append "        Frame.__init__(self, master)"
+        If OutOnlyV3 Then
+            strOut.Append "        super().__init__(master)"
+        Else
+            strOut.Append "        Frame.__init__(self, master)"
+        End If
         g_Comps(0).toString strOut, strCmd, OutRelPos, OutOOP, usettk  'g_Comps(0)固定是Form
         strOut.Append "        self.createWidgets()" & vbCrLf
         strOut.Append "    def createWidgets(self):"
@@ -1222,7 +1241,7 @@ Private Sub CmdRefsFormsList_Click()
     LstComps.Clear
     LstCfg.Clear
     
-    If VBE.ActiveVBProject Is Nothing Then
+    If VbeInst.ActiveVBProject Is Nothing Then
         CmdGenCode.Enabled = False
         CmdCopyToClipboard.Enabled = False
         CmdSaveToFile.Enabled = False
@@ -1233,10 +1252,10 @@ Private Sub CmdRefsFormsList_Click()
         Exit Sub
     End If
     
-    Me.Caption = m_BriefCaption & " [" & VBE.ActiveVBProject.Name & "]"
+    Me.Caption = m_BriefCaption & " [" & VbeInst.ActiveVBProject.Name & "]"
     
     '查找工程中所有的窗体,全部添加到组合框供选择输出
-    For Each frm In VBE.ActiveVBProject.VBComponents
+    For Each frm In VbeInst.ActiveVBProject.VBComponents
         If frm.Type = vbext_ct_VBForm Then
             nScaleMode = frm.Properties("ScaleMode")
             If nScaleMode <> vbTwips And nScaleMode <> vbPoints And nScaleMode <> vbPixels Then
@@ -1462,6 +1481,10 @@ Private Sub UpdateCfgtoCls(idx As Long)
     
 End Sub
 
+Private Sub mnuAbout_Click()
+    frmAbout.Show vbModal
+End Sub
+
 '增加自定义配置
 Private Sub mnuAddProperty_Click()
     
@@ -1536,8 +1559,46 @@ Private Sub mnuCopyToClipUiOnly_Click()
     
 End Sub
 
+'使用base64编码文件
 Private Sub mnuEncodeAFile_Click()
     frmEncodeAFile.Show vbModal
+End Sub
+
+'检查更新
+Private Sub mnuCheckUpdate_Click()
+    Dim data As String, ver As String, currVer As String, skipVer As String
+    Dim info As Variant, lastestVerInfo As Variant
+    data = HttpGetResponse(OFFICIAL_UPDATE_INFO)
+    If Len(data) = 0 Then
+        MsgBox L("l_msgFetchVerInfoFail", "Error fetching version update information."), vbInformation
+        Exit Sub
+    End If
+    data = Trim(data)
+    ParseJSONString2 data, info
+    If IsArray(info) = False Then
+        MsgBox L("l_msgParseVerInfoFail", "Unable to parse the version information."), vbInformation
+        Exit Sub
+    End If
+    If IsObject(info(0)) = False Then
+        MsgBox L("l_msgParseVerInfoFail", "Unable to parse the version information."), vbInformation
+        Exit Sub
+    End If
+    
+    On Error GoTo verErrHandler:
+    Set lastestVerInfo = info(0)  '第一个元素为最新版本，为一个字典对象
+    ver = lastestVerInfo("tag_name") '作者在github上发布版本时使用tag_name保存版本号
+    If Len(ver) > 0 Then
+        currVer = g_AppVerString
+        If isVersionNewerThan(ver, currVer) Then
+            Load frmNewVer
+            frmNewVer.lblInfo.Caption = L("l_msgFoundNewVersion", "Found new version: ") & ver
+            frmNewVer.lblInfo.Tag = ver
+            frmNewVer.Show vbModal
+            Exit Sub
+        End If
+    End If
+verErrHandler:
+    MsgBox L("l_msgYourVerIsLastest", "Your version is lastest."), vbInformation
 End Sub
 
 Private Sub mnuFile_Click()
@@ -1867,7 +1928,7 @@ End Sub
 Private Sub stabar_MouseUp(Button As Integer, Shift As Integer, x As Single, y As Single)
     If Shift = vbCtrlMask Then
         Clipboard.Clear
-        Clipboard.SetText "https://github.com/cdhigh/tkinter-designer"
+        Clipboard.SetText OFFICIAL_SITE
     End If
 End Sub
 
@@ -2003,8 +2064,8 @@ End Sub
 Private Sub TxtCode_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
     stabar.SimpleText = L("l_staTxtCode", "Preview python code here, DblClick to zoom out/in.")
 End Sub
-
+ 
 Private Sub stabar_MouseMove(Button As Integer, Shift As Integer, x As Single, y As Single)
-    stabar.SimpleText = "https://github.com/cdhigh/tkinter-designer  ['Ctrl+Click' copy url to clipboard]"
+    stabar.SimpleText = OFFICIAL_SITE & "  ['Ctrl+Click' copy url to clipboard]"
 End Sub
 

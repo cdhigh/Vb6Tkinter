@@ -1,7 +1,7 @@
 Attribute VB_Name = "Common"
 Option Explicit
 
-Public VBE As VBE
+Public VbeInst As VBE
 
 Private Declare Function GetDC Lib "user32" (ByVal hWnd As Long) As Long
 Private Declare Function GetDeviceCaps Lib "gdi32" (ByVal hdc As Long, ByVal nIndex As Long) As Long
@@ -66,6 +66,12 @@ Public g_Comps() As Object '当前窗体的控件列表，第一项为窗体对象实例
 
 Public g_bUnicodePrefixU As Boolean '是否在UNICODE字符串前加前缀u
 Public g_PythonExe As String '用于GUI预览，保存python.exe全路径
+Public g_AppVerString As String
+
+Public Declare Function ShellExecute Lib "shell32.dll" Alias "ShellExecuteA" (ByVal hWnd As Long, ByVal lpOperation As String, ByVal lpFile As String, ByVal lpParameters As String, ByVal lpDirectory As String, ByVal nShowCmd As Long) As Long
+Public Const OFFICIAL_SITE As String = "https://github.com/cdhigh/Vb6Tkinter"
+Public Const OFFICIAL_RELEASES As String = "https://github.com/cdhigh/Vb6Tkinter/releases"
+Public Const OFFICIAL_UPDATE_INFO As String = "https://api.github.com/repos/cdhigh/Vb6Tkinter/releases"
 
 'PYTHON中UNICODE字符串前缀的处理函数，如果字符串中存在双字节字符，则根据选项增加适当的前缀
 '否则，只是简单的增加单引号，即使空串也增加一对单引号
@@ -403,3 +409,74 @@ Public Sub SortWidgets(ByRef aCompsSorted() As Object, ByVal cnt As Long)
     Next
     
 End Sub
+
+'将版本号字符串前面和后面非数字部分都删除掉，比如："v1.6.8 test" 将返回 "1.6.8"
+Private Function purifyVerStr(txt As String) As String
+    Dim maxCnt As Integer, idx As Integer, startIdx As Integer, endIdx As Integer
+    Dim ch As String
+    txt = Trim(txt)
+    maxCnt = Len(txt)
+    startIdx = 1
+    endIdx = maxCnt
+    '开头部分
+    For idx = 1 To maxCnt
+        ch = Mid(txt, idx, 1)
+        If (ch >= "0") And (ch <= "9") Then
+            startIdx = idx
+            Exit For
+        End If
+    Next
+    '结尾部分
+    For idx = maxCnt To 1 Step -1
+        ch = Mid(txt, idx, 1)
+        If (ch >= "0") And (ch <= "9") Then
+            endIdx = idx
+            Exit For
+        End If
+    Next
+    
+    If startIdx <= endIdx Then
+        purifyVerStr = Mid(txt, startIdx, endIdx - startIdx + 1)
+    Else
+        purifyVerStr = ""
+    End If
+End Function
+
+'比较两个版本号，确定新版本号是否比老版本号更新，
+'版本号格式为：1.1.0
+Public Function isVersionNewerThan(newVer As String, currVer As String) As Boolean
+    Dim newArr As Variant, currArr As Variant, idx As Integer, maxCnt As Integer
+    Dim vn As Integer, vc As Integer
+    newVer = purifyVerStr(newVer)
+    currVer = purifyVerStr(currVer)
+    If Len(newVer) = 0 Or Len(currVer) = 0 Then
+        isVersionNewerThan = False
+        Exit Function
+    End If
+    
+    newArr = Split(newVer, ".")
+    currArr = Split(currVer, ".")
+    maxCnt = UBound(newArr)
+    If UBound(currArr) < maxCnt Then '两个数组最小的一个
+        maxCnt = UBound(currArr)
+    End If
+    
+    For idx = 0 To maxCnt
+        vn = Val(newArr(idx))
+        vc = Val(currArr(idx))
+        If vn > vc Then
+            isVersionNewerThan = True
+            Exit Function
+        ElseIf vn < vc Then
+            isVersionNewerThan = False
+            Exit Function
+        End If
+    Next
+    
+    '如果前面都一样，则长的一个为大
+    If UBound(newArr) > UBound(currArr) Then
+        isVersionNewerThan = True
+    Else
+        isVersionNewerThan = False
+    End If
+End Function

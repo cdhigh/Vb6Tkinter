@@ -31,8 +31,9 @@ Const DefineStatusbar1  As String = "class Statusbar(Frame):" & vbCrLf & _
 "    def __init__(self, master, **kw):" & vbCrLf & _
 "        """ & """" & """Options:" & vbCrLf & _
 "        panelwidths - a tuple of width of panels, atual number of panels is len(panelwidths)+1." & vbCrLf & _
-"        """ & """" & """" & vbCrLf & _
-"        Frame.__init__(self, master)" & vbCrLf & _
+"        """ & """" & """" & vbCrLf
+
+Const DefineStatusbar2 As String = vbCrLf & _
 "        panelwidths = kw['panelwidths'] if 'panelwidths' in kw else []" & vbCrLf & _
 "        self.lbls = []" & vbCrLf & _
 "        for pnlwidth in panelwidths:" & vbCrLf & _
@@ -43,7 +44,7 @@ Const DefineStatusbar1  As String = "class Statusbar(Frame):" & vbCrLf & _
 "        self.lbls.append(lbl)" & vbCrLf & _
 "        lbl.pack(fill=BOTH, expand=1)" & vbCrLf & vbCrLf
 
-Const DefineStatusbar2 As String = "    def set(self, panel, format, *args):" & vbCrLf & _
+Const DefineStatusbar3 As String = "    def set(self, panel, format, *args):" & vbCrLf & _
 "        if panel >= len(self.lbls): raise IndexError" & vbCrLf & _
 "        self.lbls[panel]['text'] = format % args" & vbCrLf & _
 "        self.lbls[panel].update_idletasks()" & vbCrLf & vbCrLf & _
@@ -63,8 +64,15 @@ Private m_Base As clsBaseControl
 Private m_CanbeOutByMainForm As Boolean
 
 '输出状态栏控件的定义
-Public Property Get WidgetCode() As String
-    WidgetCode = DefineStatusbar1 & DefineStatusbar2
+'OutOnlyV3: True-仅输出Python3代码，False-输出兼容Python2/3的代码
+Public Property Get WidgetCode(OutOnlyV3 As Boolean) As String
+    Dim sInit As String
+    If OutOnlyV3 Then
+        sInit = "        super().__init__(master)"
+    Else
+        sInit = "        Frame.__init__(self, master)"
+    End If
+    WidgetCode = DefineStatusbar1 & sInit & DefineStatusbar2
 End Property
 
 '输出PYTHON代码,

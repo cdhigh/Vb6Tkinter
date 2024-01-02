@@ -80,7 +80,7 @@ Applicable=Yes
 [Package|标准安装软件包 1|Distribution]
 Type=single
 Size=
-Title=Tkinter Designer
+Title=Vb6Tkinter
 
 [Package|标准安装软件包 1|Package]
 PackageFolder=D:\My Documents\编程类\Python\pack

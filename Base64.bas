@@ -6,24 +6,29 @@ Option Explicit
 '外部直接调用此函数即可
 Public Sub Base64Encode(ByRef pbAInput() As Byte, ByRef sOut As String, Optional ByRef sPrexSpace As String = "", Optional ByRef charsPerLine As Integer = 68)
     
-    Dim abOut() As Byte, i As Long, s As String
+    Dim abOut() As Byte, idx As Long, sBase64 As String
+    Dim lengthMod As Integer
+    Dim paddingCount As Integer
     
     Encode pbAInput, abOut
     
-    ByteArrayToString abOut, s
-    
+    ByteArrayToString abOut, sBase64
     sOut = ""
+    If Len(sBase64) = 0 Then Exit Sub
     
-    If Len(s) = 0 Then Exit Sub
+    'Base64要求长度为4的倍数，如果不够，则添加"="
+    lengthMod = Len(sBase64) Mod 4
+    paddingCount = 4 - lengthMod
+    sBase64 = sBase64 & String(paddingCount, "=")
     
     '转换为合适的换行模式
     If charsPerLine > 0 Then
-        For i = 1 To Len(s) Step charsPerLine
-            sOut = sOut & sPrexSpace & Mid(s, i, charsPerLine) & vbCrLf
+        For idx = 1 To Len(sBase64) Step charsPerLine
+            sOut = sOut & sPrexSpace & Mid(sBase64, idx, charsPerLine) & vbCrLf
         Next
-        sOut = Mid(sOut, 1, Len(sOut) - 3)
+        sOut = Mid(sOut, 1, Len(sOut) - 3) '去掉上面语句添加的最后的回车换行
     Else
-        sOut = s
+        sOut = sBase64
     End If
     
 End Sub

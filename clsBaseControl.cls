@@ -44,7 +44,7 @@ End Sub
 '输出结构化代码
 Public Sub toStringStructure(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, rel As Boolean, usettk As Boolean, Optional sOtherParams As String = "")
     
-    Dim s() As String, i As Long, extra As String, sStyle As String
+    Dim s() As String, I As Long, extra As String, sStyle As String
     Dim sTmp As String, dTmp As Double, sCmdName As String, sUnderlineCmd As String
     
     '如果需要变量绑定，则先创建对应的变量
@@ -186,32 +186,32 @@ Public Sub toStringStructure(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBu
         sTmp = Replace(sTmp, " ", "")
         
         s = Split(sTmp, ",")
-        For i = 0 To UBound(s)
-            s(i) = Trim(s(i))
-            If s(i) = "<Change>" Then '专门处理自定义的这个事件，用控件变量监视器模拟
+        For I = 0 To UBound(s)
+            s(I) = Trim(s(I))
+            If s(I) = "<Change>" Then '专门处理自定义的这个事件，用控件变量监视器模拟
                 If (m_Type = "Combobox" Or m_Type = "Entry" Or m_Type = "Label") And (Len(Dic("textvariable")) > 0) Then
                     sCmdName = m_Name & "_Change"
                     sOut.Append Space(4) & Dic("textvariable") & ".trace('w', " & sCmdName & ")"
                     sCmdFunc.Append CreateFuncDef(sCmdName, "*args")
                 End If
-            ElseIf Left(s(i), 1) = "<" And Right(s(i), 1) = ">" Then
+            ElseIf Left(s(I), 1) = "<" And Right(s(I), 1) = ">" Then
                 
-                sCmdName = m_Name & "_" & Replace(Replace(Replace(s(i), "<", ""), ">", ""), "-", "_")
+                sCmdName = m_Name & "_" & Replace(Replace(Replace(s(I), "<", ""), ">", ""), "-", "_")
                 
-                sOut.Append Space(4) & m_Name & ".bind('" & s(i) & "', " & sCmdName & ")"
+                sOut.Append Space(4) & m_Name & ".bind('" & s(I) & "', " & sCmdName & ")"
                 
                 sCmdFunc.Append CreateFuncDef(sCmdName, "event")
                 
                 'Python是大小写敏感的，对应快捷键也一样，如果设置的快捷键包含字母键，则将对应的大写/小写也一起绑定
-                If Right(s(i), 3) >= "-a>" And Right(s(i), 3) <= "-z>" Then
+                If Right(s(I), 3) >= "-a>" And Right(s(I), 3) <= "-z>" Then
                     
-                    s(i) = Left(s(i), Len(s(i)) - 2) & UCase(Mid(s(i), Len(s(i)) - 1, 1)) & ">" '对应字母变大写
-                    sOut.Append Space(4) & m_Name & ".bind('" & s(i) & "', " & sCmdName & ")"
+                    s(I) = Left(s(I), Len(s(I)) - 2) & UCase(Mid(s(I), Len(s(I)) - 1, 1)) & ">" '对应字母变大写
+                    sOut.Append Space(4) & m_Name & ".bind('" & s(I) & "', " & sCmdName & ")"
                     
-                ElseIf Right(s(i), 3) >= "-A>" And Right(s(i), 3) <= "-Z>" Then
+                ElseIf Right(s(I), 3) >= "-A>" And Right(s(I), 3) <= "-Z>" Then
                     
-                    s(i) = Left(s(i), Len(s(i)) - 2) & LCase(Mid(s(i), Len(s(i)) - 1, 1)) & ">" '对应字母变小写
-                    sOut.Append Space(4) & m_Name & ".bind('" & s(i) & "', " & sCmdName & ")"
+                    s(I) = Left(s(I), Len(s(I)) - 2) & LCase(Mid(s(I), Len(s(I)) - 1, 1)) & ">" '对应字母变小写
+                    sOut.Append Space(4) & m_Name & ".bind('" & s(I) & "', " & sCmdName & ")"
                     
                 End If
             End If
@@ -223,7 +223,7 @@ End Sub
 '输出面向对象代码
 Public Sub toStringOOP(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, rel As Boolean, usettk As Boolean, Optional sOtherParams As String = "")
     
-    Dim s() As String, i As Long, extra As String
+    Dim s() As String, I As Long, extra As String
     Dim sTmp As String, sStyle As String, sCmdName As String, sUnderlineCmd As String
     
     '如果需要变量绑定，则先创建对应的变量
@@ -353,31 +353,31 @@ Public Sub toStringOOP(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder,
         sTmp = Replace(sTmp, " ", "")
         
         s = Split(sTmp, ",")
-        For i = 0 To UBound(s)
-            s(i) = Trim(s(i))
-            If s(i) = "<Change>" Then '专门处理自定义的这个事件，用控件变量监视器模拟
+        For I = 0 To UBound(s)
+            s(I) = Trim(s(I))
+            If s(I) = "<Change>" Then '专门处理自定义的这个事件，用控件变量监视器模拟
                 If (m_Type = "Combobox" Or m_Type = "Entry" Or m_Type = "Label") And (Len(Dic("textvariable")) > 0) Then
                     sCmdName = m_Name & "_Change"
                     sOut.Append Space(8) & "self." & Dic("textvariable") & ".trace('w', self." & sCmdName & ")"
                     sCmdFunc.Append CreateFuncDefOOP(sCmdName, "*args")
                 End If
-            ElseIf Left(s(i), 1) = "<" And Right(s(i), 1) = ">" Then
+            ElseIf Left(s(I), 1) = "<" And Right(s(I), 1) = ">" Then
                 
-                sCmdName = m_Name & "_" & Replace(Replace(Replace(s(i), "<", ""), ">", ""), "-", "_")
+                sCmdName = m_Name & "_" & Replace(Replace(Replace(s(I), "<", ""), ">", ""), "-", "_")
                 
-                sOut.Append Space(8) & "self." & m_Name & ".bind('" & s(i) & "', self." & sCmdName & ")"
+                sOut.Append Space(8) & "self." & m_Name & ".bind('" & s(I) & "', self." & sCmdName & ")"
                 sCmdFunc.Append CreateFuncDefOOP(sCmdName, "event")
                 
                 'Python是大小写敏感的，对应快捷键也一样，如果设置的快捷键包含字母键，则将对应的大写/小写也一起绑定
-                If Right(s(i), 3) >= "-a>" And Right(s(i), 3) <= "-z>" Then
+                If Right(s(I), 3) >= "-a>" And Right(s(I), 3) <= "-z>" Then
                     
-                    s(i) = Left(s(i), Len(s(i)) - 2) & UCase(Mid(s(i), Len(s(i)) - 1, 1)) & ">" '变大写
-                    sOut.Append Space(8) & "self." & m_Name & ".bind('" & s(i) & "', self." & sCmdName & ")"
+                    s(I) = Left(s(I), Len(s(I)) - 2) & UCase(Mid(s(I), Len(s(I)) - 1, 1)) & ">" '变大写
+                    sOut.Append Space(8) & "self." & m_Name & ".bind('" & s(I) & "', self." & sCmdName & ")"
                     
-                ElseIf Right(s(i), 3) >= "-A>" And Right(s(i), 3) <= "-Z>" Then
+                ElseIf Right(s(I), 3) >= "-A>" And Right(s(I), 3) <= "-Z>" Then
                     
-                    s(i) = Left(s(i), Len(s(i)) - 2) & LCase(Mid(s(i), Len(s(i)) - 1, 1)) & ">" '变小写
-                    sOut.Append Space(8) & "self." & m_Name & ".bind('" & s(i) & "', self." & sCmdName & ")"
+                    s(I) = Left(s(I), Len(s(I)) - 2) & LCase(Mid(s(I), Len(s(I)) - 1, 1)) & ">" '变小写
+                    sOut.Append Space(8) & "self." & m_Name & ".bind('" & s(I) & "', self." & sCmdName & ")"
                     
                 End If
             End If
@@ -534,6 +534,10 @@ Public Function GetBindCommandStr(dMethods As Dictionary) As String
         If InStr(1, s, "," & m_Name & "_MouseDown,") > 0 Then sOut.Append "<Button-1>"
     ElseIf m_Type = "Listbox" Then
         If InStr(1, s, "," & m_Name & "_Click,") > 0 Then sOut.Append "<<ListboxSelect>>"
+    ElseIf m_Type = "Combobox" Then
+        If InStr(1, s, "," & m_Name & "_Change,") > 0 Then sOut.Append "<<ComboboxSelected>>"
+    ElseIf m_Type = "Text" Then
+        If InStr(1, s, "," & m_Name & "_Change,") > 0 Then sOut.Append "<<Modified>>"
     ElseIf m_Type <> "Notebook" Then
         If InStr(1, s, "," & m_Name & "_Click,") > 0 Or InStr(1, s, "," & m_Name & "_MouseDown,") > 0 Then sOut.Append "<Button-1>"
     End If
@@ -548,7 +552,9 @@ Public Function GetBindCommandStr(dMethods As Dictionary) As String
     If InStr(1, s, "," & m_Name & "_Enter,") > 0 Or InStr(1, s, "," & m_Name & "_MouseMove,") > 0 Then sOut.Append "<Motion>"
     If InStr(1, s, "," & m_Name & "_Leave,") > 0 Then sOut.Append "<Leave>"
     
-    If InStr(1, s, "," & m_Name & "_Change,") > 0 Then sOut.Append "<Change>"  '这个事件由内部处理，不是标准tk事件
+    If m_Type <> "Combobox" And m_Type <> "Text" And InStr(1, s, "," & m_Name & "_Change,") > 0 Then
+        sOut.Append "<Change>"  '这个事件由内部处理，不是标准tk事件
+    End If
     
     If m_Type = "Treeview" Then
         If InStr(1, s, "," & m_Name & "_NodeClick,") > 0 Then sOut.Append "<<TreeviewSelect>>"
@@ -599,15 +605,15 @@ End Function
 
 '将用户选择的配置更新到对象中，参数为使用"|"分割的很多对属性/值对
 Public Sub SetConfig(sAttrs As String)
-    Dim sa() As String, i As Long
+    Dim sa() As String, I As Long
     
     sa = Split(sAttrs, "|")
     Debug.Assert (UBound(sa) Mod 1 = 0)
     
     m_dic.RemoveAll
     
-    For i = 0 To UBound(sa) - 1 Step 2
-        m_dic(sa(i)) = sa(i + 1)
+    For I = 0 To UBound(sa) - 1 Step 2
+        m_dic(sa(I)) = sa(I + 1)
     Next
     
 End Sub
@@ -803,6 +809,7 @@ End Sub
 
 '构建一个函数空骨架; FuncName: 函数名，Params: 参数，sbody: 函数体
 Public Function CreateFuncDef(funcName As String, Optional sparams As String = "", Optional sbody As String = "") As String
+    Dim txtMod As String, widgetName As String
     If Len(funcName) = 0 Then Exit Function
     CreateFuncDef = "def " & funcName & "(" & sparams & "):" & vbCrLf
     If Len(sbody) Then
@@ -812,13 +819,20 @@ Public Function CreateFuncDef(funcName As String, Optional sparams As String = "
         CreateFuncDef = CreateFuncDef & Space(4) & "print('" & funcName & "')" & vbCrLf
     #Else
         CreateFuncDef = CreateFuncDef & Space(4) & "#TODO, Please finish the function here!" & vbCrLf
-        CreateFuncDef = CreateFuncDef & Space(4) & "pass" & vbCrLf
+        txtMod = "_Modified"
+        If m_Type = "Text" And Right(funcName, Len(txtMod)) = txtMod Then
+            widgetName = Left(funcName, Len(funcName) - Len(txtMod))
+            CreateFuncDef = CreateFuncDef & Space(4) & widgetName & ".edit_modified(False)" & vbCrLf
+        Else
+            CreateFuncDef = CreateFuncDef & Space(4) & "pass" & vbCrLf
+        End If
     #End If
     End If
 End Function
 
 '构建一个函数空骨架（面向对象代码）; FuncName: 函数名，Params: 参数，sbody: 函数体
 Public Function CreateFuncDefOOP(funcName As String, Optional sparams As String = "", Optional sbody As String = "") As String
+    Dim txtMod As String, widgetName As String
     If Len(funcName) = 0 Then Exit Function
     CreateFuncDefOOP = "    def " & funcName & "(self" & IIf(Len(sparams), ", ", "") & sparams & "):" & vbCrLf
     If Len(sbody) Then
@@ -828,7 +842,13 @@ Public Function CreateFuncDefOOP(funcName As String, Optional sparams As String 
         CreateFuncDefOOP = CreateFuncDefOOP & Space(8) & "print('" & funcName & "')" & vbCrLf
     #Else
         CreateFuncDefOOP = CreateFuncDefOOP & Space(8) & "#TODO, Please finish the function here!" & vbCrLf
-        CreateFuncDefOOP = CreateFuncDefOOP & Space(8) & "pass" & vbCrLf
+        txtMod = "_Modified"
+        If m_Type = "Text" And Right(funcName, Len(txtMod)) = txtMod Then
+            widgetName = Left(funcName, Len(funcName) - Len(txtMod))
+            CreateFuncDefOOP = CreateFuncDefOOP & Space(8) & "self." & widgetName & ".edit_modified(False)" & vbCrLf
+        Else
+            CreateFuncDefOOP = CreateFuncDefOOP & Space(8) & "pass" & vbCrLf
+        End If
     #End If
     End If
 End Function

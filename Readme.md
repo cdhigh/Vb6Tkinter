@@ -211,6 +211,10 @@ Readme of english version refers to [Readme_EN.md](https://github.com/cdhigh/tki
 
 
 # 版本历史
+*  v1.7.1  
+    1. Combobox的Change事件映射到Tkinter的ComboboxSelected
+    2. 多行Text的Change事件映射到Tkinter的Modified
+    3. 修正base64编码的一个小bug，之前的版本将末尾填充的=去掉了，导致有些解码库报错
 *  v1.7
     1. 插件名从 TkinterDesigner 更名为 Vb6Tkinter
     2. 增加在线检查版本更新功能

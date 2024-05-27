@@ -183,6 +183,11 @@ The standard built-in ttk themes extension provides native style on different op
 
 
 # Changelog    
+*  v1.7.1
+    1. The 'Change' event of the Combobox is mapped to 'ComboboxSelected'.
+    2. The 'Change' event of the multi-line Text is mapped to 'Modified'.
+    3. Bugfix: a minor bug in the base64 encoding where the padding = at the end was removed, causing some decoding libraries to throw errors.
+    4. Bugfix: a part of the generated status bar code was missing.
 *  v1.7
     1. Rename the add-in from TkinterDesigner to Vb6Tkinter.
     2. Add check update feature.

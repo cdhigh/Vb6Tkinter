@@ -72,7 +72,7 @@ Public Property Get WidgetCode(OutOnlyV3 As Boolean) As String
     Else
         sInit = "        Frame.__init__(self, master)"
     End If
-    WidgetCode = DefineStatusbar1 & sInit & DefineStatusbar2
+    WidgetCode = DefineStatusbar1 & sInit & DefineStatusbar2 & DefineStatusbar3
 End Property
 
 'Êä³öPYTHON´úÂë,

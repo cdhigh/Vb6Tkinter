@@ -211,6 +211,8 @@ Readme of english version refers to [Readme_EN.md](https://github.com/cdhigh/tki
 
 
 # 版本历史
+*  v1.7.2
+    1. bugfix: 面向过程代码无法预览
 *  v1.7.1  
     1. Combobox的Change事件映射到Tkinter的ComboboxSelected
     2. 多行Text的Change事件映射到Tkinter的Modified

@@ -183,6 +183,8 @@ The standard built-in ttk themes extension provides native style on different op
 
 
 # Changelog    
+*  v1.7.2
+    1. bugfix: Cannot preview structured code.
 *  v1.7.1
     1. The 'Change' event of the Combobox is mapped to 'ComboboxSelected'.
     2. The 'Change' event of the multi-line Text is mapped to 'Modified'.

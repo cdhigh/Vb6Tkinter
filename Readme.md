@@ -26,7 +26,7 @@ Readme of english version refers to [Readme_EN.md](https://github.com/cdhigh/tki
 
 2. 独立安装方式：  
 2.1. 在 <https://github.com/cdhigh/Vb6Tkinter/releases> 下载插件压缩包，解压到某个目录。   
-2.2. 先自行在其他网站下载并安装VB6，可以是完整版或精简版    
+2.2. 先自行在其他网站下载并安装VB6，可以是完整版或[精简版](https://pan.baidu.com/s/1xwMNvUsaeWOexjdo-J3VAA?pwd=7db6)    
  2.2.1. 如果是 Windows 7 及以上版本, 用 Vb6_SP6_Fix_for_Win7.zip 中的 Vb6.exe 覆盖原来的Vb6.exe   
  2.2.2. 如果是 Windows 10 及以上版本，请应用 VB6_AppCompat 补丁    
 2.3. 注册此插件，可以使用自带的注册工具"Setup for Vb6Tkinter.exe"，或自己手动完成。   

@@ -211,6 +211,9 @@ Readme of english version refers to [Readme_EN.md](https://github.com/cdhigh/tki
 
 
 # 版本历史
+*  v1.8
+    1. 删除结构化代码生成逻辑，仅生成面向对象代码
+    2. ListBox添加 (MultiSelect -> selectmode) 属性对应转换
 *  v1.7.2
     1. bugfix: 面向过程代码无法预览
 *  v1.7.1  

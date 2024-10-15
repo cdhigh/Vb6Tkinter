@@ -22,18 +22,17 @@ Private m_CanbeOutByMainForm As Boolean
 '输出PYTHON代码,
 'sCmdFunc: 输出参数，事件处理回调代码;
 'rel:是否使用相对坐标,
-'oop:是否使用面向对象编程
 'usettk:是否使用TTK主题扩展
-Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, rel As Boolean, oop As Boolean, usettk As Boolean)
+Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, rel As Boolean, usettk As Boolean)
     If Len(m_Base("orient")) = 0 Then m_Base("orient") = "'horizontal'"
-    m_Base.toString sOut, sCmdFunc, rel, oop, usettk
+    m_Base.toString sOut, sCmdFunc, rel, usettk
 End Sub
 
 '创建对象后要马上调用这个函数初始化各参数
 Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, Optional dMethods As Dictionary)
     
     Dim W As Long, H As Long, X1 As Long, X2 As Long, Y1 As Long, Y2 As Long
-    Dim s As String, sa() As String, i As Long, idx As Long
+    Dim s As String, sa() As String, I As Long, idx As Long
     
     m_Base.SetVbWidgetInstance o
     
@@ -96,8 +95,8 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, Op
     If Len(s) Then
         sa = Split(s, "@")
         If sa(0) = "p" Or sa(0) = "P" Then
-            For i = 1 To UBound(sa)
-                s = sa(i)
+            For I = 1 To UBound(sa)
+                s = sa(I)
                 idx = InStr(2, s, "=")
                 If idx > 0 Then '有值
                     m_dicTotal(Left$(s, idx - 1)) = Mid$(s, idx + 1)

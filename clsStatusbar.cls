@@ -78,52 +78,31 @@ End Property
 '输出PYTHON代码,
 'sCmdFunc: 输出参数，事件处理回调代码;
 'rel:是否使用相对坐标,
-'oop:是否使用面向对象编程
 'usettk:是否使用TTK主题扩展
-Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, rel As Boolean, oop As Boolean, usettk As Boolean)
+Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, rel As Boolean, usettk As Boolean)
     
-    If oop Then
-        sOut.Append Space(8) & "self." & m_Base.Name & " = Statusbar(self." & m_Base.Parent & _
-            IIf(Len(m_Base("panelwidths")), ", panelwidths=" & m_Base("panelwidths"), "") & ")"
-        
-        If Len(m_Base("tooltip")) Then
-            sOut.Append Space(8) & "self." & m_Base.Name & "Tooltip = Tooltip(self." & m_Base.Name & ", " & Quote(m_Base("tooltip")) & ")"
-        End If
-        
-        If Len(m_Base("side")) Then
-            sOut.Append Space(8) & "self." & m_Base.Name & ".pack(side=" & m_Base("side") & ", fill=X)"
-        ElseIf rel Then
-            sOut.Append Space(8) & "self." & m_Base.Name & ".place(relx=" & m_Base("relx") & ", rely=" & _
-                m_Base("rely") & ", relwidth=" & m_Base("relwidth") & ", relheight=" & m_Base("relheight") & ")"
-        Else
-            sOut.Append Space(8) & "self." & m_Base.Name & ".place(x=" & m_Base("x") & ", y=" & m_Base("y") & _
-                ", width=" & m_Base("width") & ", height=" & m_Base("height") & ")"
-        End If
-    Else
-        sOut.Append Space(4) & m_Base.Name & " = Statusbar(" & m_Base.Parent & _
-            IIf(Len(m_Base("panelwidths")), ", panelwidths=" & m_Base("panelwidths"), "") & ")"
-        
-        If Len(m_Base("tooltip")) Then
-            sOut.Append Space(4) & "gComps['" & m_Base.Name & "Tooltip'] = Tooltip(" & m_Base.Name & ", " & Quote(m_Base("tooltip")) & ")"
-        End If
-        
-        If Len(m_Base("side")) Then
-            sOut.Append Space(4) & m_Base.Name & ".pack(side=" & m_Base("side") & ", fill=X)"
-        ElseIf rel Then
-            sOut.Append Space(4) & m_Base.Name & ".place(relx=" & m_Base("relx") & ", rely=" & m_Base("rely") & _
-                ", relwidth=" & m_Base("relwidth") & ", relheight=" & m_Base("relheight") & ")"
-        Else
-            sOut.Append Space(4) & m_Base.Name & ".place(x=" & m_Base("x") & ", y=" & m_Base("y") & ", width=" & _
-                m_Base("width") & ", height=" & m_Base("height") & ")"
-        End If
+    sOut.Append Space(8) & "self." & m_Base.Name & " = Statusbar(self." & m_Base.Parent & _
+        IIf(Len(m_Base("panelwidths")), ", panelwidths=" & m_Base("panelwidths"), "") & ")"
+    
+    If Len(m_Base("tooltip")) Then
+        sOut.Append Space(8) & "self." & m_Base.Name & "Tooltip = Tooltip(self." & m_Base.Name & ", " & Quote(m_Base("tooltip")) & ")"
     End If
     
+    If Len(m_Base("side")) Then
+        sOut.Append Space(8) & "self." & m_Base.Name & ".pack(side=" & m_Base("side") & ", fill=X)"
+    ElseIf rel Then
+        sOut.Append Space(8) & "self." & m_Base.Name & ".place(relx=" & m_Base("relx") & ", rely=" & _
+            m_Base("rely") & ", relwidth=" & m_Base("relwidth") & ", relheight=" & m_Base("relheight") & ")"
+    Else
+        sOut.Append Space(8) & "self." & m_Base.Name & ".place(x=" & m_Base("x") & ", y=" & m_Base("y") & _
+            ", width=" & m_Base("width") & ", height=" & m_Base("height") & ")"
+    End If
 End Sub
 
 '创建对象后要马上调用这个函数初始化各参数
 Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dMethods As Dictionary)
     
-    Dim i As Long, nCnt As Long, s As String, Panels As IPanels
+    Dim I As Long, nCnt As Long, s As String, Panels As IPanels
     Dim sa() As String, idx As Long
     
     m_Base.SetVbWidgetInstance o
@@ -153,8 +132,8 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
     Set Panels = o.Properties("Panels").object
     nCnt = Panels.Count
     If o.Properties("Style") = sbrNormal And nCnt > 0 Then
-        For i = 1 To nCnt
-            s = s & Round(m_Base.toPixelX(Panels(i).MinWidth) / CharWidth()) & ","
+        For I = 1 To nCnt
+            s = s & Round(m_Base.toPixelX(Panels(I).MinWidth) / CharWidth()) & ","
         Next
         
         If Len(s) Then
@@ -168,8 +147,8 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
     If Len(s) Then
         sa = Split(s, "@")
         If sa(0) = "p" Or sa(0) = "P" Then
-            For i = 1 To UBound(sa)
-                s = sa(i)
+            For I = 1 To UBound(sa)
+                s = sa(I)
                 idx = InStr(2, s, "=")
                 If idx > 0 Then '有值
                     m_Base(Left$(s, idx - 1)) = Mid$(s, idx + 1)
@@ -216,15 +195,15 @@ End Function
 '将用户选择的配置更新到对象中，参数为使用"|"分割的很多对属性/值对
 Public Sub SetConfig(sAttrs As String)
 
-    Dim sa() As String, i As Long
+    Dim sa() As String, I As Long
     
     sa = Split(sAttrs, "|")
     Debug.Assert (UBound(sa) Mod 1 = 0)
     
     'm_Base.RemoveAll
     
-    For i = 0 To UBound(sa) - 1 Step 2
-        SetSingleConfig sa(i) & "|" & sa(i + 1)
+    For I = 0 To UBound(sa) - 1 Step 2
+        SetSingleConfig sa(I) & "|" & sa(I + 1)
     Next
     
 End Sub

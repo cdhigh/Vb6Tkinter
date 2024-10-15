@@ -25,78 +25,25 @@ Private m_CanbeOutByMainForm As Boolean
 '输出PYTHON代码,
 'sCmdFunc: 输出参数，事件处理回调代码;
 'rel:是否使用相对坐标,
-'oop:是否使用面向对象编程
 'usettk:是否使用TTK主题扩展(如果使用TTK，则VB的组合框对应到TTK的组合框，不会生出这个控件)
-Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, rel As Boolean, oop As Boolean, usettk As Boolean)
+Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, rel As Boolean, usettk As Boolean)
     
     If Len(m_Base("variable")) = 0 Then
         MsgBox L_F("l_msgMusthasVar", "'variable' is obligatory for OptionMenu(ComboBox), will not generate code for OptionMenu({0}) now.", m_Base.Name), vbInformation
         Exit Sub
     End If
     
-    If oop Then
-        toStringOOP sOut, sCmdFunc, rel, usettk
-    Else
-        toStringStructure sOut, sCmdFunc, rel, usettk
-    End If
-    
-End Sub
-
-'输出结构化代码
-Private Sub toStringStructure(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, rel As Boolean, usettk As Boolean)
-    
-    Dim s() As String, i As Long, sList As String, extra As String, sConfig As String
-    
-    '生成列表
-    For i = 0 To UBound(m_List)
-        sList = sList & U(m_List(i)) & ","
-    Next
-    sList = "(" & sList & ")"
-    
-    sConfig = getConfigStr()
-    
-    sOut.Append Space(4) & m_Base.Name & "List = " & sList
-    sOut.Append Space(4) & m_Base("variable") & " = StringVar(value=" & m_Base.Name & "List[0])"
-    
-    extra = m_Base("variable") & ", *" & m_Base.Name & "List"
-    
-    sOut.Append Space(4) & m_Base.Name & " = OptionMenu(" & m_Base.Parent & IIf(Len(extra), ", ", "") & extra & ")"
-    If Len(sConfig) Then
-        sOut.Append Space(4) & m_Base.Name & ".configure(" & sConfig & ")"
-    End If
-    sOut.Append Space(4) & m_Base.Name & ".place(" & m_Base.GetPositionParams(rel) & ")"
-    sOut.Append Space(4) & "gComps['" & m_Base.Name & "'] = " & m_Base.Name
-    sOut.Append Space(4) & "gComps['" & m_Base("variable") & "'] = " & m_Base("variable")
-    
-    '创建事件处理函数框架（如果有）
-    If Len(m_Base("command")) Then
-        sCmdFunc.Append m_Base.CreateFuncDef(m_Base("command"))
-    End If
-    
-    If Len(m_Base("bindcommand")) Then                                          '有需要使用bind语句绑定的其他事件处理
-        s = Split(m_Base("bindcommand"), ",")
-        For i = 0 To UBound(s)
-            s(i) = Trim(s(i))
-            If s(i) = "<Change>" Then '专门处理自定义的这个事件，用控件变量监视器模拟
-                sOut.Append Space(4) & m_Base("variable") & ".trace('w', " & m_Base.Name & "_Change)"
-                sCmdFunc.Append m_Base.CreateFuncDef(m_Base.Name & "_Change", "*args")
-            ElseIf Left(s(i), 1) = "<" And Right(s(i), 1) = ">" Then
-                sOut.Append Space(4) & m_Base.Name & ".bind('" & s(i) & "', " & m_Base.Name & "_" & Replace(Mid(s(i), 2, Len(s(i)) - 2), "-", "_") & ")"
-                sCmdFunc.Append m_Base.CreateFuncDef(m_Base.Name & "_" & Replace(Mid(s(i), 2, Len(s(i)) - 2), "-", "_"), "event")
-            End If
-        Next
-    End If
-    
+    toStringOOP sOut, sCmdFunc, rel, usettk
 End Sub
 
 '输出面向对象代码
 Private Sub toStringOOP(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, rel As Boolean, usettk As Boolean)
     
-    Dim s() As String, i As Long, sList As String, extra As String, sConfig As String
+    Dim s() As String, I As Long, sList As String, extra As String, sConfig As String
     
     '生成列表
-    For i = 0 To UBound(m_List)
-        sList = sList & U(m_List(i)) & ","
+    For I = 0 To UBound(m_List)
+        sList = sList & U(m_List(I)) & ","
     Next
     sList = "(" & sList & ")"
     
@@ -120,14 +67,14 @@ Private Sub toStringOOP(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder
     
     If Len(m_Base("bindcommand")) Then                                          '有需要使用bind语句绑定的其他事件处理
         s = Split(m_Base("bindcommand"), ",")
-        For i = 0 To UBound(s)
-            s(i) = Trim(s(i))
-            If s(i) = "<Change>" Then '专门处理自定义的这个事件，用控件变量监视器模拟
+        For I = 0 To UBound(s)
+            s(I) = Trim(s(I))
+            If s(I) = "<Change>" Then '专门处理自定义的这个事件，用控件变量监视器模拟
                 sOut.Append Space(8) & "self." & m_Base("variable") & ".trace('w', self." & m_Base.Name & "_Change)"
                 sCmdFunc.Append m_Base.CreateFuncDefOOP(m_Base.Name & "_Change", "*args")
-            ElseIf Left(s(i), 1) = "<" And Right(s(i), 1) = ">" Then
-                sOut.Append Space(8) & "self." & m_Base.Name & ".bind('" & s(i) & "', self." & m_Base.Name & "_" & Replace(Mid(s(i), 2, Len(s(i)) - 2), "-", "_") & ")"
-                sCmdFunc.Append m_Base.CreateFuncDefOOP(m_Base.Name & "_" & Replace(Mid(s(i), 2, Len(s(i)) - 2), "-", "_"), "event")
+            ElseIf Left(s(I), 1) = "<" And Right(s(I), 1) = ">" Then
+                sOut.Append Space(8) & "self." & m_Base.Name & ".bind('" & s(I) & "', self." & m_Base.Name & "_" & Replace(Mid(s(I), 2, Len(s(I)) - 2), "-", "_") & ")"
+                sCmdFunc.Append m_Base.CreateFuncDefOOP(m_Base.Name & "_" & Replace(Mid(s(I), 2, Len(s(I)) - 2), "-", "_"), "event")
             End If
         Next
     End If
@@ -138,7 +85,7 @@ End Sub
 '创建对象后要马上调用这个函数初始化各参数
 Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dMethods As Dictionary)
     
-    Dim i As Long, oList As Object, sList As String, numList As Long
+    Dim I As Long, oList As Object, sList As String, numList As Long
     Dim s As String, sa() As String, idx As Long
     
     m_Base.SetVbWidgetInstance o
@@ -149,13 +96,13 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
     Set oList = o.Properties("List")
     Erase m_List
     numList = 0
-    i = IIf(o.Properties("Style") = 2, 1, 0)         ' 2-Dropdown List时第一项IndexedValue为控件名，所以从第二项开始
+    I = IIf(o.Properties("Style") = 2, 1, 0)         ' 2-Dropdown List时第一项IndexedValue为控件名，所以从第二项开始
     Do While True
-        If oList.IndexedValue(i) = "" Then Exit Do
+        If oList.IndexedValue(I) = "" Then Exit Do
         
         ReDim Preserve m_List(numList) As String
-        m_List(numList) = oList.IndexedValue(i)
-        i = i + 1
+        m_List(numList) = oList.IndexedValue(I)
+        I = I + 1
         numList = numList + 1
     Loop
     If numList = 0 Then
@@ -213,8 +160,8 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
     If Len(s) Then
         sa = Split(s, "@")
         If sa(0) = "p" Or sa(0) = "P" Then
-            For i = 1 To UBound(sa)
-                s = sa(i)
+            For I = 1 To UBound(sa)
+                s = sa(I)
                 idx = InStr(2, s, "=")
                 If idx > 0 Then '有值
                     m_dicTotal(Left$(s, idx - 1)) = Mid$(s, idx + 1)
@@ -255,12 +202,12 @@ End Function
 
 '获取配置字符串
 Private Function getConfigStr() As String
-    Dim sOut As New cStrBuilder, saCfg() As String, i As Long
+    Dim sOut As New cStrBuilder, saCfg() As String, I As Long
     Const csaCfg = "relief,fg,bg,bd,wraplength,justify,state,anchor,takefocus,font"
     saCfg = Split(csaCfg, ",")
     
-    For i = 0 To UBound(saCfg)
-        If Len(m_Base(saCfg(i))) Then sOut.Append saCfg(i) & "=" & m_Base(saCfg(i))
+    For I = 0 To UBound(saCfg)
+        If Len(m_Base(saCfg(I))) Then sOut.Append saCfg(I) & "=" & m_Base(saCfg(I))
     Next
     getConfigStr = sOut.toString(", ")
     

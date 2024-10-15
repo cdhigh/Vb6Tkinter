@@ -261,10 +261,6 @@ Begin VB.Form FrmMain
          Begin VB.Menu mnuSaveAll 
             Caption         =   "Save All Code(&A)"
          End
-         Begin VB.Menu mnuSaveMainOnly 
-            Caption         =   "Save main() Only(&M)"
-            Visible         =   0   'False
-         End
          Begin VB.Menu mnuSaveUiOnly 
             Caption         =   "Save Class UI Only(&G)"
          End
@@ -273,10 +269,6 @@ Begin VB.Form FrmMain
          Caption         =   "Copy Code To Clipboard(&C)"
          Begin VB.Menu mnuCopyToClipAll 
             Caption         =   "Copy All Code(&A)"
-         End
-         Begin VB.Menu mnuCopyToClipMainOnly 
-            Caption         =   "Copy main() Only(&M)"
-            Visible         =   0   'False
          End
          Begin VB.Menu mnuCopyToClipUiOnly 
             Caption         =   "Copy Class UI Only(&G)"
@@ -297,10 +289,6 @@ Begin VB.Form FrmMain
    End
    Begin VB.Menu mnuOptions 
       Caption         =   "Options(&O)"
-      Begin VB.Menu mnuOopCode 
-         Caption         =   "Generate OOP Code(&P)"
-         Checked         =   -1  'True
-      End
       Begin VB.Menu mnuV2andV3Code 
          Caption         =   "Compatible Code for Python 2.x/3.x(&C)"
       End
@@ -407,7 +395,6 @@ Private Sub Form_Load()
     #End If
     Me.Caption = m_BriefCaption
     
-    mnuOopCode.Checked = GetSetting(App.Title, "Settings", "OopCode", "1") = "1"
     mnuV2andV3Code.Checked = GetSetting(App.Title, "Settings", "V2andV3Code", "0") = "1"
     mnuUseTtk.Checked = GetSetting(App.Title, "Settings", "UseTtk", "1") = "1"
     mnuRelPos.Checked = GetSetting(App.Title, "Settings", "RelPos", "1") = "1"
@@ -415,11 +402,6 @@ Private Sub Form_Load()
     g_bUnicodePrefixU = mnuUnicodePrefixU.Checked
     
     g_PythonExe = GetSetting(App.Title, "Settings", "PythonExe", "")
-    
-    mnuSaveMainOnly.Visible = Not mnuOopCode.Checked
-    mnuSaveUiOnly.Visible = mnuOopCode.Checked
-    mnuCopyToClipMainOnly.Visible = Not mnuOopCode.Checked
-    mnuCopyToClipUiOnly.Visible = mnuOopCode.Checked
     
     Set cmbEditList.Font = LstCfg.Font
     Set cmbEditCombo.Font = LstCfg.Font
@@ -433,7 +415,7 @@ End Sub
 '多语种支持初始化
 Private Sub InitMultiLanguage()
     
-    Dim i As Long, s As String, sa() As String
+    Dim I As Long, s As String, sa() As String
     
     If Not LngFileExist() Then
         m_nLngNum = 0
@@ -444,49 +426,49 @@ Private Sub InitMultiLanguage()
     sa = GetAllLanguageName()
     mnuLng(0).Caption = sa(0)
     m_nLngNum = 1
-    For i = 1 To UBound(sa)
-        Load mnuLng(i)
-        mnuLng(i).Caption = sa(i)
+    For I = 1 To UBound(sa)
+        Load mnuLng(I)
+        mnuLng(I).Caption = sa(I)
         m_nLngNum = m_nLngNum + 1
     Next
     
     '切换语言，注册表保存的语言优先，其次根据操作系统选择
     s = GetSetting(App.Title, "Settings", "Language", "")
-    i = m_nLngNum
+    I = m_nLngNum
     If Len(s) Then                                                              '选择之前保存的语言种类，如果存在的话
-        For i = 0 To m_nLngNum - 1
-            If mnuLng(i).Caption = s Then
-                ChangeLanguage (mnuLng(i).Caption)
-                mnuLng(i).Checked = True
+        For I = 0 To m_nLngNum - 1
+            If mnuLng(I).Caption = s Then
+                ChangeLanguage (mnuLng(I).Caption)
+                mnuLng(I).Checked = True
                 Exit For
             End If
         Next
     End If
     
     '尝试判断操作系统语种
-    If i > m_nLngNum - 1 Then
+    If I > m_nLngNum - 1 Then
         
-        i = GetSystemDefaultLCID()
-        If i = &H804 Or i = &H4 Or i = &H1004 Then
+        I = GetSystemDefaultLCID()
+        If I = &H804 Or I = &H4 Or I = &H1004 Then
             s = "简体中文"
-        ElseIf i = &H404 Or i = &HC04 Then
+        ElseIf I = &H404 Or I = &HC04 Then
             s = "繁體中文"
-        ElseIf i Mod 16 = 9 Then
+        ElseIf I Mod 16 = 9 Then
             s = "English"
         Else                                                                    '其他语言先按英语处理，待软件启动后用户再选择合适的语言
             s = "English"
         End If
         
-        For i = 0 To m_nLngNum - 1
-            If InStr(1, mnuLng(i).Caption, s) > 0 Then
-                ChangeLanguage (mnuLng(i).Caption)
-                mnuLng(i).Checked = True
+        For I = 0 To m_nLngNum - 1
+            If InStr(1, mnuLng(I).Caption, s) > 0 Then
+                ChangeLanguage (mnuLng(I).Caption)
+                mnuLng(I).Checked = True
                 Exit For
             End If
         Next
         
         ' 无法自动确认语种，默认选择第一个
-        If i > m_nLngNum - 1 Then
+        If I > m_nLngNum - 1 Then
             ChangeLanguage (mnuLng(0).Caption)
             mnuLng(0).Checked = True
         End If
@@ -553,7 +535,7 @@ End Sub
 '更新各个列表，创建对应的控件类实例, 返回False表示初始化失败，True表示成功
 Private Function ResetLstComps(frm As Object) As Long
     
-    Dim Obj As Object, ObjClsModule As Object, i As Long, s As String, j As Long, idx As Long
+    Dim Obj As Object, ObjClsModule As Object, I As Long, s As String, j As Long, idx As Long
     Dim nScaleMode As Long, nScaleWidth As Long, nScaleHeight As Long
     Dim CodeMember As Member, CodeMembers As Members, dMethods As New Dictionary
     Dim ctlsIgnored As String
@@ -575,7 +557,7 @@ Private Function ResetLstComps(frm As Object) As Long
     g_Comps(0).InitConfig frm, nScaleWidth, nScaleHeight, dMethods
     g_Comps(0).Name = WTOP
     LstComps.AddItem g_Comps(0).Name & " (Form)"
-    i = 1
+    I = 1
     
     m_HasCommonDialog = False
     
@@ -612,26 +594,26 @@ Private Function ResetLstComps(frm As Object) As Long
             
             '如果窗体存在菜单控件，则创建主菜单对象，主菜单控件将管理所有的菜单项
             If Obj.ClassName = "Menu" And m_MainMenu Is Nothing Then
-                ReDim Preserve g_Comps(i) As Object
+                ReDim Preserve g_Comps(I) As Object
                 Set m_MainMenu = New clsMenu
-                Set g_Comps(i) = m_MainMenu
+                Set g_Comps(I) = m_MainMenu
                 LstComps.AddItem m_MainMenu.Name & " (MainMenu)"
                 m_MainMenu.InitConfig
-                i = i + 1
+                I = I + 1
             End If
             
             '添加控件到控件列表
-            ReDim Preserve g_Comps(i) As Object
-            Set g_Comps(i) = ObjClsModule
+            ReDim Preserve g_Comps(I) As Object
+            Set g_Comps(I) = ObjClsModule
             LstComps.AddItem Obj.Properties("Name") & " (" & Obj.ClassName & ")"
             
             '初始化各控件对应的类模块对象
             If Obj.Container Is frm.Designer Then
-                g_Comps(i).Parent = IIf(Obj.ClassName = "Menu", "MainMenu", WTOP)
-                g_Comps(i).InitConfig Obj, frm.Properties("ScaleWidth"), frm.Properties("ScaleHeight"), dMethods
+                g_Comps(I).Parent = IIf(Obj.ClassName = "Menu", "MainMenu", WTOP)
+                g_Comps(I).InitConfig Obj, frm.Properties("ScaleWidth"), frm.Properties("ScaleHeight"), dMethods
             ElseIf Obj.Container.ClassName = "Menu" Then  '子菜单
-                g_Comps(i).Parent = Obj.Container.Properties("Name")
-                g_Comps(i).InitConfig Obj, 0, 0, dMethods
+                g_Comps(I).Parent = Obj.Container.Properties("Name")
+                g_Comps(I).InitConfig Obj, 0, 0, dMethods
             Else
                 On Error Resume Next
                 nScaleMode = Obj.Container.Properties("ScaleMode")
@@ -644,12 +626,12 @@ Private Function ResetLstComps(frm As Object) As Long
                 End If
                 Err.Clear
                 On Error GoTo 0
-                g_Comps(i).ScaleMode = nScaleMode
-                g_Comps(i).Parent = Obj.Container.Properties("Name")
-                g_Comps(i).InitConfig Obj, nScaleWidth, nScaleHeight, dMethods
+                g_Comps(I).ScaleMode = nScaleMode
+                g_Comps(I).Parent = Obj.Container.Properties("Name")
+                g_Comps(I).InitConfig Obj, nScaleWidth, nScaleHeight, dMethods
             End If
             
-            i = i + 1
+            I = I + 1
             ResetLstComps = True
         ElseIf Obj.ClassName = "CommonDialog" Then
             m_HasCommonDialog = True
@@ -671,8 +653,8 @@ Private Function ResetLstComps(frm As Object) As Long
     TryAssignScrollbar2Widgets
     
     '正确设置ComboboxAdapter的TTK属性
-    For i = 1 To UBound(g_Comps)
-        If TypeName(g_Comps(i)) = "clsComboboxAdapter" Then g_Comps(i).TTK = mnuUseTtk.Checked
+    For I = 1 To UBound(g_Comps)
+        If TypeName(g_Comps(I)) = "clsComboboxAdapter" Then g_Comps(I).TTK = mnuUseTtk.Checked
     Next
     
 End Function
@@ -763,21 +745,21 @@ End Function
 '子类储存父类的名字，父类储存所有子类的引用
 Private Sub CreateMenuHiberarchy()
 
-    Dim i As Long, j As Long
+    Dim I As Long, j As Long
     If Not m_MainMenu Is Nothing Then
-        For i = 0 To UBound(g_Comps)
-            If TypeName(g_Comps(i)) = "clsMenu" Then
+        For I = 0 To UBound(g_Comps)
+            If TypeName(g_Comps(I)) = "clsMenu" Then
                 '将所有的顶层菜单做为clsMenu的子控件
                 For j = 0 To UBound(g_Comps)
                     If TypeName(g_Comps(j)) = "clsMenuItem" And g_Comps(j).Parent = "MainMenu" Then
-                        g_Comps(i).AddChild g_Comps(j)
+                        g_Comps(I).AddChild g_Comps(j)
                     End If
                 Next
-            ElseIf TypeName(g_Comps(i)) = "clsMenuItem" Then
+            ElseIf TypeName(g_Comps(I)) = "clsMenuItem" Then
                 '子菜单有可能还有子菜单
                 For j = 0 To UBound(g_Comps)
-                    If TypeName(g_Comps(j)) = "clsMenuItem" And g_Comps(j).Parent = g_Comps(i).Name Then
-                        g_Comps(i).AddChild g_Comps(j)
+                    If TypeName(g_Comps(j)) = "clsMenuItem" And g_Comps(j).Parent = g_Comps(I).Name Then
+                        g_Comps(I).AddChild g_Comps(j)
                     End If
                 Next
             End If
@@ -789,7 +771,7 @@ End Sub
 '整理选项卡控件和其内部控件的父子关系
 Private Sub ArrangeNotebookAndSubWidgets()
 
-    Dim i As Long, j As Long, k As Long, L As Long, idx As Long, ctlNum As Long
+    Dim I As Long, j As Long, k As Long, L As Long, idx As Long, ctlNum As Long
     Dim sTabName As String, sNbName As String, sTmp As String
     
     If UBound(g_Comps) <= 0 Then  ' 0固定为顶层窗体
@@ -797,9 +779,9 @@ Private Sub ArrangeNotebookAndSubWidgets()
     End If
     
     ctlNum = UBound(g_Comps)
-    For i = 1 To ctlNum
-        If TypeName(g_Comps(i)) = "clsNotebookTab" Then
-            sTabName = g_Comps(i).Name
+    For I = 1 To ctlNum
+        If TypeName(g_Comps(I)) = "clsNotebookTab" Then
+            sTabName = g_Comps(I).Name
             idx = InStr(2, sTabName, "__Tab")
             If idx > 1 Then
                 sNbName = Left$(sTabName, idx - 1) ' Notebook控件名
@@ -808,21 +790,21 @@ Private Sub ArrangeNotebookAndSubWidgets()
                         '获取TAB号
                         sTmp = Right$(sTabName, 1)
                         If sTmp >= "1" And sTmp <= "9" Then '最多支持9个标签页
-                            g_Comps(j).AddTab g_Comps(i), CLng(sTmp)  ' 加入Notebook对象
-                            g_Comps(i).EnableOutByMainForm = False
+                            g_Comps(j).AddTab g_Comps(I), CLng(sTmp)  ' 加入Notebook对象
+                            g_Comps(I).EnableOutByMainForm = False
                             
                             '此标签页内所有控件均有clsNotebookTab来接管，不再由主窗口输出代码
                             For k = 1 To ctlNum
                                 If g_Comps(k).Parent = sTabName Then
                                     g_Comps(k).EnableOutByMainForm = False
-                                    g_Comps(i).AddSubWidget g_Comps(k)
+                                    g_Comps(I).AddSubWidget g_Comps(k)
                                     
                                     ' 万一标签页内还有其他容器控件
                                     If TypeName(g_Comps(k)) = "clsCanvas" Or TypeName(g_Comps(k)) = "clsLabelFrame" Then
                                         For L = 1 To ctlNum
                                             If g_Comps(L).Parent = g_Comps(k).Name Then
                                                 g_Comps(L).EnableOutByMainForm = False
-                                                g_Comps(i).AddSubWidget g_Comps(L)
+                                                g_Comps(I).AddSubWidget g_Comps(L)
                                             End If
                                         Next
                                     End If
@@ -841,7 +823,7 @@ End Sub
 '进行一些分析，尝试将滚动条自动绑定到合适的控件，不一定成功，而且可能误判，只算是尽力而为
 Private Sub TryAssignScrollbar2Widgets()
     
-    Dim i As Long, ctlNum As Long, Obj As Object, o As Object, oName As String
+    Dim I As Long, ctlNum As Long, Obj As Object, o As Object, oName As String
     Dim vX1 As Long, vY1 As Long, vX2 As Long, vY2 As Long
     Dim oX1 As Long, oY1 As Long, oX2 As Long, oY2 As Long
     Dim thresholdX1 As Long, thresholdY1 As Long
@@ -890,9 +872,9 @@ Private Sub TryAssignScrollbar2Widgets()
                             And (oX2 >= vX1 And oX2 <= vX2 And oY2 >= vY1 And oY2 <= vY2) Then
                             '设置控件的xscrollcommand属性
                             oName = o.Properties("Name")
-                            For i = 1 To ctlNum
-                                If g_Comps(i).Name = oName Then
-                                    g_Comps(i).SetSingleConfig ("xscrollcommand|" & Obj.Properties("Name") & ".set")
+                            For I = 1 To ctlNum
+                                If g_Comps(I).Name = oName Then
+                                    g_Comps(I).SetSingleConfig ("xscrollcommand|" & Obj.Properties("Name") & ".set")
                                     Assigned = True
                                     Debug.Print oName & " assigned to " & Obj.Properties("name")
                                     Exit For
@@ -935,9 +917,9 @@ Private Sub TryAssignScrollbar2Widgets()
                             And (oX2 >= vX1 And oX2 <= vX2 And oY2 >= vY1 And oY2 <= vY2) Then
                             '设置控件的yscrollcommand属性
                             oName = o.Properties("Name")
-                            For i = 1 To ctlNum
-                                If g_Comps(i).Name = oName Then
-                                    g_Comps(i).SetSingleConfig ("yscrollcommand|" & Obj.Properties("Name") & ".set")
+                            For I = 1 To ctlNum
+                                If g_Comps(I).Name = oName Then
+                                    g_Comps(I).SetSingleConfig ("yscrollcommand|" & Obj.Properties("Name") & ".set")
                                     Debug.Print oName & " assigned to " & Obj.Properties("name")
                                     Assigned = True
                                     Exit For
@@ -957,9 +939,9 @@ End Sub
 
 Private Sub CmdGenCode_Click()
     
-    Dim i As Long, cnt As Long, o As Object
+    Dim I As Long, cnt As Long, o As Object
     Dim strHead As New cStrBuilder, strOut As New cStrBuilder, strCmd As New cStrBuilder, s As String, finalCode As String, sF As String
-    Dim OutOnlyV3 As Boolean, OutOOP As Boolean, OutRelPos As Boolean, usettk As Boolean
+    Dim OutOnlyV3 As Boolean, OutRelPos As Boolean, usettk As Boolean
     Dim bUnicodePrefix As Boolean  '临时保存UNICODE前缀方式
     Dim aCompsSorted() As Object '用于排序的代码输出
     
@@ -979,7 +961,6 @@ Private Sub CmdGenCode_Click()
     On Error GoTo 0
     
     OutOnlyV3 = Not mnuV2andV3Code.Checked
-    OutOOP = mnuOopCode.Checked
     OutRelPos = mnuRelPos.Checked
     usettk = mnuUseTtk.Checked
     
@@ -1051,65 +1032,51 @@ Private Sub CmdGenCode_Click()
     End If
     
     '如果存在状态栏控件，则先输出状态栏控件的类定义
-    For i = 1 To UBound(g_Comps)  '0固定为窗体，不用判断
-        If TypeName(g_Comps(i)) = "clsStatusbar" Then
-            strHead.Append g_Comps(i).WidgetCode(OutOnlyV3)
+    For I = 1 To UBound(g_Comps)  '0固定为窗体，不用判断
+        If TypeName(g_Comps(I)) = "clsStatusbar" Then
+            strHead.Append g_Comps(I).WidgetCode(OutOnlyV3)
             Exit For
         End If
     Next
     
     '如果有控件设置了ToolTipText，则先输出Tooptip的自定义类定义
-    For i = 1 To UBound(g_Comps)  '0固定为窗体，不用判断
-        If g_Comps(i).hasAttribute("tooltip") And g_Comps(i).GetAttrCurrentValue("tooltip") <> "" Then
+    For I = 1 To UBound(g_Comps)  '0固定为窗体，不用判断
+        If g_Comps(I).hasAttribute("tooltip") And g_Comps(I).GetAttrCurrentValue("tooltip") <> "" Then
             CreateTooltipClassCode strHead
             Exit For
         End If
     Next
     
-    If OutOOP Then
-        strCmd.Append vbCrLf
-        strCmd.Append "class Application(Application_ui):"
-        strCmd.Append "    " & L("l_cmtClsApp", "#The class will implement callback function for events and your logical code.")
-        strCmd.Append "    def __init__(self, master=None):"
-        If OutOnlyV3 Then
-            strCmd.Append "        super().__init__(master)" & vbCrLf
-        Else
-            strCmd.Append "        Application_ui.__init__(self, master)" & vbCrLf
-        End If
-        
-        strOut.Append "class Application_ui(Frame):"
-        strOut.Append "    " & L("l_cmtClsUi", "#The class will create all widgets for UI.")
-        strOut.Append "    def __init__(self, master=None):"
-        If OutOnlyV3 Then
-            strOut.Append "        super().__init__(master)"
-        Else
-            strOut.Append "        Frame.__init__(self, master)"
-        End If
-        g_Comps(0).toString strOut, strCmd, OutRelPos, OutOOP, usettk  'g_Comps(0)固定是Form
-        strOut.Append "        self.createWidgets()" & vbCrLf
-        strOut.Append "    def createWidgets(self):"
-        strOut.Append "        self." & WTOP & " = self.winfo_toplevel()" & vbCrLf
-        If usettk Then strOut.Append "        self.style = Style()" & vbCrLf
+    strCmd.Append vbCrLf
+    strCmd.Append "class Application(Application_ui):"
+    strCmd.Append "    " & L("l_cmtClsApp", "#The class will implement callback function for events and your logical code.")
+    strCmd.Append "    def __init__(self, master=None):"
+    If OutOnlyV3 Then
+        strCmd.Append "        super().__init__(master)" & vbCrLf
     Else
-        strHead.Append L("l_cmtgComps", "#Global dictionary of widgets for using in others functions.")
-        strHead.Append "gComps = {}"
-        strHead.Append vbCrLf & vbCrLf
-        
-        strOut.Append vbCrLf
-        strOut.Append "def main(argv):"
-        g_Comps(0).toString strOut, strCmd, OutRelPos, OutOOP, usettk  'g_Comps(0)固定是Form
-        If usettk Then
-            strOut.Append "    style = Style()"
-            strOut.Append "    gComps['style'] = style" & vbCrLf
-        End If
+        strCmd.Append "        Application_ui.__init__(self, master)" & vbCrLf
     End If
+    
+    strOut.Append "class Application_ui(Frame):"
+    strOut.Append "    " & L("l_cmtClsUi", "#The class will create all widgets for UI.")
+    strOut.Append "    def __init__(self, master=None):"
+    If OutOnlyV3 Then
+        strOut.Append "        super().__init__(master)"
+    Else
+        strOut.Append "        Frame.__init__(self, master)"
+    End If
+    g_Comps(0).toString strOut, strCmd, OutRelPos, usettk  'g_Comps(0)固定是Form
+    strOut.Append "        self.createWidgets()" & vbCrLf
+    strOut.Append "    def createWidgets(self):"
+    strOut.Append "        self." & WTOP & " = self.winfo_toplevel()" & vbCrLf
+    If usettk Then strOut.Append "        self.style = Style()" & vbCrLf
     
     '根据依赖关系排序控件的先后顺序
     cnt = 0
-    For i = 1 To UBound(g_Comps)
-        If g_Comps(i).EnableOutByMainForm Then
+    For I = 1 To UBound(g_Comps)
+        If g_Comps(I).EnableOutByMainForm Then
             ReDim Preserve aCompsSorted(cnt) As Object
-            Set aCompsSorted(cnt) = g_Comps(i)
+            Set aCompsSorted(cnt) = g_Comps(I)
             cnt = cnt + 1
         End If
     Next
@@ -1118,29 +1085,19 @@ Private Sub CmdGenCode_Click()
     End If
     
     '遍历各控件，由各控件自己输出自己的界面生成代码
-    For i = 0 To cnt - 1
-        aCompsSorted(i).toString strOut, strCmd, OutRelPos, OutOOP, usettk
+    For I = 0 To cnt - 1
+        aCompsSorted(I).toString strOut, strCmd, OutRelPos, usettk
         strOut.Append ""  '两个控件之间使用一个空行隔开
     Next
     
     '输出到文本框
-    If OutOOP Then
-        strCmd.Append "if __name__ == ""__main__"":"
-        strCmd.Append "    " & WTOP & " = Tk()"
-        strCmd.Append "    Application(" & WTOP & ").mainloop()"
-        strCmd.Append vbCrLf
-        'strCmd.Append "    try: " & WTOP & ".destroy()"
-        'strCmd.Append "    except: pass" & vbCrLf
-        finalCode = strHead.toString(vbCrLf) & strOut.toString(vbCrLf) & strCmd.toString(vbCrLf)
-    Else
-        strOut.Append "    " & WTOP & ".mainloop()"
-        'strOut.Append "    try: " & WTOP & ".destroy()"
-        'strOut.Append "    except: pass"
-        strOut.Append vbCrLf & vbCrLf
-        strOut.Append "if __name__ == ""__main__"":"
-        strOut.Append "    main(sys.argv)" & vbCrLf
-        finalCode = strHead.toString(vbCrLf) & strCmd.toString(vbCrLf) & strOut.toString(vbCrLf)
-    End If
+    strCmd.Append "if __name__ == ""__main__"":"
+    strCmd.Append "    " & WTOP & " = Tk()"
+    strCmd.Append "    Application(" & WTOP & ").mainloop()"
+    strCmd.Append vbCrLf
+    'strCmd.Append "    try: " & WTOP & ".destroy()"
+    'strCmd.Append "    except: pass" & vbCrLf
+    finalCode = strHead.toString(vbCrLf) & strOut.toString(vbCrLf) & strCmd.toString(vbCrLf)
     
     'VB的TEXTBOX最多支持65K文本
     If Len(finalCode) > 65000 Then
@@ -1300,7 +1257,7 @@ Private Sub CmdSaveToFile_Click()
 End Sub
 
 Private Sub Form_QueryUnload(Cancel As Integer, UnloadMode As Integer)
-    Dim i As Long
+    Dim I As Long
     If TxtCode.Width = Me.ScaleWidth Then
         TxtCode_DblClick
         Cancel = True
@@ -1309,9 +1266,9 @@ Private Sub Form_QueryUnload(Cancel As Integer, UnloadMode As Integer)
         Cancel = True
     ElseIf UBound(m_saTmpFile) > 0 Then '删除用于预览的临时文件
         On Error Resume Next
-        For i = 0 To UBound(m_saTmpFile)
-            If Len(m_saTmpFile(i)) Then
-                Kill m_saTmpFile(i)
+        For I = 0 To UBound(m_saTmpFile)
+            If Len(m_saTmpFile(I)) Then
+                Kill m_saTmpFile(I)
             End If
         Next
         On Error GoTo 0
@@ -1371,10 +1328,10 @@ End Sub
 
 Private Sub LstCfg_KeyDown(KeyCode As Integer, Shift As Integer)
     If (KeyCode = &H41 Or KeyCode = &H61) And Shift = vbCtrlMask Then 'Ctrl+a:全选，主要用于测试目的
-        Dim i As Long
+        Dim I As Long
         LstCfg.Redraw = False
-        For i = 0 To LstCfg.ItemCount - 1
-            LstCfg.ItemChecked(i) = True
+        For I = 0 To LstCfg.ItemCount - 1
+            LstCfg.ItemChecked(I) = True
         Next
         LstCfg.Redraw = True
     End If
@@ -1463,7 +1420,7 @@ End Sub
 
 '更新配置到实例对象,idx表示当前在LstCfg上显示的属性是属于哪个控件的。
 Private Sub UpdateCfgtoCls(idx As Long)
-    Dim s As String, i As Long
+    Dim s As String, I As Long
     
     If idx < 0 Or idx > UBound(g_Comps) Then Exit Sub
     
@@ -1471,9 +1428,9 @@ Private Sub UpdateCfgtoCls(idx As Long)
     LstCfg.Refresh
     
     s = ""
-    For i = 0 To LstCfg.ItemCount - 1
-        If LstCfg.ItemChecked(i) Then
-            s = s & IIf(i > 0, "|", "") & LstCfg.CellText(i, 0) & "|" & LstCfg.CellText(i, 1)
+    For I = 0 To LstCfg.ItemCount - 1
+        If LstCfg.ItemChecked(I) Then
+            s = s & IIf(I > 0, "|", "") & LstCfg.CellText(I, 0) & "|" & LstCfg.CellText(I, 1)
         End If
     Next
     
@@ -1488,7 +1445,7 @@ End Sub
 '增加自定义配置
 Private Sub mnuAddProperty_Click()
     
-    Dim s As String, sa() As String, nRow As Long, i As Long
+    Dim s As String, sa() As String, nRow As Long, I As Long
     
     If LstCfg.ItemCount <= 0 Then Exit Sub
     
@@ -1503,19 +1460,19 @@ Private Sub mnuAddProperty_Click()
     
     ' 如果输入的属性已经存在，则覆盖原有的值
     sa(0) = Trim(sa(0))
-    For i = 0 To LstCfg.ItemCount - 1
-        If LstCfg.CellText(i, 0) = sa(0) Then
-            LstCfg.CellText(i, 1) = Trim(sa(1))
+    For I = 0 To LstCfg.ItemCount - 1
+        If LstCfg.CellText(I, 0) = sa(0) Then
+            LstCfg.CellText(I, 1) = Trim(sa(1))
             Exit For
         End If
     Next
     '新增一个属性
-    If i >= LstCfg.ItemCount Then
-        i = LstCfg.AddItem(Trim(sa(0)))
-        LstCfg.CellText(i, 1) = Trim(sa(1))
+    If I >= LstCfg.ItemCount Then
+        I = LstCfg.AddItem(Trim(sa(0)))
+        LstCfg.CellText(I, 1) = Trim(sa(1))
     End If
     
-    LstCfg.ItemChecked(i) = True
+    LstCfg.ItemChecked(I) = True
     UpdateCfgtoCls m_PrevCompIdx
     
 End Sub
@@ -1523,23 +1480,6 @@ End Sub
 Private Sub mnuCopyToClipAll_Click()
     Clipboard.Clear
     Clipboard.SetText TxtCode.Text
-End Sub
-
-Private Sub mnuCopyToClipMainOnly_Click()
-    
-    Dim s As String, nm As Long, nf As Long
-    
-    '分析代码，仅提取main(),使用正则表达式也可以，但是这里使用简单字符串分析
-    s = TxtCode.Text
-    nm = InStr(1, s, "def main(argv):")
-    nf = InStr(1, s, "if __name__")
-    If nm > 0 And nf > 0 Then
-        Clipboard.Clear
-        Clipboard.SetText Mid(s, nm, nf - nm)
-    Else
-        MsgBox L("l_msgNoMain", "Function 'main()' no founded in code!"), vbInformation
-    End If
-    
 End Sub
 
 Private Sub mnuCopyToClipUiOnly_Click()
@@ -1611,12 +1551,12 @@ End Sub
 
 Private Sub mnuLng_Click(Index As Integer)
     
-    Dim i As Long
+    Dim I As Long
     
     If m_nLngNum = 0 Then Exit Sub
     
-    For i = 0 To m_nLngNum - 1
-        mnuLng(i).Checked = False
+    For I = 0 To m_nLngNum - 1
+        mnuLng(I).Checked = False
     Next
     
     mnuLng(Index).Checked = True
@@ -1624,15 +1564,6 @@ Private Sub mnuLng_Click(Index As Integer)
     
     ChangeLanguage (mnuLng(Index).Caption)
     
-End Sub
-
-Private Sub mnuOopCode_Click()
-    mnuOopCode.Checked = Not mnuOopCode.Checked
-    SaveSetting App.Title, "Settings", "OopCode", IIf(mnuOopCode.Checked, "1", "0")
-    mnuSaveMainOnly.Visible = Not mnuOopCode.Checked
-    mnuSaveUiOnly.Visible = mnuOopCode.Checked
-    mnuCopyToClipMainOnly.Visible = Not mnuOopCode.Checked
-    mnuCopyToClipUiOnly.Visible = mnuOopCode.Checked
 End Sub
 
 Private Sub mnuSaveAll_Click()
@@ -1643,29 +1574,6 @@ Private Sub mnuSaveAll_Click()
     If Len(sF) Then
         If Len(FileExt(sF)) = 0 Then sF = sF & ".py"  '如果文件名没有扩展名，自动添加.py扩展名
         Utf8File_Write_VB sF, TxtCode.Text
-    End If
-    
-    m_prevsf = sF
-    
-End Sub
-
-'仅输出main()函数，用于之前已经建好框架，并且也写了一些代码，现在修改空间布局，不用影响其他代码
-Private Sub mnuSaveMainOnly_Click()
-    
-    Dim sF As String, s As String, nm As Long, nf As Long
-    
-    '分析代码，仅提取main(),使用正则表达式也可以，但是这里使用简单字符串分析
-    s = TxtCode.Text
-    nm = InStr(1, s, "def main(argv):")
-    nf = InStr(1, s, "if __name__")
-    If nm > 0 And nf > 0 Then
-        sF = FileDialog(Me, True, L("l_fdSave", "Save file to:"), "*.py", m_prevsf)
-        If Len(sF) Then
-            If Len(FileExt(sF)) = 0 Then sF = sF & ".py"  '如果文件名没有扩展名，自动添加.py扩展名
-            Utf8File_Write_VB sF, Mid(s, nm, nf - nm)
-        End If
-    Else
-        MsgBox L("l_msgNoMain", "Function 'main()' no founded in code!"), vbInformation
     End If
     
     m_prevsf = sF
@@ -1756,7 +1664,7 @@ Private Sub mnuPreview_Click()
 End Sub
 
 Private Sub mnuPythonExe_Click()
-    Dim sExe As String, sExes() As String, i As Long
+    Dim sExe As String, sExes() As String, I As Long
     
     Load frmOption
     
@@ -1764,8 +1672,8 @@ Private Sub mnuPythonExe_Click()
     frmOption.cmbPythonExe.Clear
     sExes = GetAllInstalledPython()
     If UBound(sExes) >= 0 Then
-        For i = 0 To UBound(sExes)
-            frmOption.cmbPythonExe.AddItem sExes(i)
+        For I = 0 To UBound(sExes)
+            frmOption.cmbPythonExe.AddItem sExes(I)
         Next
     End If
     
@@ -1833,7 +1741,7 @@ Private Sub mnuUnicodePrefixU_Click()
 End Sub
 
 Private Sub mnuUseTtk_Click()
-    Dim i As Long, s As String
+    Dim I As Long, s As String
     
     If LstComps.ListCount > 0 And LstComps.ListIndex >= 0 Then
         If InStr(1, LstComps.List(LstComps.ListIndex), "ComboBox") Then
@@ -1845,8 +1753,8 @@ Private Sub mnuUseTtk_Click()
     
     '判断是否有TTK都有的控件，如果有，则不允许取消TTK选项
     If Not mnuUseTtk.Checked Then
-        For i = 0 To LstComps.ListCount - 1
-            s = Mid(LstComps.List(i), InStr(1, LstComps.List(i), "(") + 1)
+        For I = 0 To LstComps.ListCount - 1
+            s = Mid(LstComps.List(I), InStr(1, LstComps.List(I), "(") + 1)
             s = Left(s, Len(s) - 1)
             If InStr(1, " ProgressBar, TreeView, TabStrip, Line, ", " " & s & ",") > 0 Then
                 MsgBox L("l_msgCantCancelTTK", "Can't uncheck the menu 'Use TTK Themed Library' for has some widgets specified in TTK."), vbInformation
@@ -1858,9 +1766,9 @@ Private Sub mnuUseTtk_Click()
     
     '切换组合框适配器的TTK属性
     If LstComps.ListCount > 0 Then
-        For i = 0 To UBound(g_Comps)
-            If TypeName(g_Comps(i)) = "clsComboboxAdapter" Then
-                g_Comps(i).TTK = mnuUseTtk.Checked
+        For I = 0 To UBound(g_Comps)
+            If TypeName(g_Comps(I)) = "clsComboboxAdapter" Then
+                g_Comps(I).TTK = mnuUseTtk.Checked
             End If
         Next
         
@@ -1884,7 +1792,7 @@ End Sub
 '自动填充编辑用的组合框内容
 Private Sub FillcmbEdit(Row As Long, Col As Long)
     
-    Dim sa() As String, i As Long, nEditType As Long, fn As String
+    Dim sa() As String, I As Long, nEditType As Long, fn As String
     Static s_NoFirstcmbEditList As Boolean, s_NoFirstcmbEditCombo As Boolean
     
     If LstComps.ListCount = 0 Or LstComps.ListIndex < 0 Then Exit Sub
@@ -1896,12 +1804,12 @@ Private Sub FillcmbEdit(Row As Long, Col As Long)
         LstCfg.BindControl 1, cmbEditList
         cmbEditList.Clear
         cmbEditList.AddItem "" '在第一行放一个空字符串，这样就可以不设置对应的参数。
-        For i = 0 To UBound(sa)
-            cmbEditList.AddItem sa(i)
+        For I = 0 To UBound(sa)
+            cmbEditList.AddItem sa(I)
         Next
-        For i = 0 To cmbEditList.ListCount - 1
-            If cmbEditList.List(i) = LstCfg.CellText(Row, Col) Then
-                cmbEditList.ListIndex = i
+        For I = 0 To cmbEditList.ListCount - 1
+            If cmbEditList.List(I) = LstCfg.CellText(Row, Col) Then
+                cmbEditList.ListIndex = I
                 Exit For
             End If
         Next
@@ -1909,8 +1817,8 @@ Private Sub FillcmbEdit(Row As Long, Col As Long)
     ElseIf nEditType = 2 Then
         LstCfg.BindControl 1, cmbEditCombo
         cmbEditCombo.Clear
-        For i = 0 To UBound(sa)
-            cmbEditCombo.AddItem sa(i)
+        For I = 0 To UBound(sa)
+            cmbEditCombo.AddItem sa(I)
         Next
         cmbEditCombo.Text = LstCfg.CellText(Row, Col)
         cmbEditCombo.Refresh

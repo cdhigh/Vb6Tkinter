@@ -29,195 +29,9 @@ Private m_vbWidgetInstance As Object                                            
 '输出PYTHON代码,
 'sCmdFunc: 输出参数，事件处理回调代码;
 'rel:是否使用相对坐标,
-'oop:是否使用面向对象编程
 'usettk:是否使用TTK主题扩展
-Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, rel As Boolean, oop As Boolean, usettk As Boolean)
-    
-    If oop Then
-        toStringOOP sOut, sCmdFunc, rel, IIf(Len(m_StyleName), usettk, False)
-    Else
-        toStringStructure sOut, sCmdFunc, rel, IIf(Len(m_StyleName), usettk, False)
-    End If
-    
-End Sub
-
-'输出结构化代码
-Public Sub toStringStructure(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, rel As Boolean, usettk As Boolean, Optional sOtherParams As String = "")
-    
-    Dim s() As String, I As Long, extra As String, sStyle As String
-    Dim sTmp As String, dTmp As Double, sCmdName As String, sUnderlineCmd As String
-    
-    '如果需要变量绑定，则先创建对应的变量
-    If Len(Dic("textvariable")) Then
-        sOut.Append Space(4) & Dic("textvariable") & " = StringVar(value=" & U(Dic("text")) & ")"
-    End If
-    If Len(Dic("variable")) Then
-        If m_Type = "Radiobutton" Then  '一组单选按钮的variable都是同一个，不要重复创建
-            sTmp = Space(4) & Dic("variable") & " = StringVar()"
-            If Not sOut.ExistString(sTmp) Then
-                sOut.Append sTmp
-            End If
-        ElseIf m_Type = "Checkbutton" Then '多选按钮的variable使用IntVar比较好
-            sOut.Append Space(4) & Dic("variable") & " = IntVar(value=" & m_Value & ")"
-        Else
-            sOut.Append Space(4) & Dic("variable") & " = StringVar(value=" & U(m_Value) & ")"
-        End If
-    End If
-    If Len(Dic("listvariable")) Then
-        sOut.Append Space(4) & Dic("listvariable") & " = StringVar(value=" & U(m_Value) & ")"
-    End If
-    If Not usettk And Len(Dic("font")) Then
-        If Left$(Dic("font"), 1) = "(" Then
-            sOut.Append Space(4) & m_Name & "Font = Font(font=" & Dic("font") & ")"
-        Else '如果用户忘了加括号，这里加上
-            sOut.Append Space(4) & m_Name & "Font = Font(font=(" & Dic("font") & "))"
-        End If
-    End If
-    
-    If Len(Dic("columns")) Then
-        sOut.Append Space(4) & Dic("columns") & " = []  " & L("l_cmtTodoCols", "#TODO Add list of titles here, first column fixed for tree view.")
-    End If
-    If Len(Dic("displaycolumns")) And InStr(1, Dic("displaycolumns"), "#all") <= 0 Then
-        sOut.Append Space(4) & Dic("displaycolumns") & "[]    " & L("l_cmtTodoDisCols", "#TODO Add list of titles will be displayed, first column fixed for tree view.")
-    End If
-    
-    '组合框将displayrows转换为height属性
-    If Len(Dic("displayrows")) Then
-        sOtherParams = sOtherParams & IIf(Len(sOtherParams), ", ", "") & "height=" & Dic("displayrows")
-    End If
-    
-    If usettk Then                                                              '创建STYLE对象
-        sStyle = GetStyleParams(False, usettk)
-        If Len(sStyle) Then
-            sOut.Append Space(4) & "style.configure('T" & m_Name & "." & m_StyleName & "', " & sStyle & ")"
-            If m_Type = "LabelFrame" Then ' LabelFrame的字体和前景色要设置到Label
-                sOut.Append Space(4) & "style.configure('T" & m_Name & "." & m_StyleName & ".Label" & "', " & sStyle & ")"
-            End If
-            sOtherParams = sOtherParams & IIf(Len(sOtherParams), ", ", "") & "style='T" & m_Name & "." & m_StyleName & "'"
-        End If
-    End If
-    
-    extra = GetExtraParams(False, usettk)
-    extra = extra & IIf(Len(extra) > 0 And Len(sOtherParams) > 0, ", ", "") & sOtherParams
-    '创建控件实例
-    sOut.Append Space(4) & m_Name & " = " & m_Type & "(" & m_Parent & IIf(Len(extra), ", ", "") & extra & ")"
-    
-    '如果需要，给实例添加几个简单的“封装方法”方便访问variable，比如Entry的setText/text方法
-    If Len(Dic("textvariable")) Then
-        sOut.Append Space(4) & m_Name & ".setText = lambda x: " & Dic("textvariable") & ".set(x)"
-        sOut.Append Space(4) & m_Name & ".text = lambda : " & Dic("textvariable") & ".get()"
-    End If
-    
-    '如果需要，给实例添加几个简单的“封装方法”方便访问variable，比如CheckButton的setValue/value方法
-    If Len(Dic("variable")) Then
-        If m_Type = "Radiobutton" Then '单选按钮
-            If Len(Dic("value")) Then
-                sOut.Append Space(4) & m_Name & ".setValue = lambda x: " & Dic("variable") & ".set(" & Dic("value") & " if x else '')"
-                sOut.Append Space(4) & m_Name & ".value = lambda : 1 if " & Dic("variable") & ".get() == " & Dic("value") & " else 0"
-                If m_vbWidgetInstance.Properties("Value") And Len(Dic("value")) Then '默认选择其中之一
-                    sOut.Append Space(4) & m_Name & ".setValue(1)"
-                End If
-            Else
-                sOut.Append Space(4) & m_Name & ".setValue = lambda x: " & Dic("variable") & ".set(x)"
-                sOut.Append Space(4) & m_Name & ".value = lambda : " & Dic("variable") & ".get()"
-            End If
-        ElseIf m_Type = "Checkbutton" Then  '多选按钮
-            sOut.Append Space(4) & m_Name & ".setValue = lambda x: self." & Dic("variable") & ".set(x)"
-            sOut.Append Space(4) & m_Name & ".value = lambda : self." & Dic("variable") & ".get()"
-        End If
-    End If
-    
-    '如果设置了tooltip提示文本，则创建Tooltip实例
-    If Len(Dic("tooltip")) Then
-        sOut.Append Space(4) & "gComps['" & m_Name & "Tooltip" & "'] = Tooltip(" & m_Name & ", " & Quote(Dic("tooltip")) & ")"
-    End If
-    
-    '放置控件
-    sOut.Append Space(4) & m_Name & ".place(" & GetPositionParams(rel) & ")"
-    sOut.Append Space(4) & "gComps['" & m_Name & "'] = " & m_Name
-    
-    '如果需要变量绑定，为了方便在main()函数外使用，同时将变量引用放入全局控件字典
-    If Len(Dic("textvariable")) Then
-        sOut.Append Space(4) & "gComps['" & Dic("textvariable") & "'] = " & Dic("textvariable")
-    End If
-    If Len(Dic("variable")) Then
-        sOut.Append Space(4) & "gComps['" & Dic("variable") & "'] = " & Dic("variable")
-    End If
-    If Len(Dic("listvariable")) Then
-        sOut.Append Space(4) & "gComps['" & Dic("listvariable") & "'] = " & Dic("listvariable")
-    End If
-    
-    '创建事件处理函数框架（如果有），事件里面有点号说明是调用系统的函数，不需要生成函数体
-    If Len(Dic("command")) > 0 And InStr(1, Dic("command"), ".") <= 0 And InStr(1, Dic("command"), "lambda ") <= 0 Then
-        sCmdFunc.Append CreateFuncDef(Dic("command"), "event=None")
-    End If
-    If Len(Dic("postcommand")) Then
-        sCmdFunc.Append CreateFuncDef(Dic("postcommand"), "event=None")
-    End If
-    
-    '处理下划线快捷方式
-    If Len(Dic("underline")) > 0 And Dic("underline") <> "-1" And IsNumeric(Dic("underline")) Then
-        If m_Type = "Button" Or m_Type = "Checkbutton" Or m_Type = "Radiobutton" Then
-            sUnderlineCmd = "lambda e: " & m_Name & ".focus_set() or " & m_Name & ".invoke()"
-        ElseIf Len(Dic("command")) > 0 Then
-            sUnderlineCmd = Dic("command")
-        Else
-            sUnderlineCmd = "lambda e: " & m_Name & ".focus_set()"
-        End If
-        
-        If Len(sUnderlineCmd) Then
-            sTmp = Dic("text")
-            If Len(sTmp) = 0 Then sTmp = Dic("label")
-            If Len(sTmp) And CLng(Dic("underline")) < Len(sTmp) Then
-                sOut.Append Space(4) & WTOP & ".bind_all('<Alt-" & Mid(sTmp, CLng(Dic("underline")) + 1, 1) & ">', " & sUnderlineCmd & ")"
-                If Mid(sTmp, CLng(Dic("underline")) + 1, 1) >= "a" And Mid(sTmp, CLng(Dic("underline")) + 1, 1) <= "z" Then
-                    sOut.Append Space(4) & WTOP & ".bind_all('<Alt-" & UCase(Mid(sTmp, CLng(Dic("underline")) + 1, 1)) & ">', " & sUnderlineCmd & ")"
-                ElseIf Mid(sTmp, CLng(Dic("underline")) + 1, 1) >= "A" And Mid(sTmp, CLng(Dic("underline")) + 1, 1) <= "Z" Then
-                    sOut.Append Space(4) & WTOP & ".bind_all('<Alt-" & LCase(Mid(sTmp, CLng(Dic("underline")) + 1, 1)) & ">', " & sUnderlineCmd & ")"
-                End If
-            End If
-        End If
-    End If
-    
-    If Len(Dic("bindcommand")) Then                                             '有需要使用bind语句绑定的其他事件处理
-        sTmp = Dic("bindcommand")
-        sTmp = Replace(sTmp, "'", "")                                           '自动去掉括号和空格，如果有的话
-        sTmp = Replace(sTmp, Chr(34), "")
-        sTmp = Replace(sTmp, " ", "")
-        
-        s = Split(sTmp, ",")
-        For I = 0 To UBound(s)
-            s(I) = Trim(s(I))
-            If s(I) = "<Change>" Then '专门处理自定义的这个事件，用控件变量监视器模拟
-                If (m_Type = "Combobox" Or m_Type = "Entry" Or m_Type = "Label") And (Len(Dic("textvariable")) > 0) Then
-                    sCmdName = m_Name & "_Change"
-                    sOut.Append Space(4) & Dic("textvariable") & ".trace('w', " & sCmdName & ")"
-                    sCmdFunc.Append CreateFuncDef(sCmdName, "*args")
-                End If
-            ElseIf Left(s(I), 1) = "<" And Right(s(I), 1) = ">" Then
-                
-                sCmdName = m_Name & "_" & Replace(Replace(Replace(s(I), "<", ""), ">", ""), "-", "_")
-                
-                sOut.Append Space(4) & m_Name & ".bind('" & s(I) & "', " & sCmdName & ")"
-                
-                sCmdFunc.Append CreateFuncDef(sCmdName, "event")
-                
-                'Python是大小写敏感的，对应快捷键也一样，如果设置的快捷键包含字母键，则将对应的大写/小写也一起绑定
-                If Right(s(I), 3) >= "-a>" And Right(s(I), 3) <= "-z>" Then
-                    
-                    s(I) = Left(s(I), Len(s(I)) - 2) & UCase(Mid(s(I), Len(s(I)) - 1, 1)) & ">" '对应字母变大写
-                    sOut.Append Space(4) & m_Name & ".bind('" & s(I) & "', " & sCmdName & ")"
-                    
-                ElseIf Right(s(I), 3) >= "-A>" And Right(s(I), 3) <= "-Z>" Then
-                    
-                    s(I) = Left(s(I), Len(s(I)) - 2) & LCase(Mid(s(I), Len(s(I)) - 1, 1)) & ">" '对应字母变小写
-                    sOut.Append Space(4) & m_Name & ".bind('" & s(I) & "', " & sCmdName & ")"
-                    
-                End If
-            End If
-        Next
-    End If
-    
+Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, rel As Boolean, usettk As Boolean)
+    toStringOOP sOut, sCmdFunc, rel, IIf(Len(m_StyleName), usettk, False)
 End Sub
 
 '输出面向对象代码
@@ -266,7 +80,7 @@ Public Sub toStringOOP(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder,
     End If
     
     If usettk Then                                                              '创建STYLE对象
-        sStyle = GetStyleParams(True, usettk)
+        sStyle = GetStyleParams(usettk)
         If Len(sStyle) Then
             sOut.Append Space(8) & "self.style.configure('T" & m_Name & "." & m_StyleName & "', " & sStyle & ")"
             If m_Type = "LabelFrame" Then ' LabelFrame的字体和前景色要设置到Label
@@ -276,7 +90,7 @@ Public Sub toStringOOP(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder,
         End If
     End If
     
-    extra = GetExtraParams(True, usettk)
+    extra = GetExtraParams(usettk)
     extra = extra & IIf(Len(extra) > 0 And Len(sOtherParams) > 0, ", ", "") & sOtherParams
     '创建本控件实例
     sOut.Append Space(8) & "self." & m_Name & " = " & m_Type & "(self." & m_Parent & IIf(Len(extra), ", ", "") & extra & ")"
@@ -404,7 +218,7 @@ Public Function GetPositionParams(rel As Boolean) As String
 End Function
 
 '除了必选参数外，这个函数生成用户选择的其他参数列表
-Public Function GetExtraParams(oop As Boolean, usettk As Boolean) As String
+Public Function GetExtraParams(usettk As Boolean) As String
     
     Dim cfg As Variant, k As Variant, ks As Variant, sValue As String, s As New cStrBuilder
     
@@ -433,43 +247,42 @@ Public Function GetExtraParams(oop As Boolean, usettk As Boolean) As String
         End If
     Next
     
-    If Len(Dic("columns")) Then s.Append "columns=" & IIf(oop, "self.", "") & Dic("columns")
+    If Len(Dic("columns")) Then s.Append "columns=self." & Dic("columns")
     If Len(Dic("displaycolumns")) Then
         If InStr(1, Dic("displaycolumns"), "#all") <= 0 Then
-            s.Append "displaycolumns=" & IIf(oop, "self.", "") & Dic("displaycolumns")
+            s.Append "displaycolumns=self." & Dic("displaycolumns")
         Else
             s.Append "displaycolumns='#all'"
         End If
     End If
     
-    If Len(Dic("textvariable")) Then s.Append "textvariable=" & IIf(oop, "self.", "") & Dic("textvariable")
-    If Len(Dic("variable")) Then s.Append "variable=" & IIf(oop, "self.", "") & Dic("variable")
-    If Len(Dic("listvariable")) Then s.Append "listvariable=" & IIf(oop, "self.", "") & Dic("listvariable")
-    If Len(Dic("values")) Then s.Append "values=" & IIf(oop, "self.", "") & Dic("values")
+    If Len(Dic("textvariable")) Then s.Append "textvariable=self." & Dic("textvariable")
+    If Len(Dic("variable")) Then s.Append "variable=self." & Dic("variable")
+    If Len(Dic("listvariable")) Then s.Append "listvariable=self." & Dic("listvariable")
+    If Len(Dic("values")) Then s.Append "values=self." & Dic("values")
     
     If Len(Dic("command")) Then
         If InStr(1, Dic("command"), "lambda ") > 0 Then '匿名函数，不用加self.
             s.Append "command=" & Dic("command")
         Else
-            s.Append "command=" & IIf(oop, "self.", "") & Dic("command")
+            s.Append "command=self." & Dic("command")
         End If
     End If
     
-    If Len(Dic("postcommand")) Then s.Append "postcommand=" & IIf(oop, "self.", "") & Dic("postcommand")
-    If Len(Dic("xscrollcommand")) Then s.Append "xscrollcommand=" & IIf(oop, "self.", "") & Dic("xscrollcommand")
-    If Len(Dic("yscrollcommand")) Then s.Append "yscrollcommand=" & IIf(oop, "self.", "") & Dic("yscrollcommand")
+    If Len(Dic("postcommand")) Then s.Append "postcommand=self." & Dic("postcommand")
+    If Len(Dic("xscrollcommand")) Then s.Append "xscrollcommand=self." & Dic("xscrollcommand")
+    If Len(Dic("yscrollcommand")) Then s.Append "yscrollcommand=self." & Dic("yscrollcommand")
     If Len(Dic("font")) Then
         If usettk Then 'TTK模式的大多数控件的font一般都要写在样式里面，但Entry/Combobox的font要写在创建函数中才管用
             If m_Type = "Entry" Or m_Type = "Combobox" Then
                 s.Append "font=" & IIf(Left$(Dic("font"), 1) = "(", Dic("font"), "(" & Dic("font") & ")") '自动加括号
             End If
         Else
-            s.Append "font=" & IIf(oop, "self.", "") & m_Name & "Font"
+            s.Append "font=self." & m_Name & "Font"
         End If
     End If
     
     GetExtraParams = s.toString(", ")
-    
 End Function
 
 '判断一个属性是否是额外参数，会根据TTK来判断更多的属性
@@ -488,7 +301,7 @@ Private Function isExtra(ByVal sK As String, usettk As Boolean) As Boolean
 End Function
 
 '如果使用了TTK扩展，使用这个函数获取TTK相关参数并创建合法的字符参数列表
-Private Function GetStyleParams(oop As Boolean, usettk As Boolean) As String
+Private Function GetStyleParams(usettk As Boolean) As String
     Dim s As New cStrBuilder
     
     If Len(Dic("relief")) Then s.Append "relief=" & Dic("relief")

@@ -31,13 +31,12 @@ End Property
 '输出PYTHON代码,
 'sCmdFunc: 输出参数，事件处理回调代码;
 'rel:是否使用相对坐标,
-'oop:是否使用面向对象编程
 'usettk:是否使用TTK主题扩展
-Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, rel As Boolean, oop As Boolean, usettk As Boolean)
+Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, rel As Boolean, usettk As Boolean)
     If usettk Then
-        m_Combobox.toString sOut, sCmdFunc, rel, oop, usettk
+        m_Combobox.toString sOut, sCmdFunc, rel, usettk
     Else
-        m_OptionMenu.toString sOut, sCmdFunc, rel, oop, usettk
+        m_OptionMenu.toString sOut, sCmdFunc, rel, usettk
     End If
 End Sub
 

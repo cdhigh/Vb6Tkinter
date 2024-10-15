@@ -26,49 +26,23 @@ Private m_CanbeOutByMainForm As Boolean
 '输出PYTHON代码,
 'sCmdFunc: 输出参数，事件处理回调代码;
 'rel:是否使用相对坐标,
-'oop:是否使用面向对象编程
 'usettk:是否使用TTK主题扩展
-Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, rel As Boolean, oop As Boolean, usettk As Boolean)
-    
-    If oop Then
-        toStringOOP sOut, sCmd, rel
-    Else
-        toStringStructure sOut, sCmd, rel
-    End If
-    
-End Sub
-
-'输出结构化代码
-Private Sub toStringStructure(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, rel As Boolean)
-    
-    Dim s() As String, i As Long, extra As String
-    
-    extra = IIf(Len(m_Base("tearoff")), ", tearoff=" & m_Base("tearoff"), "")
-    
-    sOut.Append Space(4) & m_Base.Name & " = Menu(" & m_Base.Parent & extra & ")"
-    
-    '逐个输出各顶级菜单，各顶级菜单下的子菜单由各顶级菜单负责生成对应的代码
-    For i = 0 To m_numChilds - 1
-        m_Childs(i).toString sOut, sCmd, rel, False, False
-    Next
-    
-    sOut.Append Space(4) & m_Base.Parent & "['menu'] = " & m_Base.Name
-    sOut.Append Space(4) & "gComps['" & m_Base.Name & "'] = " & m_Base.Name
-    
+Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, rel As Boolean, usettk As Boolean)
+    toStringOOP sOut, sCmd, rel
 End Sub
 
 '输出面向对象代码
 Private Sub toStringOOP(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, rel As Boolean)
     
-    Dim s() As String, i As Long, extra As String
+    Dim s() As String, I As Long, extra As String
     
     extra = IIf(Len(m_Base("tearoff")), ", tearoff=" & m_Base("tearoff"), "")
     
     sOut.Append Space(8) & "self." & m_Base.Name & " = Menu(self." & m_Base.Parent & extra & ")"
     
     '逐个输出各顶级菜单，各顶级菜单下的子菜单由各顶级菜单负责生成对应的代码
-    For i = 0 To m_numChilds - 1
-        m_Childs(i).toString sOut, sCmd, rel, True, False
+    For I = 0 To m_numChilds - 1
+        m_Childs(I).toString sOut, sCmd, rel, False
     Next
     
     sOut.Append Space(8) & "self." & m_Base.Parent & "['menu'] = self." & m_Base.Name

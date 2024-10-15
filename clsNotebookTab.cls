@@ -26,17 +26,16 @@ Private m_Parent  As String
 '输出PYTHON代码,
 'sCmdFunc: 输出参数，事件处理回调代码;
 'rel:是否使用相对坐标,
-'oop:是否使用面向对象编程
 'usettk:是否使用TTK主题扩展
-Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, rel As Boolean, oop As Boolean, usettk As Boolean)
+Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, rel As Boolean, usettk As Boolean)
     
-    Dim i As Long
+    Dim I As Long
     
     '得先按依赖关系进行排序
     SortWidgets m_SubWidgets, m_numSubWidgets
     
-    For i = 0 To m_numSubWidgets - 1
-        m_SubWidgets(i).toString sOut, sCmdFunc, rel, oop, usettk
+    For I = 0 To m_numSubWidgets - 1
+        m_SubWidgets(I).toString sOut, sCmdFunc, rel, usettk
     Next
     
 End Sub

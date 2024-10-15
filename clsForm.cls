@@ -38,66 +38,41 @@ Const defaultIconName As String = "icon.gif" '如果存在此文件名，则自动做为窗体图
 '输出PYTHON代码,
 'sCmdFunc: 输出参数，事件处理回调代码;
 'rel:是否使用相对坐标,
-'oop:是否使用面向对象编程
 'usettk:是否使用TTK主题扩展
-Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, rel As Boolean, oop As Boolean, usettk As Boolean)
+Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, rel As Boolean, usettk As Boolean)
     
      '如果需要窗体在屏幕中间，计算相对位置，这句话要放在最前面，避免窗口启动后先有一个小框再移动到屏幕正中
     If m_StartupPosition = "Center" Then
-        CenterWindow sOut, oop
+        CenterWindow sOut
     End If
     
-    If oop Then
-        sOut.Append "        self.master.title(" & U(m_Title) & ")"
-        If m_StartupPosition = "Manual" Then  '手工指定窗口初始位置
-            sOut.Append "        self.master.geometry('" & m_Geometry & CoordinateOnStart() & "')"
-        ElseIf m_StartupPosition <> "Center" Then
-            sOut.Append "        self.master.geometry('" & m_Geometry & "')"
-        End If
-        If Not m_Resizable Then sOut.Append "        self.master.resizable(0,0)"
-        If Len(m_WindowState) > 0 And m_WindowState <> "'normal'" Then
-            sOut.Append "        self.master.wm_state(" & m_WindowState & ")"
-        End If
-        If m_Topmost Then
-            '增加wait函数是因为http://code.activestate.com/lists/python-list/385778/，有网友反馈偶尔会出现窗体不显示的情况，
-            'wait函数可以规避这个问题
-            sOut.Append "        self.master.wait_visibility(self.master)"
-            sOut.Append "        self.master.wm_attributes('-topmost', 1)"
-        End If
-        If Len(m_Alpha) Then
-            sOut.Append "        self.master.wm_attributes('-alpha', " & m_Alpha & ")"
-        End If
-    Else
-        sOut.Append "    " & m_Name & " = Tk()"
-        sOut.Append "    " & m_Name & ".title(" & U(m_Title) & ")"
-        If m_StartupPosition = "Manual" Then  '手工指定窗口初始位置
-            sOut.Append "    " & m_Name & ".geometry('" & m_Geometry & CoordinateOnStart() & "')"
-        ElseIf m_StartupPosition <> "Center" Then
-            sOut.Append "    " & m_Name & ".geometry('" & m_Geometry & "')"
-        End If
-        If Not m_Resizable Then sOut.Append "    " & m_Name & ".resizable(0,0)"
-        If Len(m_WindowState) > 0 And m_WindowState <> "'normal'" Then
-            sOut.Append "    " & m_Name & ".wm_state(" & m_WindowState & ")"
-        End If
-        If m_Topmost Then
-            sOut.Append "    " & m_Name & ".wait_visibility(" & m_Name & ")"
-            sOut.Append "    " & m_Name & ".wm_attributes('-topmost', 1)"
-        End If
-        If Len(m_Alpha) Then
-            sOut.Append "    " & m_Name & ".wm_attributes('-alpha', " & m_Alpha & ")"
-        End If
+    sOut.Append "        self.master.title(" & U(m_Title) & ")"
+    If m_StartupPosition = "Manual" Then  '手工指定窗口初始位置
+        sOut.Append "        self.master.geometry('" & m_Geometry & CoordinateOnStart() & "')"
+    ElseIf m_StartupPosition <> "Center" Then
+        sOut.Append "        self.master.geometry('" & m_Geometry & "')"
+    End If
+    If Not m_Resizable Then sOut.Append "        self.master.resizable(0,0)"
+    If Len(m_WindowState) > 0 And m_WindowState <> "'normal'" Then
+        sOut.Append "        self.master.wm_state(" & m_WindowState & ")"
+    End If
+    If m_Topmost Then
+        '增加wait函数是因为http://code.activestate.com/lists/python-list/385778/，有网友反馈偶尔会出现窗体不显示的情况，
+        'wait函数可以规避这个问题
+        sOut.Append "        self.master.wait_visibility(self.master)"
+        sOut.Append "        self.master.wm_attributes('-topmost', 1)"
+    End If
+    If Len(m_Alpha) Then
+        sOut.Append "        self.master.wm_attributes('-alpha', " & m_Alpha & ")"
     End If
     
-    ProcessIcon sOut, oop  '处理窗体图标
-    ProcessBindCommand sOut, sCmdFunc, oop ' 处理bindcommand
-    ProcessProtocol sOut, sCmdFunc, oop '窗口消息拦截，如果有的话
-    
-    If Not oop Then
-        sOut.Append "    gComps['" & m_Name & "'] = " & m_Name & vbCrLf
-    End If
+    ProcessIcon sOut  '处理窗体图标
+    ProcessBindCommand sOut, sCmdFunc ' 处理bindcommand
+    ProcessProtocol sOut, sCmdFunc '窗口消息拦截，如果有的话
 End Sub
 
-Private Sub ProcessIcon(sOut As cStrBuilder, oop As Boolean)
+'处理窗体图标
+Private Sub ProcessIcon(sOut As cStrBuilder)
     
     Dim s As String, sBase64 As String
     
@@ -106,137 +81,85 @@ Private Sub ProcessIcon(sOut As cStrBuilder, oop As Boolean)
     s = UCase(FileExt(m_IconFile))
     
     '处理窗体图标
-    If oop Then
-        If s = "GIF" And m_IconEmbedding Then
-            sBase64 = CreateIconBase64(Space(12)) '使用BASE64将GIF图片嵌入源码
-            If Len(sBase64) Then
-                sOut.Append "        self.icondata = " & String(3, Chr(34)) & vbCrLf & sBase64 & String(3, Chr(34))
-                sOut.Append "        self.iconimg = PhotoImage(data=self.icondata)"
-                sOut.Append "        self.master.tk.call('wm', 'iconphoto', self.master._w, self.iconimg)"
-            End If
-        ElseIf Len(s) = 0 Or s = "ICO" Then '如果没有后缀名，则假定为ico格式
-            sOut.Append "        self.master.iconbitmap(default=r'" & FileFullName(m_IconFile) & "')"
-        Else
-            sOut.Append "        self.iconimg = PhotoImage(file=r'" & FileFullName(m_IconFile) & "')"
+    If s = "GIF" And m_IconEmbedding Then
+        sBase64 = CreateIconBase64(Space(12)) '使用BASE64将GIF图片嵌入源码
+        If Len(sBase64) Then
+            sOut.Append "        self.icondata = " & String(3, Chr(34)) & vbCrLf & sBase64 & String(3, Chr(34))
+            sOut.Append "        self.iconimg = PhotoImage(data=self.icondata)"
             sOut.Append "        self.master.tk.call('wm', 'iconphoto', self.master._w, self.iconimg)"
         End If
+    ElseIf Len(s) = 0 Or s = "ICO" Then '如果没有后缀名，则假定为ico格式
+        sOut.Append "        self.master.iconbitmap(default=r'" & FileFullName(m_IconFile) & "')"
     Else
-        If s = "GIF" And m_IconEmbedding Then
-            sBase64 = CreateIconBase64(Space(8))
-            If Len(sBase64) Then
-                sOut.Append "    icondata = " & String(3, Chr(34)) & vbCrLf & sBase64 & String(3, Chr(34))
-                sOut.Append "    iconimg = PhotoImage(data=icondata)"
-                sOut.Append "    " & m_Name & ".tk.call('wm', 'iconphoto', " & m_Name & "._w, iconimg)"
-            End If
-        ElseIf Len(s) = 0 Or s = "ICO" Then '如果图标没有后缀名，则假定为ico格式
-            sOut.Append "    " & m_Name & ".iconbitmap(default=r'" & FileFullName(m_IconFile) & "')"
-        Else
-            sOut.Append "    iconimg = PhotoImage(file=r'" & FileFullName(m_IconFile) & "')"
-            sOut.Append "    " & m_Name & ".tk.call('wm', 'iconphoto', " & m_Name & "._w, iconimg)"
-        End If
+        sOut.Append "        self.iconimg = PhotoImage(file=r'" & FileFullName(m_IconFile) & "')"
+        sOut.Append "        self.master.tk.call('wm', 'iconphoto', self.master._w, self.iconimg)"
     End If
 End Sub
 
-Private Sub ProcessBindCommand(sOut As cStrBuilder, sCmdFunc As cStrBuilder, oop As Boolean)
+' 处理bindcommand
+Private Sub ProcessBindCommand(sOut As cStrBuilder, sCmdFunc As cStrBuilder)
     
-    Dim i As Long, s() As String, sCmdName As String
+    Dim I As Long, s() As String, sCmdName As String
     
     If Len(m_Bindcommand) = 0 Then Exit Sub
     
     s = Split(m_Bindcommand, ",")
     
-    For i = 0 To UBound(s)
-        s(i) = Trim(s(i))
-        If Left$(s(i), 1) = "<" And Right$(s(i), 1) = ">" Then
+    For I = 0 To UBound(s)
+        s(I) = Trim(s(I))
+        If Left$(s(I), 1) = "<" And Right$(s(I), 1) = ">" Then
             
-            sCmdName = m_Name & "_" & Replace(Replace(Replace(s(i), "<", ""), ">", ""), "-", "_")
+            sCmdName = m_Name & "_" & Replace(Replace(Replace(s(I), "<", ""), ">", ""), "-", "_")
             
-            If oop Then
-                sOut.Append Space(8) & "self.master.bind('" & s(i) & "', self." & sCmdName & ")"
-                sCmdFunc.Append m_Base.CreateFuncDefOOP(sCmdName, "event")
-                
-                'Python是大小写敏感的，对应快捷键也一样，如果设置的快捷键包含字母键，则将对应的大写/小写也一起绑定
-                If Right$(s(i), 3) >= "-a>" And Right$(s(i), 3) <= "-z>" Then
-                    s(i) = Left(s(i), Len(s(i)) - 2) & UCase(Mid(s(i), Len(s(i)) - 1, 1)) & ">" '变大写
-                    sOut.Append Space(8) & "self.master.bind('" & s(i) & "', self." & sCmdName & ")"
-                ElseIf Right$(s(i), 3) >= "-A>" And Right$(s(i), 3) <= "-Z>" Then
-                    s(i) = Left(s(i), Len(s(i)) - 2) & LCase(Mid(s(i), Len(s(i)) - 1, 1)) & ">" '变小写
-                    sOut.Append Space(8) & "self.master.bind('" & s(i) & "', self." & sCmdName & ")"
-                End If
-            Else
-                sOut.Append Space(4) & m_Name & ".bind('" & s(i) & "', " & sCmdName & ")"
-                sCmdFunc.Append m_Base.CreateFuncDef(sCmdName, "event")
-                
-                'Python是大小写敏感的，对应快捷键也一样，如果设置的快捷键包含字母键，则将对应的大写/小写也一起绑定
-                If Right(s(i), 3) >= "-a>" And Right(s(i), 3) <= "-z>" Then
-                    s(i) = Left(s(i), Len(s(i)) - 2) & UCase(Mid(s(i), Len(s(i)) - 1, 1)) & ">" '对应字母变大写
-                    sOut.Append Space(4) & m_Name & ".bind('" & s(i) & "', " & sCmdName & ")"
-                ElseIf Right(s(i), 3) >= "-A>" And Right(s(i), 3) <= "-Z>" Then
-                    s(i) = Left(s(i), Len(s(i)) - 2) & LCase(Mid(s(i), Len(s(i)) - 1, 1)) & ">" '对应字母变小写
-                    sOut.Append Space(4) & m_Name & ".bind('" & s(i) & "', " & sCmdName & ")"
-                End If
+            sOut.Append Space(8) & "self.master.bind('" & s(I) & "', self." & sCmdName & ")"
+            sCmdFunc.Append m_Base.CreateFuncDefOOP(sCmdName, "event")
+            
+            'Python是大小写敏感的，对应快捷键也一样，如果设置的快捷键包含字母键，则将对应的大写/小写也一起绑定
+            If Right$(s(I), 3) >= "-a>" And Right$(s(I), 3) <= "-z>" Then
+                s(I) = Left(s(I), Len(s(I)) - 2) & UCase(Mid(s(I), Len(s(I)) - 1, 1)) & ">" '变大写
+                sOut.Append Space(8) & "self.master.bind('" & s(I) & "', self." & sCmdName & ")"
+            ElseIf Right$(s(I), 3) >= "-A>" And Right$(s(I), 3) <= "-Z>" Then
+                s(I) = Left(s(I), Len(s(I)) - 2) & LCase(Mid(s(I), Len(s(I)) - 1, 1)) & ">" '变小写
+                sOut.Append Space(8) & "self.master.bind('" & s(I) & "', self." & sCmdName & ")"
             End If
-            
         End If
     Next
     
 End Sub
 
 '窗口消息拦截，如果有的话
-Private Sub ProcessProtocol(sOut As cStrBuilder, sCmdFunc As cStrBuilder, oop As Boolean)
+Private Sub ProcessProtocol(sOut As cStrBuilder, sCmdFunc As cStrBuilder)
     
-    Dim sa() As String, i As Long, s As String
+    Dim sa() As String, I As Long, s As String
     
     If Len(m_Protocol) = 0 Then Exit Sub
     
     sa = Split(m_Protocol, ",")
     
-    If oop Then
-        For i = 0 To UBound(sa)
-            sOut.Append "        self.master.protocol('" & sa(i) & "', self.EV_" & sa(i) & ")"
-            If sa(i) = "WM_DELETE_WINDOW" Then
-                s = "        if askyesno(message='Are you sure to quit?'):" & vbCrLf & Space(12) & "self.master.destroy()"
-                sCmdFunc.Append m_Base.CreateFuncDefOOP("EV_" & sa(i), "event=None", s)
-            Else
-                sCmdFunc.Append m_Base.CreateFuncDefOOP("EV_" & sa(i), "event=None")
-            End If
-        Next
-    Else
-        For i = 0 To UBound(sa)
-            sOut.Append "    " & m_Name & ".protocol('" & sa(i) & "', EV_" & sa(i) & ")"
-            If sa(i) = "WM_DELETE_WINDOW" Then
-                s = "    if askyesno(message='Are you sure to quit?'):" & vbCrLf & "        gComps['" & m_Name & "'].destroy()"
-                sCmdFunc.Append m_Base.CreateFuncDef("EV_" & sa(i), "event=None", s)
-            Else
-                sCmdFunc.Append m_Base.CreateFuncDef("EV_" & sa(i), "event=None")
-            End If
-        Next
-    End If
-    
+    For I = 0 To UBound(sa)
+        sOut.Append "        self.master.protocol('" & sa(I) & "', self.EV_" & sa(I) & ")"
+        If sa(I) = "WM_DELETE_WINDOW" Then
+            s = "        if askyesno(message='Are you sure to quit?'):" & vbCrLf & Space(12) & "self.master.destroy()"
+            sCmdFunc.Append m_Base.CreateFuncDefOOP("EV_" & sa(I), "event=None", s)
+        Else
+            sCmdFunc.Append m_Base.CreateFuncDefOOP("EV_" & sa(I), "event=None")
+        End If
+    Next
 End Sub
 
 '将主窗体放置在屏幕中间
-Private Sub CenterWindow(sOut As cStrBuilder, oop As Boolean)
+Private Sub CenterWindow(sOut As cStrBuilder)
     Dim W As String, H As String
     
     W = Left$(m_Geometry, InStr(1, m_Geometry, "x") - 1)
     H = Mid$(m_Geometry, InStr(1, m_Geometry, "x") + 1)
     
-    If oop Then
-        sOut.Append Space(8) & "# To center the window on the screen."
-        sOut.Append Space(8) & "ws = self.master.winfo_screenwidth()"
-        sOut.Append Space(8) & "hs = self.master.winfo_screenheight()"
-        sOut.Append Space(8) & "x = (ws / 2) - (" & W & " / 2)"
-        sOut.Append Space(8) & "y = (hs / 2) - (" & H & " / 2)"
-        sOut.Append Space(8) & "self.master.geometry('%dx%d+%d+%d' % (" & W & "," & H & ",x,y))"
-    Else
-        sOut.Append Space(4) & "# To center the window on the screen."
-        sOut.Append Space(4) & "ws = top.winfo_screenwidth()"
-        sOut.Append Space(4) & "hs = top.winfo_screenheight()"
-        sOut.Append Space(4) & "x = (ws / 2) - (" & W & " / 2)"
-        sOut.Append Space(4) & "y = (hs / 2) - (" & H & " / 2)"
-        sOut.Append Space(4) & "top.geometry('%dx%d+%d+%d' % (" & W & "," & H & ",x,y))"
-    End If
+    sOut.Append Space(8) & "# To center the window on the screen."
+    sOut.Append Space(8) & "ws = self.master.winfo_screenwidth()"
+    sOut.Append Space(8) & "hs = self.master.winfo_screenheight()"
+    sOut.Append Space(8) & "x = (ws / 2) - (" & W & " / 2)"
+    sOut.Append Space(8) & "y = (hs / 2) - (" & H & " / 2)"
+    sOut.Append Space(8) & "self.master.geometry('%dx%d+%d+%d' % (" & W & "," & H & ",x,y))"
 End Sub
 
 Private Function CreateIconBase64(sPrexSpace As String) As String
@@ -269,7 +192,7 @@ End Function
 '创建对象后要马上调用这个函数初始化各参数, 窗体大小以像素为单位
 Public Sub InitConfig(o As Object, nWidth As Long, nHeight As Long, dMethods As Dictionary)
     
-    Dim s As String, cAttr As String, cValue As String, sa() As String, i As Long, idx As Long
+    Dim s As String, cAttr As String, cValue As String, sa() As String, I As Long, idx As Long
     
     m_Base.SetVbWidgetInstance o
     
@@ -302,8 +225,8 @@ Public Sub InitConfig(o As Object, nWidth As Long, nHeight As Long, dMethods As 
         
         '如果有一个命名为 icon.gif 的图像文件，则自动选择此文件
         sa = Split(m_IconFilesInPath, ",")
-        For i = 0 To UBound(sa)
-            s = sa(i)
+        For I = 0 To UBound(sa)
+            s = sa(I)
             If (Len(s) > Len(defaultIconName)) And (Right(LCase(s), Len(defaultIconName)) = defaultIconName) Then
                 m_IconFile = s
                 Exit For
@@ -328,8 +251,8 @@ Public Sub InitConfig(o As Object, nWidth As Long, nHeight As Long, dMethods As 
     If Len(s) Then
         sa = Split(s, "@")
         If UCase(sa(0)) = "P" Then
-            For i = 1 To UBound(sa)
-                s = sa(i)
+            For I = 1 To UBound(sa)
+                s = sa(I)
                 idx = InStr(2, s, "=")
                 If idx > 0 Then '有值
                     cAttr = Left$(s, idx - 1)
@@ -471,7 +394,7 @@ Public Function Allitems() As Collection
 End Function
 
 Public Sub SetConfig(sAttrs As String)
-    Dim sa() As String, i As Long
+    Dim sa() As String, I As Long
     
     m_Title = ""
     m_Resizable = True
@@ -488,8 +411,8 @@ Public Sub SetConfig(sAttrs As String)
     
     sa = Split(sAttrs, "|")
     
-    For i = 0 To UBound(sa) - 1 Step 2
-        SetSingleConfig sa(i) & "|" & sa(i + 1)
+    For I = 0 To UBound(sa) - 1 Step 2
+        SetSingleConfig sa(I) & "|" & sa(I + 1)
     Next
     
 End Sub

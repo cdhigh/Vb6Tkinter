@@ -183,6 +183,9 @@ The standard built-in ttk themes extension provides native style on different op
 
 
 # Changelog    
+*  v1.8
+    1. Generate oop code only.
+    2. Add an interpretation of property (MultiSelect -> selectmode) of ListBox.
 *  v1.7.2
     1. bugfix: Cannot preview structured code.
 *  v1.7.1

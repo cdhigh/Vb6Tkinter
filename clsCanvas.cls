@@ -24,38 +24,28 @@ Private m_CanbeOutByMainForm As Boolean
 '输出PYTHON代码,
 'sCmdFunc: 输出参数，事件处理回调代码;
 'rel:是否使用相对坐标,
-'oop:是否使用面向对象编程
 'usettk:是否使用TTK主题扩展
-Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, rel As Boolean, oop As Boolean, usettk As Boolean)
+Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, rel As Boolean, usettk As Boolean)
     Dim scrlcmd As String
     
-    m_Base.toString sOut, sCmdFunc, rel, oop, usettk
+    m_Base.toString sOut, sCmdFunc, rel, usettk
     
     ' 增加滚动条的绑定处理
     scrlcmd = m_Base("xscrollcommand")
     If Right$(scrlcmd, 4) = ".set" Then
-        If oop Then
-            sOut.Append Space(8) & "self." & Left$(scrlcmd, Len(scrlcmd) - 4) & "['command'] = self." & m_Base.Name & ".xview"
-        Else
-            sOut.Append Space(4) & Left$(scrlcmd, Len(scrlcmd) - 4) & "['command'] = " & m_Base.Name & ".xview"
-        End If
+        sOut.Append Space(8) & "self." & Left$(scrlcmd, Len(scrlcmd) - 4) & "['command'] = self." & m_Base.Name & ".xview"
     End If
     
     scrlcmd = m_Base("yscrollcommand")
     If Right$(scrlcmd, 4) = ".set" Then
-        If oop Then
-            sOut.Append Space(8) & "self." & Left$(scrlcmd, Len(scrlcmd) - 4) & "['command'] = self." & m_Base.Name & ".yview"
-        Else
-            sOut.Append Space(4) & Left$(scrlcmd, Len(scrlcmd) - 4) & "['command'] = " & m_Base.Name & ".yview"
-        End If
+        sOut.Append Space(8) & "self." & Left$(scrlcmd, Len(scrlcmd) - 4) & "['command'] = self." & m_Base.Name & ".yview"
     End If
     
 End Sub
 
-
 '创建对象后要马上调用这个函数初始化各参数
 Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dMethods As Dictionary)
-    Dim s As String, sa() As String, i As Long, idx As Long
+    Dim s As String, sa() As String, I As Long, idx As Long
     
     m_Base.SetVbWidgetInstance o
     
@@ -112,8 +102,8 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
     If Len(s) Then
         sa = Split(s, "@")
         If sa(0) = "p" Or sa(0) = "P" Then
-            For i = 1 To UBound(sa)
-                s = sa(i)
+            For I = 1 To UBound(sa)
+                s = sa(I)
                 idx = InStr(2, s, "=")
                 If idx > 0 Then '有值
                     m_dicTotal(Left$(s, idx - 1)) = Mid$(s, idx + 1)
@@ -130,13 +120,13 @@ End Sub
 '返回值：0-没有可选值，1-有一个严格限制的可选值列表，2-除提供的可选值列表外，还可以手动输入其他值
 '输出：sa()可选值列表数组
 Public Function GetAttrValueList(sAttr As String, ByRef sa() As String) As Long
-    Dim aComps() As String, i As Long, satmp() As String, sOut As String
+    Dim aComps() As String, I As Long, satmp() As String, sOut As String
     If sAttr = "xscrollcommand" Or sAttr = "yscrollcommand" Then
         aComps = GetAllComps()
         If UBound(aComps) >= 0 Then
             sOut = ""
-            For i = 1 To UBound(aComps) '0为窗体，不需要判断
-                satmp = Split(aComps(i), "|")
+            For I = 1 To UBound(aComps) '0为窗体，不需要判断
+                satmp = Split(aComps(I), "|")
                 If UBound(satmp) > 0 Then
                     If satmp(1) = "clsScrollbar" Then
                         sOut = sOut & IIf(Len(sOut), ",", "") & satmp(0) & ".set"

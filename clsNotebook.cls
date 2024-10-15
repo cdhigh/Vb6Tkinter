@@ -25,24 +25,23 @@ Private m_CanbeOutByMainForm As Boolean
 '输出PYTHON代码,
 'sCmdFunc: 输出参数，事件处理回调代码;
 'rel:是否使用相对坐标,
-'oop:是否使用面向对象编程
 'usettk:是否使用TTK主题扩展
-Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, rel As Boolean, oop As Boolean, usettk As Boolean)
-    m_Base.toString sOut, sCmdFunc, rel, oop, usettk
-    CreateTabWidgets sOut, sCmdFunc, rel, oop, usettk
+Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, rel As Boolean, usettk As Boolean)
+    m_Base.toString sOut, sCmdFunc, rel, usettk
+    CreateTabWidgets sOut, sCmdFunc, rel, usettk
 End Sub
 
-Private Sub CreateTabWidgets(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, rel As Boolean, oop As Boolean, usettk As Boolean)
+Private Sub CreateTabWidgets(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, rel As Boolean, usettk As Boolean)
     
-    Dim i As Long, nTabs As Long, s As String
+    Dim I As Long, nTabs As Long, s As String
     Dim bTabExisted As Boolean, sCaption As String
     
     nTabs = IIf(m_nTabs > UBound(m_Tabs), m_nTabs, UBound(m_Tabs))
     
-    For i = 1 To nTabs  'TAB下标从1开始
-        If i > UBound(m_Tabs) Then
+    For I = 1 To nTabs  'TAB下标从1开始
+        If I > UBound(m_Tabs) Then
             bTabExisted = False
-        ElseIf m_Tabs(i) Is Nothing Then
+        ElseIf m_Tabs(I) Is Nothing Then
             bTabExisted = False
         Else
             bTabExisted = True
@@ -50,61 +49,45 @@ Private Sub CreateTabWidgets(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBu
         
         '优先使用TabStrip设置的选项页标题，如果为空，则使用Frame控件的标题。
         If bTabExisted Then
-            If i > m_nTabs Then
-                sCaption = m_Tabs(i).Caption
-            ElseIf Len(m_TabTitles(i)) = 0 Then
-                sCaption = m_Tabs(i).Caption
-            ElseIf i <= m_nTabs Then
-                sCaption = m_TabTitles(i)
+            If I > m_nTabs Then
+                sCaption = m_Tabs(I).Caption
+            ElseIf Len(m_TabTitles(I)) = 0 Then
+                sCaption = m_Tabs(I).Caption
+            ElseIf I <= m_nTabs Then
+                sCaption = m_TabTitles(I)
             End If
-        ElseIf i <= m_nTabs Then
-            sCaption = m_TabTitles(i)
+        ElseIf I <= m_nTabs Then
+            sCaption = m_TabTitles(I)
         End If
-        If Len(sCaption) = 0 Then sCaption = "Tab" & i
+        If Len(sCaption) = 0 Then sCaption = "Tab" & I
         
-        CreateSingleTabWidget sOut, sCmdFunc, rel, oop, usettk, i, bTabExisted, sCaption
+        CreateSingleTabWidget sOut, sCmdFunc, rel, usettk, I, bTabExisted, sCaption
     Next
     
 End Sub
 
-Private Sub CreateSingleTabWidget(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, rel As Boolean, oop As Boolean, usettk As Boolean, _
+Private Sub CreateSingleTabWidget(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, rel As Boolean, usettk As Boolean, _
                                         nTabIdx As Long, bUseTabObj As Boolean, sCaption As String)
     Dim s As String
     
-    If oop Then
-        If bUseTabObj Then
-            s = "self." & m_Tabs(nTabIdx).Name
-            sOut.Append vbCrLf & Space(8) & s & " = Frame(self." & m_Base.Name & ")"
-            m_Tabs(nTabIdx).toString sOut, sCmdFunc, rel, oop, usettk
-        Else
-            s = "self." & m_Base.Name & "__Tab" & nTabIdx
-            sOut.Append vbCrLf & Space(8) & s & " = Frame(self." & m_Base.Name & ")"
-            sOut.Append Space(8) & s & "Lbl = Label(" & s & ", text='Please add widgets in code.')"
-            sOut.Append Space(8) & s & "Lbl.place(relx=0.1,rely=0.5)"
-        End If
-        
-        sOut.Append Space(8) & "self." & m_Base.Name & ".add(" & s & ", text=" & U(sCaption) & ")"
+    If bUseTabObj Then
+        s = "self." & m_Tabs(nTabIdx).Name
+        sOut.Append vbCrLf & Space(8) & s & " = Frame(self." & m_Base.Name & ")"
+        m_Tabs(nTabIdx).toString sOut, sCmdFunc, rel, usettk
     Else
-        If bUseTabObj Then
-            s = m_Tabs(nTabIdx).Name
-            sOut.Append vbCrLf & Space(4) & s & " = Frame(" & m_Base.Name & ")"
-            m_Tabs(nTabIdx).toString sOut, sCmdFunc, rel, oop, usettk
-        Else
-            s = m_Base.Name & "__Tab" & nTabIdx
-            sOut.Append vbCrLf & Space(4) & s & " = Frame(" & m_Base.Name & ")"
-            sOut.Append Space(4) & s & "Lbl = Label(" & s & ", text='Please add widgets in code.')"
-            sOut.Append Space(4) & s & "Lbl.place(relx=0.1,rely=0.5)"
-        End If
-        
-        sOut.Append Space(4) & m_Base.Name & ".add(" & s & ", text=" & U(sCaption) & ")"
+        s = "self." & m_Base.Name & "__Tab" & nTabIdx
+        sOut.Append vbCrLf & Space(8) & s & " = Frame(self." & m_Base.Name & ")"
+        sOut.Append Space(8) & s & "Lbl = Label(" & s & ", text='Please add widgets in code.')"
+        sOut.Append Space(8) & s & "Lbl.place(relx=0.1,rely=0.5)"
     End If
     
+    sOut.Append Space(8) & "self." & m_Base.Name & ".add(" & s & ", text=" & U(sCaption) & ")"
 End Sub
 
 
 '创建对象后要马上调用这个函数初始化各参数
 Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dMethods As Dictionary)
-    Dim i As Long, oiTabs As ITabs, s As String, sa() As String, idx As Long
+    Dim I As Long, oiTabs As ITabs, s As String, sa() As String, idx As Long
     
     m_Base.SetVbWidgetInstance o
     
@@ -114,8 +97,8 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
     m_nTabs = oiTabs.Count
     
     ReDim m_TabTitles(m_nTabs) As String
-    For i = 1 To m_nTabs
-        m_TabTitles(i) = oiTabs.Item(i).Caption  'TAB下标从1开始
+    For I = 1 To m_nTabs
+        m_TabTitles(I) = oiTabs.Item(I).Caption  'TAB下标从1开始
     Next
     
     '这些是所有的默认值
@@ -153,8 +136,8 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
     If Len(s) Then
         sa = Split(s, "@")
         If sa(0) = "p" Or sa(0) = "P" Then
-            For i = 1 To UBound(sa)
-                s = sa(i)
+            For I = 1 To UBound(sa)
+                s = sa(I)
                 idx = InStr(2, s, "=")
                 If idx > 0 Then '有值
                     m_dicTotal(Left$(s, idx - 1)) = Mid$(s, idx + 1)

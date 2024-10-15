@@ -24,37 +24,28 @@ Private m_CanbeOutByMainForm As Boolean
 '输出PYTHON代码,
 'sCmdFunc: 输出参数，事件处理回调代码;
 'rel:是否使用相对坐标,
-'oop:是否使用面向对象编程
 'usettk:是否使用TTK主题扩展
-Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, rel As Boolean, oop As Boolean, usettk As Boolean)
+Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, rel As Boolean, usettk As Boolean)
     Dim scrlcmd As String
     
-    m_Base.toString sOut, sCmdFunc, rel, oop, usettk
+    m_Base.toString sOut, sCmdFunc, rel, usettk
     
     ' 增加滚动条的绑定处理
     scrlcmd = m_Base("xscrollcommand")
     If Right$(scrlcmd, 4) = ".set" Then
-        If oop Then
-            sOut.Append Space(8) & "self." & Left$(scrlcmd, Len(scrlcmd) - 4) & "['command'] = self." & m_Base.Name & ".xview"
-        Else
-            sOut.Append Space(4) & Left$(scrlcmd, Len(scrlcmd) - 4) & "['command'] = " & m_Base.Name & ".xview"
-        End If
+        sOut.Append Space(8) & "self." & Left$(scrlcmd, Len(scrlcmd) - 4) & "['command'] = self." & m_Base.Name & ".xview"
     End If
     
     scrlcmd = m_Base("yscrollcommand")
     If Right$(scrlcmd, 4) = ".set" Then
-        If oop Then
-            sOut.Append Space(8) & "self." & Left$(scrlcmd, Len(scrlcmd) - 4) & "['command'] = self." & m_Base.Name & ".yview"
-        Else
-            sOut.Append Space(4) & Left$(scrlcmd, Len(scrlcmd) - 4) & "['command'] = " & m_Base.Name & ".yview"
-        End If
+        sOut.Append Space(8) & "self." & Left$(scrlcmd, Len(scrlcmd) - 4) & "['command'] = self." & m_Base.Name & ".yview"
     End If
     
 End Sub
 
 '创建对象后要马上调用这个函数初始化各参数
 Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dMethods As Dictionary)
-    Dim i As Long, oList As Object, sList As String
+    Dim I As Long, oList As Object, sList As String
     Dim s As String, sa() As String, idx As Long
     
     m_Base.SetVbWidgetInstance o
@@ -62,13 +53,13 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
     m_Base.Name = o.Properties("Name")
     
     '保存列表，中间使用空格隔开
-    i = 0
+    I = 0
     Set oList = o.Properties("List")
     Do While True
-        If oList.IndexedValue(i) = "" Then Exit Do
+        If oList.IndexedValue(I) = "" Then Exit Do
         
-        sList = sList & " " & oList.IndexedValue(i)
-        i = i + 1
+        sList = sList & " " & oList.IndexedValue(I)
+        I = I + 1
     Loop
     m_Base.Value = Trim(sList)
     
@@ -87,7 +78,14 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
     m_dicTotal("bg") = TranslateColor(o.Properties("BackColor"))
     m_dicTotal("bd") = "1"
     m_dicTotal("relief") = "SUNKEN"
-    m_dicTotal("selectmode") = "SINGLE"
+    Select Case o.Properties("MultiSelect")
+        Case 1
+            m_dicTotal("selectmode") = "MULTIPLE"
+        Case 2
+            m_dicTotal("selectmode") = "EXTENDED"
+        Case Else
+            m_dicTotal("selectmode") = "SINGLE"
+    End Select
     m_dicTotal("font") = "(" & U(CStr(o.Properties("Font")("Name"))) & "," & Round(o.Properties("Font")("Size")) & _
                         IIf(o.Properties("Font")("Bold"), ",'bold'", "") & IIf(o.Properties("Font")("Italic"), ",'italic'", "") & _
                         IIf(o.Properties("Font")("Underline"), ",'underline'", "") & IIf(o.Properties("Font")("Strikethrough"), ",'overstrike')", ")")
@@ -110,6 +108,7 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
     If m_dicTotal("tooltip") <> "" Then m_Base("tooltip") = m_dicTotal("tooltip")
     If o.Properties("ForeColor") <> vbWindowText Then m_Base("fg") = m_dicTotal("fg")
     If o.Properties("BackColor") <> vbWindowBackground Then m_Base("bg") = m_dicTotal("bg")
+    If m_dicTotal("selectmode") <> "SINGLE" Then m_Base("selectmode") = m_dicTotal("selectmode")
     If m_dicTotal("font") <> "(" & U(GetDefaultFontName()) & ",9)" Then m_Base("font") = m_dicTotal("font")
     If m_dicTotal("takefocus") = 0 Then m_Base("takefocus") = m_dicTotal("takefocus")
     If m_dicTotal("cursor") <> "" Then m_Base("cursor") = m_dicTotal("cursor")
@@ -121,8 +120,8 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
     If Len(s) Then
         sa = Split(s, "@")
         If sa(0) = "p" Or sa(0) = "P" Then
-            For i = 1 To UBound(sa)
-                s = sa(i)
+            For I = 1 To UBound(sa)
+                s = sa(I)
                 idx = InStr(2, s, "=")
                 If idx > 0 Then '有值
                     m_dicTotal(Left$(s, idx - 1)) = Mid$(s, idx + 1)
@@ -139,7 +138,7 @@ End Sub
 '返回值：0-没有可选值，1-有一个严格限制的可选值列表，2-除提供的可选值列表外，还可以手动输入其他值
 '输出：sa()可选值列表数组
 Public Function GetAttrValueList(sAttr As String, ByRef sa() As String) As Long
-    Dim aComps() As String, i As Long, satmp() As String, sOut As String
+    Dim aComps() As String, I As Long, satmp() As String, sOut As String
     GetAttrValueList = 1
     If sAttr = "activestyle" Then
         sa = Split("'underline','dotbox','none'", ",")
@@ -152,8 +151,8 @@ Public Function GetAttrValueList(sAttr As String, ByRef sa() As String) As Long
         aComps = GetAllComps()
         If UBound(aComps) >= 0 Then
             sOut = ""
-            For i = 1 To UBound(aComps) '0为窗体，不需要判断
-                satmp = Split(aComps(i), "|")
+            For I = 1 To UBound(aComps) '0为窗体，不需要判断
+                satmp = Split(aComps(I), "|")
                 If UBound(satmp) > 0 Then
                     If satmp(1) = "clsScrollbar" Then
                         sOut = sOut & IIf(Len(sOut), ",", "") & satmp(0) & ".set"

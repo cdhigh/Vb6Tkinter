@@ -23,32 +23,23 @@ Private m_CanbeOutByMainForm As Boolean
 '输出PYTHON代码,
 'sCmdFunc: 输出参数，事件处理回调代码;
 'rel:是否使用相对坐标,
-'oop:是否使用面向对象编程
 'usettk:是否使用TTK主题扩展
-Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, rel As Boolean, oop As Boolean, usettk As Boolean)
+Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, rel As Boolean, usettk As Boolean)
     
     '先创建下拉列表
     If Len(m_Base("values")) Then
-        If oop Then
-            sOut.Append Space(8) & "self." & m_Base.Name & "List = " & m_List
-        Else
-            sOut.Append Space(4) & m_Base.Name & "List = " & m_List
-        End If
+        sOut.Append Space(8) & "self." & m_Base.Name & "List = " & m_List
         If Len(m_Base("textvariable")) Then m_Base("text") = GetFirstItemText()
     End If
     
-    m_Base.toString sOut, sCmdFunc, rel, oop, usettk
+    m_Base.toString sOut, sCmdFunc, rel, usettk
     
     '默认启动后组合框显示第一项
     If Len(m_Base("values")) Then
         If Len(m_Base("textvariable")) Then
             m_Base.Remove ("text")
         Else
-            If oop Then
-                sOut.Append Space(8) & "self." & m_Base.Name & ".set(self." & m_Base.Name & "List[0])"
-            Else
-                sOut.Append Space(4) & m_Base.Name & ".set(" & m_Base.Name & "List[0])"
-            End If
+            sOut.Append Space(8) & "self." & m_Base.Name & ".set(self." & m_Base.Name & "List[0])"
         End If
     End If
     
@@ -57,7 +48,7 @@ End Sub
 '创建对象后要马上调用这个函数初始化各参数
 Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dMethods As Dictionary)
     
-    Dim i As Long, oList As Object, sList As String
+    Dim I As Long, oList As Object, sList As String
     Dim s As String, sa() As String, idx As Long
     
     m_Base.SetVbWidgetInstance o
@@ -67,11 +58,11 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
     '保存下拉选项值
     Set oList = o.Properties("List")
     sList = "["
-    i = IIf(o.Properties("Style") = 2, 1, 0)                                    ' 2-Dropdown List时第一项IndexedValue为控件名，所以从第二项开始
+    I = IIf(o.Properties("Style") = 2, 1, 0)                                    ' 2-Dropdown List时第一项IndexedValue为控件名，所以从第二项开始
     Do While True
-        If oList.IndexedValue(i) = "" Then Exit Do
-        sList = sList & U(oList.IndexedValue(i)) & ","
-        i = i + 1
+        If oList.IndexedValue(I) = "" Then Exit Do
+        sList = sList & U(oList.IndexedValue(I)) & ","
+        I = I + 1
     Loop
     m_List = sList & IIf(sList = "[", "'',]", "]")
     
@@ -98,7 +89,7 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
                         IIf(o.Properties("Font")("Underline"), ",'underline'", "") & IIf(o.Properties("Font")("Strikethrough"), ",'overstrike')", ")")
     m_dicTotal("takefocus") = IIf(o.Properties("TabStop"), 1, 0)
     m_dicTotal("cursor") = m_Base.GetCursorName(o.Properties("MousePointer"))
-    m_dicTotal("exportselection") = ""
+    m_dicTotal("exportselection") = "0"
     m_dicTotal("postcommand") = ""
     m_dicTotal("bindcommand") = m_Base.GetBindCommandStr(dMethods)
     
@@ -113,6 +104,7 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
     m_Base("relheight") = m_dicTotal("relheight")
     m_Base("values") = m_dicTotal("values")
     m_Base("textvariable") = m_dicTotal("textvariable")
+    m_Base("exportselection") = m_dicTotal("exportselection")
     If m_dicTotal("tooltip") <> "" Then m_Base("tooltip") = m_dicTotal("tooltip")
     If o.Properties("ForeColor") <> vbWindowText Then m_Base("fg") = m_dicTotal("fg")
     If o.Properties("BackColor") <> vbWindowBackground Then m_Base("bg") = m_dicTotal("bg")
@@ -123,14 +115,15 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
     If m_Base.IsExistCommand(dMethods, "Change") Then m_Base("textvariable") = m_dicTotal("textvariable")
     If m_dicTotal("bindcommand") <> "" Then m_Base("bindcommand") = m_dicTotal("bindcommand")
     
+    
     '使用控件的tag属性保存一些额外默认要保存的属性，
     '开始字符为：p@，后接属性名，每个属性使用@隔开，属性值可选，如果有值，则使用k=v格式
     s = Trim(o.Properties("Tag"))
     If Len(s) Then
         sa = Split(s, "@")
         If sa(0) = "p" Or sa(0) = "P" Then
-            For i = 1 To UBound(sa)
-                s = sa(i)
+            For I = 1 To UBound(sa)
+                s = sa(I)
                 idx = InStr(2, s, "=")
                 If idx > 0 Then '有值
                     m_dicTotal(Left$(s, idx - 1)) = Mid$(s, idx + 1)

@@ -24,26 +24,25 @@ Private m_Caption As String
 Private m_Parent  As String
 
 '输出PYTHON代码,
-'sCmdFunc: 输出参数，事件处理回调代码;
+'sOut: 输出参数，界面代码
+'sCmd: 输出参数，事件处理回调代码
+'sI18n: 输出参数，控件文本翻译代码
 'rel:是否使用相对坐标,
 'usettk:是否使用TTK主题扩展
-Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, rel As Boolean, usettk As Boolean)
-    
+Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, ByRef sI18n As cStrBuilder, ByVal rel As Boolean, ByVal usettk As Boolean)
     Dim I As Long
     
     '得先按依赖关系进行排序
     SortWidgets m_SubWidgets, m_numSubWidgets
     
     For I = 0 To m_numSubWidgets - 1
-        m_SubWidgets(I).toString sOut, sCmdFunc, rel, usettk
+        m_SubWidgets(I).toString sOut, sCmd, sI18n, rel, usettk
     Next
-    
 End Sub
 
 
 '创建对象后要马上调用这个函数初始化各参数
 Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, Optional dMethods As Dictionary)
-    
     m_Name = o.Properties("Name")
     
     On Error Resume Next
@@ -52,7 +51,6 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, Op
     
     Erase m_SubWidgets
     m_numSubWidgets = 0
-    
 End Sub
 
 '增加一个子控件

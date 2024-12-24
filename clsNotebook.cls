@@ -23,16 +23,17 @@ Private m_nTabs As Long                '选项卡数目
 Private m_CanbeOutByMainForm As Boolean
 
 '输出PYTHON代码,
-'sCmdFunc: 输出参数，事件处理回调代码;
+'sOut: 输出参数，界面代码
+'sCmd: 输出参数，事件处理回调代码
+'sI18n: 输出参数，控件文本翻译代码
 'rel:是否使用相对坐标,
 'usettk:是否使用TTK主题扩展
-Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, rel As Boolean, usettk As Boolean)
-    m_Base.toString sOut, sCmdFunc, rel, usettk
-    CreateTabWidgets sOut, sCmdFunc, rel, usettk
+Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, ByRef sI18n As cStrBuilder, ByVal rel As Boolean, ByVal usettk As Boolean)
+    m_Base.toString sOut, sCmd, sI18n, rel, usettk
+    CreateTabWidgets sOut, sCmd, sI18n, rel, usettk
 End Sub
 
-Private Sub CreateTabWidgets(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, rel As Boolean, usettk As Boolean)
-    
+Private Sub CreateTabWidgets(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, ByRef sI18n As cStrBuilder, ByVal rel As Boolean, ByVal usettk As Boolean)
     Dim I As Long, nTabs As Long, s As String
     Dim bTabExisted As Boolean, sCaption As String
     
@@ -61,27 +62,29 @@ Private Sub CreateTabWidgets(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBu
         End If
         If Len(sCaption) = 0 Then sCaption = "Tab" & I
         
-        CreateSingleTabWidget sOut, sCmdFunc, rel, usettk, I, bTabExisted, sCaption
+        CreateSingleTabWidget sOut, sCmd, sI18n, rel, usettk, I, bTabExisted, sCaption
     Next
-    
 End Sub
 
-Private Sub CreateSingleTabWidget(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, rel As Boolean, usettk As Boolean, _
-                                        nTabIdx As Long, bUseTabObj As Boolean, sCaption As String)
-    Dim s As String
+'创建某个选项卡里面的控件
+Private Sub CreateSingleTabWidget(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, ByRef sI18n As cStrBuilder, ByVal rel As Boolean, _
+                       ByVal usettk As Boolean, ByVal nTabIdx As Long, ByVal bUseTabObj As Boolean, ByVal sCaption As String)
+    Dim sTabName As String
     
     If bUseTabObj Then
-        s = "self." & m_Tabs(nTabIdx).Name
-        sOut.Append vbCrLf & Space(8) & s & " = Frame(self." & m_Base.Name & ")"
-        m_Tabs(nTabIdx).toString sOut, sCmdFunc, rel, usettk
+        sTabName = "self." & m_Tabs(nTabIdx).Name
+        sOut.Append vbCrLf & Space(8) & sTabName & " = Frame(self." & m_Base.Name & ")"
+        m_Tabs(nTabIdx).toString sOut, sCmd, sI18n, rel, usettk
     Else
-        s = "self." & m_Base.Name & "__Tab" & nTabIdx
-        sOut.Append vbCrLf & Space(8) & s & " = Frame(self." & m_Base.Name & ")"
-        sOut.Append Space(8) & s & "Lbl = Label(" & s & ", text='Please add widgets in code.')"
-        sOut.Append Space(8) & s & "Lbl.place(relx=0.1,rely=0.5)"
+        sTabName = "self." & m_Base.Name & "__Tab" & nTabIdx
+        sOut.Append vbCrLf & Space(8) & sTabName & " = Frame(self." & m_Base.Name & ")"
+        sOut.Append Space(8) & sTabName & "Lbl = Label(" & sTabName & ", text='Please add widgets in code.')"
+        sOut.Append Space(8) & sTabName & "Lbl.place(relx=0.1,rely=0.5)"
     End If
     
-    sOut.Append Space(8) & "self." & m_Base.Name & ".add(" & s & ", text=" & U(sCaption) & ")"
+    sOut.Append "        self." & m_Base.Name & ".add(" & sTabName & ", text=" & U(sCaption) & ")"
+    '国际化翻译
+    sI18n.Append "        self." & m_Base.Name & ".tab(" & (nTabIdx - 1) & ", text=_(" & U(sCaption) & "))"
 End Sub
 
 

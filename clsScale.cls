@@ -22,10 +22,12 @@ Private m_Base As clsBaseControl                                                
 Private m_CanbeOutByMainForm As Boolean
 
 '输出PYTHON代码,
-'sCmdFunc: 输出参数，事件处理回调代码;
+'sOut: 输出参数，界面代码
+'sCmd: 输出参数，事件处理回调代码
+'sI18n: 输出参数，控件文本翻译代码
 'rel:是否使用相对坐标,
 'usettk:是否使用TTK主题扩展
-Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, rel As Boolean, usettk As Boolean)
+Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, ByRef sI18n As cStrBuilder, ByVal rel As Boolean, ByVal usettk As Boolean)
     
     Dim s As String
     If usettk And Len(m_Base("label")) Then  'TTK库不支持Scale的label属性
@@ -33,7 +35,7 @@ Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, re
         m_Base("label") = ""
     End If
     
-    m_Base.toString sOut, sCmdFunc, rel, usettk
+    m_Base.toString sOut, sCmd, sI18n, rel, usettk
     
     If usettk And Len(s) Then
         m_Base("label") = s

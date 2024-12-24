@@ -24,29 +24,24 @@ Private m_IdxCurChild As Long
 Private m_CanbeOutByMainForm As Boolean
 
 '输出PYTHON代码,
-'sCmdFunc: 输出参数，事件处理回调代码;
+'sOut: 输出参数，界面代码
+'sCmd: 输出参数，事件处理回调代码
+'sI18n: 输出参数，控件文本翻译代码
 'rel:是否使用相对坐标,
 'usettk:是否使用TTK主题扩展
-Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, rel As Boolean, usettk As Boolean)
-    toStringOOP sOut, sCmd, rel
-End Sub
-
-'输出面向对象代码
-Private Sub toStringOOP(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, rel As Boolean)
-    
+Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, ByRef sI18n As cStrBuilder, ByVal rel As Boolean, ByVal usettk As Boolean)
     Dim s() As String, I As Long, extra As String
     
     extra = IIf(Len(m_Base("tearoff")), ", tearoff=" & m_Base("tearoff"), "")
     
-    sOut.Append Space(8) & "self." & m_Base.Name & " = Menu(self." & m_Base.Parent & extra & ")"
+    sOut.Append "        self." & m_Base.Name & " = Menu(self." & m_Base.Parent & extra & ")"
     
     '逐个输出各顶级菜单，各顶级菜单下的子菜单由各顶级菜单负责生成对应的代码
     For I = 0 To m_numChilds - 1
-        m_Childs(I).toString sOut, sCmd, rel, False
+        m_Childs(I).toString sOut, sCmd, sI18n, rel, usettk, I
     Next
     
-    sOut.Append Space(8) & "self." & m_Base.Parent & "['menu'] = self." & m_Base.Name
-    
+    sOut.Append "        self." & m_Base.Parent & ".configure(menu=self." & m_Base.Name & ")"
 End Sub
 
 '创建对象后要马上调用这个函数初始化各参数

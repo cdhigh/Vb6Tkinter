@@ -22,11 +22,13 @@ Private m_Base As clsBaseControl                                                
 Private m_CanbeOutByMainForm As Boolean                                         '由主函数调用生成字符串还是由其他对象调用
 
 '输出PYTHON代码,
-'sCmdFunc: 输出参数，事件处理回调代码;
+'sOut: 输出参数，界面代码
+'sCmd: 输出参数，事件处理回调代码
+'sI18n: 输出参数，控件文本翻译代码
 'rel:是否使用相对坐标,
 'usettk:是否使用TTK主题扩展
-Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, rel As Boolean, usettk As Boolean)
-    m_Base.toString sOut, sCmdFunc, rel, usettk
+Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, ByRef sI18n As cStrBuilder, ByVal rel As Boolean, ByVal usettk As Boolean)
+    m_Base.toString sOut, sCmd, sI18n, rel, usettk
 End Sub
 
 '创建对象后要马上调用这个函数初始化各参数
@@ -78,6 +80,7 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
     m_Base("text") = m_dicTotal("text")
     m_Base("value") = m_dicTotal("value")
     m_Base("variable") = m_dicTotal("variable")
+    m_Base("textvariable") = m_dicTotal("textvariable")
     If m_dicTotal("tooltip") <> "" Then m_Base("tooltip") = m_dicTotal("tooltip")
     If o.Properties("ForeColor") <> vbButtonText Then m_Base("fg") = m_dicTotal("fg")
     If o.Properties("BackColor") <> vbButtonFace Then m_Base("bg") = m_dicTotal("bg")

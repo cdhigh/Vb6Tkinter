@@ -15,34 +15,34 @@ Option Explicit
 
 '组合框类，用于设置和保持相应的属性和值，并生成对应PYTHON的TKinter代码
 
-Private m_dicTotal As Dictionary                                                '保存全部的属性，包括默认值
-Private m_Base As clsBaseControl                                                '基础控件类
-Private m_List As String
+Private m_dicTotal As Dictionary        '保存全部的属性，包括默认值
+Private m_Base As clsBaseControl        '基础控件类
+Private m_List As String                '预置的列表项
 Private m_CanbeOutByMainForm As Boolean
 
 '输出PYTHON代码,
-'sCmdFunc: 输出参数，事件处理回调代码;
+'sOut: 输出参数，界面代码
+'sCmd: 输出参数，事件处理回调代码
+'sI18n: 输出参数，控件文本翻译代码
 'rel:是否使用相对坐标,
 'usettk:是否使用TTK主题扩展
-Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, rel As Boolean, usettk As Boolean)
-    
+Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, ByRef sI18n As cStrBuilder, ByVal rel As Boolean, ByVal usettk As Boolean)
     '先创建下拉列表
     If Len(m_Base("values")) Then
-        sOut.Append Space(8) & "self." & m_Base.Name & "List = " & m_List
+        sOut.Append "        self." & m_Base.Name & "List = " & m_List
         If Len(m_Base("textvariable")) Then m_Base("text") = GetFirstItemText()
     End If
     
-    m_Base.toString sOut, sCmdFunc, rel, usettk
+    m_Base.toString sOut, sCmd, sI18n, rel, usettk
     
     '默认启动后组合框显示第一项
     If Len(m_Base("values")) Then
         If Len(m_Base("textvariable")) Then
             m_Base.Remove ("text")
         Else
-            sOut.Append Space(8) & "self." & m_Base.Name & ".set(self." & m_Base.Name & "List[0])"
+            sOut.Append "        self." & m_Base.Name & ".set(self." & m_Base.Name & "List[0])"
         End If
     End If
-    
 End Sub
 
 '创建对象后要马上调用这个函数初始化各参数
@@ -61,7 +61,7 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
     I = IIf(o.Properties("Style") = 2, 1, 0)                                    ' 2-Dropdown List时第一项IndexedValue为控件名，所以从第二项开始
     Do While True
         If oList.IndexedValue(I) = "" Then Exit Do
-        sList = sList & U(oList.IndexedValue(I)) & ","
+        sList = sList & U(oList.IndexedValue(I)) & ", "
         I = I + 1
     Loop
     m_List = sList & IIf(sList = "[", "'',]", "]")

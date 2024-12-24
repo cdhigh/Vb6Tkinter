@@ -23,23 +23,18 @@ Private m_List() As String
 Private m_CanbeOutByMainForm As Boolean
 
 '输出PYTHON代码,
-'sCmdFunc: 输出参数，事件处理回调代码;
+'sOut: 输出参数，界面代码
+'sCmd: 输出参数，事件处理回调代码
+'sI18n: 输出参数，控件文本翻译代码
 'rel:是否使用相对坐标,
 'usettk:是否使用TTK主题扩展(如果使用TTK，则VB的组合框对应到TTK的组合框，不会生出这个控件)
-Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, rel As Boolean, usettk As Boolean)
+Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, ByRef sI18n As cStrBuilder, ByVal rel As Boolean, ByVal usettk As Boolean)
+    Dim s() As String, I As Long, sList As String, extra As String, sConfig As String
     
     If Len(m_Base("variable")) = 0 Then
         MsgBox L_F("l_msgMusthasVar", "'variable' is obligatory for OptionMenu(ComboBox), will not generate code for OptionMenu({0}) now.", m_Base.Name), vbInformation
         Exit Sub
     End If
-    
-    toStringOOP sOut, sCmdFunc, rel, usettk
-End Sub
-
-'输出面向对象代码
-Private Sub toStringOOP(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, rel As Boolean, usettk As Boolean)
-    
-    Dim s() As String, I As Long, sList As String, extra As String, sConfig As String
     
     '生成列表
     For I = 0 To UBound(m_List)
@@ -49,20 +44,20 @@ Private Sub toStringOOP(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder
     
     sConfig = getConfigStr()
     
-    sOut.Append Space(8) & "self." & m_Base.Name & "List = " & sList
-    sOut.Append Space(8) & "self." & m_Base("variable") & " = StringVar(value=self." & m_Base.Name & "List[0])"
+    sOut.Append "        self." & m_Base.Name & "List = " & sList
+    sOut.Append "        self." & m_Base("variable") & " = StringVar(value=self." & m_Base.Name & "List[0])"
     
     extra = "self." & m_Base("variable") & ", *self." & m_Base.Name & "List"
     
-    sOut.Append Space(8) & "self." & m_Base.Name & " = OptionMenu(self." & m_Base.Parent & IIf(Len(extra), ", ", "") & extra & ")"
+    sOut.Append "        self." & m_Base.Name & " = OptionMenu(self." & m_Base.Parent & IIf(Len(extra), ", ", "") & extra & ")"
     If Len(sConfig) Then
-        sOut.Append Space(8) & "self." & m_Base.Name & ".configure(" & sConfig & ")"
+        sOut.Append "        self." & m_Base.Name & ".configure(" & sConfig & ")"
     End If
-    sOut.Append Space(8) & "self." & m_Base.Name & ".place(" & m_Base.GetPositionParams(rel) & ")"
+    sOut.Append "        self." & m_Base.Name & ".place(" & m_Base.GetPositionParams(rel) & ")"
     
     '创建事件处理函数框架（如果有）
     If Len(m_Base("command")) Then
-        sCmdFunc.Append m_Base.CreateFuncDefOOP(m_Base("command"))
+        sCmd.Append m_Base.CreateFuncDefOOP(m_Base("command"))
     End If
     
     If Len(m_Base("bindcommand")) Then                                          '有需要使用bind语句绑定的其他事件处理
@@ -70,17 +65,15 @@ Private Sub toStringOOP(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder
         For I = 0 To UBound(s)
             s(I) = Trim(s(I))
             If s(I) = "<Change>" Then '专门处理自定义的这个事件，用控件变量监视器模拟
-                sOut.Append Space(8) & "self." & m_Base("variable") & ".trace('w', self." & m_Base.Name & "_Change)"
-                sCmdFunc.Append m_Base.CreateFuncDefOOP(m_Base.Name & "_Change", "*args")
+                sOut.Append "        self." & m_Base("variable") & ".trace('w', self." & m_Base.Name & "_Change)"
+                sCmd.Append m_Base.CreateFuncDefOOP(m_Base.Name & "_Change", "*args")
             ElseIf Left(s(I), 1) = "<" And Right(s(I), 1) = ">" Then
-                sOut.Append Space(8) & "self." & m_Base.Name & ".bind('" & s(I) & "', self." & m_Base.Name & "_" & Replace(Mid(s(I), 2, Len(s(I)) - 2), "-", "_") & ")"
-                sCmdFunc.Append m_Base.CreateFuncDefOOP(m_Base.Name & "_" & Replace(Mid(s(I), 2, Len(s(I)) - 2), "-", "_"), "event")
+                sOut.Append "        self." & m_Base.Name & ".bind('" & s(I) & "', self." & m_Base.Name & "_" & Replace(Mid(s(I), 2, Len(s(I)) - 2), "-", "_") & ")"
+                sCmd.Append m_Base.CreateFuncDefOOP(m_Base.Name & "_" & Replace(Mid(s(I), 2, Len(s(I)) - 2), "-", "_"), "event")
             End If
         Next
     End If
-    
 End Sub
-
 
 '创建对象后要马上调用这个函数初始化各参数
 Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dMethods As Dictionary)

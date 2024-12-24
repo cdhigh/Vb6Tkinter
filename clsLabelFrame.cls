@@ -16,27 +16,33 @@ Attribute VB_Ext_KEY = "Top_Level" ,"Yes"
 Option Explicit
 
 '带标签框架类，用于设置和保持相应的属性和值，并生成对应PYTHON的TKinter代码
-
+'如果带标题，生成LabelFrame，没有标题就生成Frame
 Private m_dicTotal As Dictionary                                                '保存全部的属性，包括默认值
 Private m_Base As clsBaseControl                                                '基础控件类
 Private m_CanbeOutByMainForm As Boolean
 
 '输出PYTHON代码,
-'sCmdFunc: 输出参数，事件处理回调代码;
+'sOut: 输出参数，界面代码
+'sCmd: 输出参数，事件处理回调代码
+'sI18n: 输出参数，控件文本翻译代码
 'rel:是否使用相对坐标,
 'usettk:是否使用TTK主题扩展
-Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, rel As Boolean, usettk As Boolean)
-    m_Base.toString sOut, sCmdFunc, rel, usettk
+Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, ByRef sI18n As cStrBuilder, ByVal rel As Boolean, ByVal usettk As Boolean)
+    m_Base.toString sOut, sCmd, sI18n, rel, usettk
+    If m_Base.ctlType = "LabelFrame" Then
+        sI18n.Append "        self." & m_Base.Name & ".configure(text=_(" & U(m_Base("text")) & "))"
+    End If
 End Sub
 
 '创建对象后要马上调用这个函数初始化各参数
 Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dMethods As Dictionary)
-    Dim s As String, sa() As String, I As Long, idx As Long
+    Dim s As String, sa() As String, I As Long, idx As Long, txt As String
     
     m_Base.SetVbWidgetInstance o
     
     m_Base.Name = o.Properties("Name")
     
+    txt = o.Properties("Caption")
     m_dicTotal("x") = m_Base.toPixelX(o.Properties("Left"))
     m_dicTotal("y") = m_Base.toPixelY(o.Properties("Top"))
     m_dicTotal("width") = m_Base.toPixelX(o.Properties("Width"))
@@ -45,7 +51,7 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
     m_dicTotal("rely") = Format(o.Properties("Top") / parentHeight, "0.###")
     m_dicTotal("relwidth") = Format(o.Properties("Width") / parentWidth, "0.###")
     m_dicTotal("relheight") = Format(o.Properties("Height") / parentHeight, "0.###")
-    m_dicTotal("text") = "'" & o.Properties("Caption") & "'"
+    m_dicTotal("text") = "'" & txt & "'"
     m_dicTotal("tooltip") = o.Properties("ToolTipText")
     m_dicTotal("fg") = TranslateColor(o.Properties("ForeColor"))
     m_dicTotal("bg") = TranslateColor(o.Properties("BackColor"))
@@ -90,6 +96,13 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
             Next
         End If
     End If
+    
+    '如果有标题，生成LabelFrame，否则生成Frame
+    If txt = "" Then
+        SetWidgetType "Frame", "TFrame"
+    Else
+        SetWidgetType "LabelFrame", "TLabelframe"
+    End If
 End Sub
 
 '设置属性值的可能值列表
@@ -115,13 +128,11 @@ Public Function GetAttrCurrentValue(sAttr As String) As String
 End Function
 
 Public Function Tips(sAttr As String) As String
-    
     If sAttr = "labelanchor" Then
         Tips = sAttr & vbCrLf & L("l_TipLblAnchor", "Specifies the position of the label on the widget's border.\nThey are 'nw','wn','en','n','ne','w','e','ws','es','sw','s','se'")
     Else
         Tips = m_Base.Tips(sAttr)
     End If
-    
 End Function
 
 '将用户选择的配置更新到对象中，参数为使用"|"分割的很多对属性/值对
@@ -195,6 +206,10 @@ Public Function SetWidgetType(sType As String, sStyleName As String)
         m_dicTotal.Remove ("text")
         m_Base.Remove ("labelanchor")
         m_dicTotal.Remove ("labelanchor")
+        m_Base.Remove ("font")
+        m_dicTotal.Remove ("font")
+        m_Base.Remove ("fg")
+        m_dicTotal.Remove ("fg")
     Else ' 添加这两个属性
         If Len(m_Base("text")) = 0 Then m_Base("text") = ""
         If Len(m_dicTotal("text")) = 0 Then m_dicTotal("text") = ""

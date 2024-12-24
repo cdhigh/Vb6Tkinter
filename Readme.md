@@ -75,7 +75,8 @@ Readme of english version refers to [Readme_EN.md](https://github.com/cdhigh/tki
     Python文本框有两种：Entry和Text，如果VB的TextBox的MultiLine=False，则
     生成Entry，否则生成Text。
 4. **Frame**    
-    对应Python的LabelFrame控件，做为其他控件的容器，或做为界面元素视觉分类。
+    对应Python的Frame或LabelFrame控件，做为其他控件的容器，或做为界面元素视觉分类。    
+    有Caption时生成LabelFrame，否则生成Frame。
 5. **CommandButton**    
     对应Python的Button，没有太多区别。
     为了代码简洁，窗体的退出按钮可以设置Cancel属性为True，然后程序自动生成
@@ -195,7 +196,11 @@ Readme of english version refers to [Readme_EN.md](https://github.com/cdhigh/tki
 2. 插件不支持使用控件数组，界面可以显示，但是后面的同名控件名会覆盖前面定义的，导致在代码中无法再和此控件互动。
 3. VB窗体的ScaleMode建议保持默认值(vbTwips)，如果要设置为其他值，则Frame控件内就不要再放Frame控件了，否则其内部的控件布局错误。
 4. 如果需要简体汉字界面，则需要Vb6Tkinter.lng文件在Vb6Tkinter.dll同一目录。
-5. 此插件支持更多的一些便捷特性，分散在版本历史中，这里就不一一列举了，有需要的可以去了解。
+5. 界面设计往往需要经历多次修改，如果某些属性不使用Vb6Tkinter生成的默认值，则有可能下次修改界面时忘记同步修改，导致界面错误，此时可以修改对应控件的Tag属性为下面两个格式任何一个：
+- `p@属性1@属性2@属性n`
+- `p@属性1=值1@属性2=值2@属性n=值n`
+每个属性的值可以忽略，忽略值属性则自动选中对应属性，不修改值。
+6. 此插件支持更多的一些便捷特性，分散在版本历史中，这里就不一一列举了，有需要的可以去了解。
 
 
 
@@ -205,12 +210,15 @@ Readme of english version refers to [Readme_EN.md](https://github.com/cdhigh/tki
   只是要注意以下几个ttk的BUG：    
 1. TTK的Entry和Combobox控件背景色设置无效（可以设置，不报错，但是界面不变）。
 2. LabelFrame和Notebook控件的字体单独设置无效，但是可以设置ttk的全局字体属性来改变，比如：self.style.configure('.', font=('宋体',12))。
-3. Python 2.7.3附带的ttk中的Treeview字体设置无效，但3.2.3及之后的的Treeview的字体设置有效。
 
 
 
 
 # 版本历史
+*  v1.9
+    1. 支持生成GUI国际化代码（gettext）
+*  v1.8.1
+    1. 根据Caption属性自动转换Frame为LabelFrame或Frame
 *  v1.8
     1. 删除结构化代码生成逻辑，仅生成面向对象代码
     2. ListBox添加 (MultiSelect -> selectmode) 属性对应转换

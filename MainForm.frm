@@ -300,6 +300,9 @@ Begin VB.Form FrmMain
          Caption         =   "Use Relative Position(&R)"
          Checked         =   -1  'True
       End
+      Begin VB.Menu mnuI18n 
+         Caption         =   "Support i18n(&I)"
+      End
       Begin VB.Menu mnuUnicodePrefixU 
          Caption         =   "Add A Prefix 'u' to Unicode String(&U)"
       End
@@ -398,6 +401,7 @@ Private Sub Form_Load()
     mnuV2andV3Code.Checked = GetSetting(App.Title, "Settings", "V2andV3Code", "0") = "1"
     mnuUseTtk.Checked = GetSetting(App.Title, "Settings", "UseTtk", "1") = "1"
     mnuRelPos.Checked = GetSetting(App.Title, "Settings", "RelPos", "1") = "1"
+    mnuI18n.Checked = GetSetting(App.Title, "Settings", "i18n", "1") = "1"
     mnuUnicodePrefixU.Checked = GetSetting(App.Title, "Settings", "UnicodePrefix", "0") = "1"
     g_bUnicodePrefixU = mnuUnicodePrefixU.Checked
     
@@ -937,11 +941,12 @@ Private Sub TryAssignScrollbar2Widgets()
     
 End Sub
 
+'创建代码
 Private Sub CmdGenCode_Click()
-    
-    Dim I As Long, cnt As Long, o As Object
-    Dim strHead As New cStrBuilder, strOut As New cStrBuilder, strCmd As New cStrBuilder, s As String, finalCode As String, sF As String
-    Dim OutOnlyV3 As Boolean, OutRelPos As Boolean, usettk As Boolean
+    Dim I As Long, cnt As Long, o As Object, sysImport As String
+    Dim strHead As New cStrBuilder, strOut As New cStrBuilder, strCmd As New cStrBuilder, strI18n As New cStrBuilder, strTmp As New cStrBuilder
+    Dim s As String, finalCode As String, sF As String
+    Dim OutOnlyV3 As Boolean, OutRelPos As Boolean, i18n As Boolean, usettk As Boolean
     Dim bUnicodePrefix As Boolean  '临时保存UNICODE前缀方式
     Dim aCompsSorted() As Object '用于排序的代码输出
     
@@ -962,9 +967,10 @@ Private Sub CmdGenCode_Click()
     
     OutOnlyV3 = Not mnuV2andV3Code.Checked
     OutRelPos = mnuRelPos.Checked
+    i18n = mnuI18n.Checked
     usettk = mnuUseTtk.Checked
     
-    '绝对坐标
+    '绝对坐标BUG提示
 '    If Not OutRelPos And m_curFrm.Properties("ScaleMode") <> vbTwips Then
 '        '如果使用绝对坐标，则Frame控件仅支持vbTwips模式
 '        For Each o In m_curFrm.Designer.VBControls
@@ -983,10 +989,11 @@ Private Sub CmdGenCode_Click()
     '在输出代码前先更新一下当前显示的数据
     UpdateCfgtoCls LstComps.ListIndex
     
+    sysImport = IIf(i18n, "import os, sys, gettext", "import os, sys")
     If OutOnlyV3 Then                                                           '输出仅针对PYTHON 3.X的代码
         strHead.Append "#!/usr/bin/env python3"
         strHead.Append "#-*- coding:utf-8 -*-" & vbCrLf
-        strHead.Append "import os, sys"
+        strHead.Append sysImport
         strHead.Append "from tkinter import *"
         strHead.Append "from tkinter.font import Font"
         If usettk Then strHead.Append "from tkinter.ttk import *"
@@ -1001,7 +1008,7 @@ Private Sub CmdGenCode_Click()
     Else
         strHead.Append "#!/usr/bin/env python"
         strHead.Append "#-*- coding:utf-8 -*-" & vbCrLf
-        strHead.Append "import os, sys"
+        strHead.Append sysImport
         strHead.Append "if sys.version_info[0] == 2:"
         strHead.Append "    from Tkinter import *"
         strHead.Append "    from tkFont import Font"
@@ -1047,26 +1054,39 @@ Private Sub CmdGenCode_Click()
         End If
     Next
     
-    strCmd.Append vbCrLf
-    strCmd.Append "class Application(Application_ui):"
-    strCmd.Append "    " & L("l_cmtClsApp", "#The class will implement callback function for events and your logical code.")
-    strCmd.Append "    def __init__(self, master=None):"
-    If OutOnlyV3 Then
-        strCmd.Append "        super().__init__(master)" & vbCrLf
-    Else
-        strCmd.Append "        Application_ui.__init__(self, master)" & vbCrLf
+    '国际化支持函数头
+    If i18n Then
+        strI18n.Append vbCrLf & "    def retranslateUi(self):"
     End If
     
+    '命令回调代码块
+    strTmp.Reset
+    If i18n Then
+        strTmp.Append vbCrLf & "        tr = gettext.translation('lang', localedir='i18n', languages=['en'], fallback=True)"
+        strTmp.Append "        tr.install()"
+        strTmp.Append "        self.retranslateUi()"
+    End If
+    strCmd.Append vbCrLf
+    strCmd.Append "class Application(Application_ui):"
+    strCmd.Append "    def __init__(self, master):"
+    If OutOnlyV3 Then
+        strCmd.Append "        super().__init__(master)" & strTmp.toString(vbCrLf) & vbCrLf
+    Else
+        strCmd.Append "        Application_ui.__init__(self, master)" & strTmp.toString(vbCrLf) & vbCrLf
+    End If
+    strTmp.Reset
+    
+    '主GUI代码块
     strOut.Append "class Application_ui(Frame):"
-    strOut.Append "    " & L("l_cmtClsUi", "#The class will create all widgets for UI.")
-    strOut.Append "    def __init__(self, master=None):"
+    strOut.Append "    def __init__(self, master):"
     If OutOnlyV3 Then
         strOut.Append "        super().__init__(master)"
     Else
         strOut.Append "        Frame.__init__(self, master)"
     End If
-    g_Comps(0).toString strOut, strCmd, OutRelPos, usettk  'g_Comps(0)固定是Form
+    g_Comps(0).toString strOut, strCmd, strI18n, OutRelPos, usettk  'g_Comps(0)固定是Form
     strOut.Append "        self.createWidgets()" & vbCrLf
+    
     strOut.Append "    def createWidgets(self):"
     strOut.Append "        self." & WTOP & " = self.winfo_toplevel()" & vbCrLf
     If usettk Then strOut.Append "        self.style = Style()" & vbCrLf
@@ -1086,18 +1106,19 @@ Private Sub CmdGenCode_Click()
     
     '遍历各控件，由各控件自己输出自己的界面生成代码
     For I = 0 To cnt - 1
-        aCompsSorted(I).toString strOut, strCmd, OutRelPos, usettk
+        aCompsSorted(I).toString strOut, strCmd, strI18n, OutRelPos, usettk
         strOut.Append ""  '两个控件之间使用一个空行隔开
     Next
     
-    '输出到文本框
+    '拼接各部分代码，输出到文本框
+    If Not i18n Then
+        strI18n.Reset
+    End If
     strCmd.Append "if __name__ == ""__main__"":"
     strCmd.Append "    " & WTOP & " = Tk()"
     strCmd.Append "    Application(" & WTOP & ").mainloop()"
     strCmd.Append vbCrLf
-    'strCmd.Append "    try: " & WTOP & ".destroy()"
-    'strCmd.Append "    except: pass" & vbCrLf
-    finalCode = strHead.toString(vbCrLf) & strOut.toString(vbCrLf) & strCmd.toString(vbCrLf)
+    finalCode = strHead.toString(vbCrLf) & strOut.toString(vbCrLf) & strI18n.toString(vbCrLf) & strCmd.toString(vbCrLf)
     
     'VB的TEXTBOX最多支持65K文本
     If Len(finalCode) > 65000 Then
@@ -1117,9 +1138,9 @@ Private Sub CmdGenCode_Click()
     strOut.Reset
     strHead.Reset
     strCmd.Reset
+    strI18n.Reset
     
     g_bUnicodePrefixU = bUnicodePrefix    '恢复UNICODE前缀模式
-    
 End Sub
 
 '输入自定义的Tooltip类
@@ -1549,8 +1570,13 @@ Private Sub mnuGenCode_Click()
     CmdGenCode_Click
 End Sub
 
+Private Sub mnuI18n_Click()
+    Dim o As Object
+    mnuI18n.Checked = Not mnuI18n.Checked
+    SaveSetting App.Title, "Settings", "i18n", IIf(mnuI18n.Checked, "1", "0")
+End Sub
+
 Private Sub mnuLng_Click(Index As Integer)
-    
     Dim I As Long
     
     If m_nLngNum = 0 Then Exit Sub
@@ -1563,11 +1589,9 @@ Private Sub mnuLng_Click(Index As Integer)
     SaveSetting App.Title, "Settings", "Language", mnuLng(Index).Caption
     
     ChangeLanguage (mnuLng(Index).Caption)
-    
 End Sub
 
 Private Sub mnuSaveAll_Click()
-    
     Dim sF As String
     sF = FileDialog(Me, True, L("l_fdSave", "Save file to:"), "*.py", m_prevsf)
     
@@ -1577,7 +1601,6 @@ Private Sub mnuSaveAll_Click()
     End If
     
     m_prevsf = sF
-    
 End Sub
 
 '仅输出界面生成类，用于之前已经建好框架，并且也写了一些代码，现在修改空间布局，不用影响其他代码
@@ -1704,9 +1727,7 @@ Private Sub mnuRefreshForms_Click()
 End Sub
 
 Private Sub mnuRelPos_Click()
-    
     Dim o As Object
-    
     mnuRelPos.Checked = Not mnuRelPos.Checked
     
     '绝对坐标

@@ -20,12 +20,14 @@ Private m_Base As clsBaseControl                                                
 Private m_CanbeOutByMainForm As Boolean
 
 '输出PYTHON代码,
-'sCmdFunc: 输出参数，事件处理回调代码;
+'sOut: 输出参数，界面代码
+'sCmd: 输出参数，事件处理回调代码
+'sI18n: 输出参数，控件文本翻译代码
 'rel:是否使用相对坐标,
 'usettk:是否使用TTK主题扩展
-Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, rel As Boolean, usettk As Boolean)
+Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, ByRef sI18n As cStrBuilder, ByVal rel As Boolean, ByVal usettk As Boolean)
     If Len(m_Base("orient")) = 0 Then m_Base("orient") = "'horizontal'"
-    m_Base.toString sOut, sCmdFunc, rel, usettk
+    m_Base.toString sOut, sCmd, sI18n, rel, usettk
 End Sub
 
 '创建对象后要马上调用这个函数初始化各参数

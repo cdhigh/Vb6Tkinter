@@ -36,17 +36,19 @@ Private m_StartupPosition As String
 Const defaultIconName As String = "icon.gif" '如果存在此文件名，则自动做为窗体图标
 
 '输出PYTHON代码,
-'sCmdFunc: 输出参数，事件处理回调代码;
+'sOut: 输出参数，界面代码
+'sCmd: 输出参数，事件处理回调代码
+'sI18n: 输出参数，控件文本翻译代码
 'rel:是否使用相对坐标,
 'usettk:是否使用TTK主题扩展
-Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, rel As Boolean, usettk As Boolean)
-    
+Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, ByRef sI18n As cStrBuilder, ByVal rel As Boolean, ByVal usettk As Boolean)
      '如果需要窗体在屏幕中间，计算相对位置，这句话要放在最前面，避免窗口启动后先有一个小框再移动到屏幕正中
     If m_StartupPosition = "Center" Then
         CenterWindow sOut
     End If
     
     sOut.Append "        self.master.title(" & U(m_Title) & ")"
+    sI18n.Append "        self.master.title(_(" & U(m_Title) & "))"
     If m_StartupPosition = "Manual" Then  '手工指定窗口初始位置
         sOut.Append "        self.master.geometry('" & m_Geometry & CoordinateOnStart() & "')"
     ElseIf m_StartupPosition <> "Center" Then
@@ -67,8 +69,8 @@ Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, re
     End If
     
     ProcessIcon sOut  '处理窗体图标
-    ProcessBindCommand sOut, sCmdFunc ' 处理bindcommand
-    ProcessProtocol sOut, sCmdFunc '窗口消息拦截，如果有的话
+    ProcessBindCommand sOut, sCmd ' 处理bindcommand
+    ProcessProtocol sOut, sCmd '窗口消息拦截，如果有的话
 End Sub
 
 '处理窗体图标
@@ -97,7 +99,7 @@ Private Sub ProcessIcon(sOut As cStrBuilder)
 End Sub
 
 ' 处理bindcommand
-Private Sub ProcessBindCommand(sOut As cStrBuilder, sCmdFunc As cStrBuilder)
+Private Sub ProcessBindCommand(sOut As cStrBuilder, sCmd As cStrBuilder)
     
     Dim I As Long, s() As String, sCmdName As String
     
@@ -111,16 +113,16 @@ Private Sub ProcessBindCommand(sOut As cStrBuilder, sCmdFunc As cStrBuilder)
             
             sCmdName = m_Name & "_" & Replace(Replace(Replace(s(I), "<", ""), ">", ""), "-", "_")
             
-            sOut.Append Space(8) & "self.master.bind('" & s(I) & "', self." & sCmdName & ")"
-            sCmdFunc.Append m_Base.CreateFuncDefOOP(sCmdName, "event")
+            sOut.Append "        self.master.bind('" & s(I) & "', self." & sCmdName & ")"
+            sCmd.Append m_Base.CreateFuncDefOOP(sCmdName, "event")
             
             'Python是大小写敏感的，对应快捷键也一样，如果设置的快捷键包含字母键，则将对应的大写/小写也一起绑定
             If Right$(s(I), 3) >= "-a>" And Right$(s(I), 3) <= "-z>" Then
                 s(I) = Left(s(I), Len(s(I)) - 2) & UCase(Mid(s(I), Len(s(I)) - 1, 1)) & ">" '变大写
-                sOut.Append Space(8) & "self.master.bind('" & s(I) & "', self." & sCmdName & ")"
+                sOut.Append "        self.master.bind('" & s(I) & "', self." & sCmdName & ")"
             ElseIf Right$(s(I), 3) >= "-A>" And Right$(s(I), 3) <= "-Z>" Then
                 s(I) = Left(s(I), Len(s(I)) - 2) & LCase(Mid(s(I), Len(s(I)) - 1, 1)) & ">" '变小写
-                sOut.Append Space(8) & "self.master.bind('" & s(I) & "', self." & sCmdName & ")"
+                sOut.Append "        self.master.bind('" & s(I) & "', self." & sCmdName & ")"
             End If
         End If
     Next
@@ -128,7 +130,7 @@ Private Sub ProcessBindCommand(sOut As cStrBuilder, sCmdFunc As cStrBuilder)
 End Sub
 
 '窗口消息拦截，如果有的话
-Private Sub ProcessProtocol(sOut As cStrBuilder, sCmdFunc As cStrBuilder)
+Private Sub ProcessProtocol(sOut As cStrBuilder, sCmd As cStrBuilder)
     
     Dim sa() As String, I As Long, s As String
     
@@ -140,26 +142,27 @@ Private Sub ProcessProtocol(sOut As cStrBuilder, sCmdFunc As cStrBuilder)
         sOut.Append "        self.master.protocol('" & sa(I) & "', self.EV_" & sa(I) & ")"
         If sa(I) = "WM_DELETE_WINDOW" Then
             s = "        if askyesno(message='Are you sure to quit?'):" & vbCrLf & Space(12) & "self.master.destroy()"
-            sCmdFunc.Append m_Base.CreateFuncDefOOP("EV_" & sa(I), "event=None", s)
+            sCmd.Append m_Base.CreateFuncDefOOP("EV_" & sa(I), "event=None", s)
         Else
-            sCmdFunc.Append m_Base.CreateFuncDefOOP("EV_" & sa(I), "event=None")
+            sCmd.Append m_Base.CreateFuncDefOOP("EV_" & sa(I), "event=None")
         End If
     Next
 End Sub
 
 '将主窗体放置在屏幕中间
+'其实这几个语句可以使用一条语句来代替: self.master.eval('tk::PlaceWindow . center')
 Private Sub CenterWindow(sOut As cStrBuilder)
     Dim W As String, H As String
     
     W = Left$(m_Geometry, InStr(1, m_Geometry, "x") - 1)
     H = Mid$(m_Geometry, InStr(1, m_Geometry, "x") + 1)
     
-    sOut.Append Space(8) & "# To center the window on the screen."
-    sOut.Append Space(8) & "ws = self.master.winfo_screenwidth()"
-    sOut.Append Space(8) & "hs = self.master.winfo_screenheight()"
-    sOut.Append Space(8) & "x = (ws / 2) - (" & W & " / 2)"
-    sOut.Append Space(8) & "y = (hs / 2) - (" & H & " / 2)"
-    sOut.Append Space(8) & "self.master.geometry('%dx%d+%d+%d' % (" & W & "," & H & ",x,y))"
+    sOut.Append "        # To center the window on the screen."
+    sOut.Append "        ws = self.master.winfo_screenwidth()"
+    sOut.Append "        hs = self.master.winfo_screenheight()"
+    sOut.Append "        x = (ws / 2) - (" & W & " / 2)"
+    sOut.Append "        y = (hs / 2) - (" & H & " / 2)"
+    sOut.Append "        self.master.geometry('%dx%d+%d+%d' % (" & W & "," & H & ",x,y))"
 End Sub
 
 Private Function CreateIconBase64(sPrexSpace As String) As String

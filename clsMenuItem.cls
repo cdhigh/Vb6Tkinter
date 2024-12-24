@@ -26,43 +26,40 @@ Private m_numChilds As Long
 Private m_IdxCurChild As Long
 
 '输出PYTHON代码,
-'sCmdFunc: 输出参数，事件处理回调代码;
+'sOut: 输出参数，界面代码
+'sCmd: 输出参数，事件处理回调代码
+'sI18n: 输出参数，控件文本翻译代码
 'rel:是否使用相对坐标,
 'usettk:是否使用TTK主题扩展
-Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, rel As Boolean, usettk As Boolean)
-    toStringOOP sOut, sCmd, rel
-End Sub
-
-'输出面向对象代码
-Public Sub toStringOOP(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, rel As Boolean)
-    
+'index: 这个菜单项在其父菜单下的索引号，从0开始，用于i18n设置label
+Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, ByRef sI18n As cStrBuilder, ByVal rel As Boolean, ByVal usettk As Boolean, index As Long)
     Dim I As Long, extra As String, var As String, sTmp As String, s() As String, sr2 As String, sr3 As String
     
     extra = IIf(Len(m_Base("tearoff")), ", tearoff=" & m_Base("tearoff"), "")
     
     If m_numChilds > 0 Then
-        sOut.Append vbCrLf & Space(8) & "self." & m_Base.Name & " = Menu(self." & m_Base.Parent & extra & ")"
+        sOut.Append vbCrLf & "        self." & m_Base.Name & " = Menu(self." & m_Base.Parent & extra & ")"
         For I = 0 To m_numChilds - 1                                            '递归生成代码
-            m_Childs(I).toStringOOP sOut, sCmd, rel
+            m_Childs(I).toString sOut, sCmd, sI18n, rel, usettk, I
         Next
         
         If m_Visible Then                                                       '如果Visible=0，一般说明此菜单设置为右键弹出菜单
             m_Base("variable") = ""
             m_Base("command") = ""
             extra = GetExtraParams()
-            sOut.Append Space(8) & "self." & m_Base.Parent & ".add_cascade(menu=" & "self." & m_Base.Name & IIf(Len(extra), ", " & extra, "") & ")"
+            sOut.Append "        self." & m_Base.Parent & ".add_cascade(menu=" & "self." & m_Base.Name & IIf(Len(extra), ", " & extra, "") & ")"
         End If
     ElseIf m_IsSeparator Then                                                   '菜单分隔符
-        sOut.Append Space(8) & "self." & m_Base.Parent & ".add_separator()"
+        sOut.Append "        self." & m_Base.Parent & ".add_separator()"
     ElseIf m_IsCheckBox Then                                                    ' 菜单增加选择框
         If m_Base("variable") <> "" Then
-            sOut.Append Space(8) & "self." & m_Base("variable") & " = StringVar()"
-            sOut.Append Space(8) & "self." & m_Base("variable") & ".set(1)"
+            sOut.Append "        self." & m_Base("variable") & " = StringVar()"
+            sOut.Append "        self." & m_Base("variable") & ".set(1)"
         End If
         
         If m_Base("command") = "" Then m_Base("command") = m_Base.Name & "_Cmd"
         extra = GetExtraParams()
-        sOut.Append Space(8) & "self." & m_Base.Parent & ".add_checkbutton(" & extra & ")"
+        sOut.Append "        self." & m_Base.Parent & ".add_checkbutton(" & extra & ")"
         If Len(m_Base("command")) Then
             sCmd.Append m_Base.CreateFuncDefOOP(m_Base("command"), "event=None")
         End If
@@ -72,10 +69,15 @@ Public Sub toStringOOP(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, rel
         If m_Base("command") = "" Then m_Base("command") = m_Base.Name & "_Cmd"
         extra = GetExtraParams()
         m_Base("variable") = var
-        sOut.Append Space(8) & "self." & m_Base.Parent & ".add_command(" & extra & ")"
+        sOut.Append "        self." & m_Base.Parent & ".add_command(" & extra & ")"
         If Len(m_Base("command")) Then
             sCmd.Append m_Base.CreateFuncDefOOP(m_Base("command"), "event=None")
         End If
+    End If
+    
+    '国际化翻译
+    If (Not m_IsSeparator) And Len(m_Base("label")) > 0 Then
+        sI18n.Append "        self." & m_Base.Parent & ".entryconfigure(" & index & ", label=_(" & U(m_Base("label")) & "))"
     End If
     
     '有需要使用bind语句绑定的其他事件处理
@@ -86,7 +88,7 @@ Public Sub toStringOOP(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, rel
         For I = 0 To UBound(s)
             s(I) = Trim(s(I))
             If Left(s(I), 1) = "<" And Right(s(I), 1) = ">" Then
-                sOut.Append Space(8) & "self." & WTOP & ".bind_all('" & s(I) & "', " & "self." & m_Base("command") & ")"
+                sOut.Append "        self." & WTOP & ".bind_all('" & s(I) & "', " & "self." & m_Base("command") & ")"
                 
                 sr2 = Mid$(s(I), Len(s(I)) - 1, 1)
                 sr3 = Mid$(s(I), Len(s(I)) - 2, 1)
@@ -95,16 +97,15 @@ Public Sub toStringOOP(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, rel
                 If sr3 = "-" Then
                     If sr2 >= "a" And sr2 <= "z" Then
                         s(I) = Left$(s(I), Len(s(I)) - 2) & UCase$(sr2) & ">"
-                        sOut.Append Space(8) & "self." & WTOP & ".bind_all('" & s(I) & "', " & "self." & m_Base("command") & ")"
+                        sOut.Append "        self." & WTOP & ".bind_all('" & s(I) & "', " & "self." & m_Base("command") & ")"
                     ElseIf sr2 >= "A" And sr2 <= "Z" Then
                         s(I) = Left$(s(I), Len(s(I)) - 2) & LCase$(sr2) & ">"
-                        sOut.Append Space(8) & "self." & WTOP & ".bind_all('" & s(I) & "', " & "self." & m_Base("command") & ")"
+                        sOut.Append "        self." & WTOP & ".bind_all('" & s(I) & "', " & "self." & m_Base("command") & ")"
                     End If
                 End If
             End If
         Next
     End If
-    
 End Sub
 
 '创建对象后要马上调用这个函数初始化各参数
@@ -186,7 +187,6 @@ End Function
 
 '除了必选参数外，这个函数生成用户选择的其他参数列表
 Public Function GetExtraParams() As String
-    
     Dim cfg As Variant, k As Variant, ks As Variant, sValue As String
     
     Set ks = m_Base.Keys
@@ -214,7 +214,6 @@ Public Function GetExtraParams() As String
     If Len(m_Base("font")) Then
         GetExtraParams = GetExtraParams & IIf(Len(GetExtraParams), ", ", "") & "font=self." & m_Base.Name & "Font"
     End If
-    
 End Function
 
 Private Function isExtra(ByVal sK As String) As Boolean

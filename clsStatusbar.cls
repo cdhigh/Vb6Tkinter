@@ -76,25 +76,27 @@ Public Property Get WidgetCode(OutOnlyV3 As Boolean) As String
 End Property
 
 '输出PYTHON代码,
-'sCmdFunc: 输出参数，事件处理回调代码;
+'sOut: 输出参数，界面代码
+'sCmd: 输出参数，事件处理回调代码
+'sI18n: 输出参数，控件文本翻译代码
 'rel:是否使用相对坐标,
 'usettk:是否使用TTK主题扩展
-Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmdFunc As cStrBuilder, rel As Boolean, usettk As Boolean)
+Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, ByRef sI18n As cStrBuilder, ByVal rel As Boolean, ByVal usettk As Boolean)
     
-    sOut.Append Space(8) & "self." & m_Base.Name & " = Statusbar(self." & m_Base.Parent & _
+    sOut.Append "        self." & m_Base.Name & " = Statusbar(self." & m_Base.Parent & _
         IIf(Len(m_Base("panelwidths")), ", panelwidths=" & m_Base("panelwidths"), "") & ")"
     
     If Len(m_Base("tooltip")) Then
-        sOut.Append Space(8) & "self." & m_Base.Name & "Tooltip = Tooltip(self." & m_Base.Name & ", " & Quote(m_Base("tooltip")) & ")"
+        sOut.Append "        self." & m_Base.Name & "Tooltip = Tooltip(self." & m_Base.Name & ", " & Quote(m_Base("tooltip")) & ")"
     End If
     
     If Len(m_Base("side")) Then
-        sOut.Append Space(8) & "self." & m_Base.Name & ".pack(side=" & m_Base("side") & ", fill=X)"
+        sOut.Append "        self." & m_Base.Name & ".pack(side=" & m_Base("side") & ", fill=X)"
     ElseIf rel Then
-        sOut.Append Space(8) & "self." & m_Base.Name & ".place(relx=" & m_Base("relx") & ", rely=" & _
+        sOut.Append "        self." & m_Base.Name & ".place(relx=" & m_Base("relx") & ", rely=" & _
             m_Base("rely") & ", relwidth=" & m_Base("relwidth") & ", relheight=" & m_Base("relheight") & ")"
     Else
-        sOut.Append Space(8) & "self." & m_Base.Name & ".place(x=" & m_Base("x") & ", y=" & m_Base("y") & _
+        sOut.Append "        self." & m_Base.Name & ".place(x=" & m_Base("x") & ", y=" & m_Base("y") & _
             ", width=" & m_Base("width") & ", height=" & m_Base("height") & ")"
     End If
 End Sub

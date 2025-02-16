@@ -78,6 +78,7 @@ Public Const OFFICIAL_UPDATE_INFO As String = "https://api.github.com/repos/cdhi
 Public Function U(s As String) As String
     
     Dim nLen As Long
+    s = Replace(s, vbCrLf, "\n")
     nLen = Len(s)
     
     If lstrlen(s) > nLen Then  '´æÔÚË«×Ö½Ú×Ö·û

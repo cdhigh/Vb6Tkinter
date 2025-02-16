@@ -49,8 +49,9 @@ Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, ByRef 
             If Not sOut.ExistString(sTmp) Then
                 sOut.Append sTmp
             End If
-        ElseIf m_Type = "Checkbutton" Then '多选按钮的variable使用IntVar比较好
-            sOut.Append "        self." & Dic("variable") & " = IntVar(value=" & m_Value & ")"
+        ElseIf m_Type = "Checkbutton" Or m_Type = "Progressbar" Then '多选按钮/进度条的variable使用IntVar比较好
+            sTmp = IIf(IsNumeric(m_Value), m_Value, "0")
+            sOut.Append "        self." & Dic("variable") & " = IntVar(value=" & sTmp & ")"
         Else
             sOut.Append "        self." & Dic("variable") & " = StringVar(value=" & U(m_Value) & ")"
         End If
@@ -117,7 +118,7 @@ Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, ByRef 
                 sOut.Append "        self." & m_Name & ".setValue = lambda x: self." & Dic("variable") & ".set(x)"
                 sOut.Append "        self." & m_Name & ".value = lambda : self." & Dic("variable") & ".get()"
             End If
-        ElseIf m_Type = "Checkbutton" Then  '多选按钮
+        ElseIf m_Type = "Checkbutton" Or m_Type = "Progressbar" Then  '多选按钮和进度条
             sOut.Append "        self." & m_Name & ".setValue = lambda x: self." & Dic("variable") & ".set(x)"
             sOut.Append "        self." & m_Name & ".value = lambda : self." & Dic("variable") & ".get()"
         End If

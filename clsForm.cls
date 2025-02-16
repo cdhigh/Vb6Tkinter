@@ -54,7 +54,7 @@ Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, ByRef 
     ElseIf m_StartupPosition <> "Center" Then
         sOut.Append "        self.master.geometry('" & m_Geometry & "')"
     End If
-    If Not m_Resizable Then sOut.Append "        self.master.resizable(0,0)"
+    If Not m_Resizable Then sOut.Append "        self.master.resizable(0, 0)"
     If Len(m_WindowState) > 0 And m_WindowState <> "'normal'" Then
         sOut.Append "        self.master.wm_state(" & m_WindowState & ")"
     End If
@@ -88,13 +88,13 @@ Private Sub ProcessIcon(sOut As cStrBuilder)
         If Len(sBase64) Then
             sOut.Append "        self.icondata = " & String(3, Chr(34)) & vbCrLf & sBase64 & String(3, Chr(34))
             sOut.Append "        self.iconimg = PhotoImage(data=self.icondata)"
-            sOut.Append "        self.master.tk.call('wm', 'iconphoto', self.master._w, self.iconimg)"
+            sOut.Append "        self.master.iconphoto(True, self.iconimg)"
         End If
     ElseIf Len(s) = 0 Or s = "ICO" Then '如果没有后缀名，则假定为ico格式
         sOut.Append "        self.master.iconbitmap(default=r'" & FileFullName(m_IconFile) & "')"
     Else
         sOut.Append "        self.iconimg = PhotoImage(file=r'" & FileFullName(m_IconFile) & "')"
-        sOut.Append "        self.master.tk.call('wm', 'iconphoto', self.master._w, self.iconimg)"
+        sOut.Append "        self.master.iconphoto(True, self.iconimg)"
     End If
 End Sub
 
@@ -156,13 +156,9 @@ Private Sub CenterWindow(sOut As cStrBuilder)
     
     W = Left$(m_Geometry, InStr(1, m_Geometry, "x") - 1)
     H = Mid$(m_Geometry, InStr(1, m_Geometry, "x") + 1)
-    
-    sOut.Append "        # To center the window on the screen."
-    sOut.Append "        ws = self.master.winfo_screenwidth()"
-    sOut.Append "        hs = self.master.winfo_screenheight()"
-    sOut.Append "        x = (ws / 2) - (" & W & " / 2)"
-    sOut.Append "        y = (hs / 2) - (" & H & " / 2)"
-    sOut.Append "        self.master.geometry('%dx%d+%d+%d' % (" & W & "," & H & ",x,y))"
+    sOut.Append "        x = int((self.master.winfo_screenwidth() - " & W & ") / 2)"
+    sOut.Append "        y = int((self.master.winfo_screenheight() - " & H & ") / 2)"
+    sOut.Append "        self.master.geometry('" & W & "x" & H & "+{}+{}'.format(" & "x, y))"
 End Sub
 
 Private Function CreateIconBase64(sPrexSpace As String) As String

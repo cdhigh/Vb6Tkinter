@@ -403,7 +403,7 @@ Private Sub Form_Load()
     
     mnuV2andV3Code.Checked = GetSetting(App.Title, "Settings", "V2andV3Code", "0") = "1"
     mnuUseTtk.Checked = GetSetting(App.Title, "Settings", "UseTtk", "1") = "1"
-    mnuUseTkNamedFonts.Checked = GetSetting(App.Title, "Settings", "UseTkNamedFonts", "1") = "1"
+    mnuUseTkNamedFonts.Checked = GetSetting(App.Title, "Settings", "UseTkNamedFonts", "0") = "1"
     mnuRelPos.Checked = GetSetting(App.Title, "Settings", "RelPos", "1") = "1"
     mnuI18n.Checked = GetSetting(App.Title, "Settings", "i18n", "1") = "1"
     mnuUnicodePrefixU.Checked = GetSetting(App.Title, "Settings", "UnicodePrefix", "0") = "1"

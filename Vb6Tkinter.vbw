@@ -1,7 +1,7 @@
 GridOcx = 125, 125, 851, 574, C, 175, 175, 1048, 606, C
 Common = 125, 125, 998, 556, 
 FileDlg = 150, 150, 981, 581, C
-clsBaseControl = 100, 100, 931, 531, Z
+clsBaseControl = 100, 100, 931, 531, 
 clsButton = 75, 75, 906, 506, 
 clsCanvas = 25, 25, 869, 474, 
 clsCheckbutton = 50, 50, 894, 499, 
@@ -17,7 +17,7 @@ clsSerialization = 25, 25, 869, 474, C
 clsText = 0, 0, 879, 406, 
 cStrBuilder = 100, 100, 969, 549, C
 Dictionary = 0, 0, 0, 0, C
-FrmMain = 25, 25, 898, 456, , 50, 50, 923, 481, C
+FrmMain = 25, 25, 898, 456, Z, 50, 50, 923, 481, C
 clsMenu = 0, 0, 844, 449, 
 clsMenuItem = 25, 25, 869, 474, 
 clsProgressBar = 125, 125, 969, 574, 

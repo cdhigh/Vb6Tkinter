@@ -296,6 +296,9 @@ Begin VB.Form FrmMain
          Caption         =   "Use TTK Themed Library(&T)"
          Checked         =   -1  'True
       End
+      Begin VB.Menu mnuUseTkNamedFonts 
+         Caption         =   "Use Tkinter Named Fonts(&F)"
+      End
       Begin VB.Menu mnuRelPos 
          Caption         =   "Use Relative Position(&R)"
          Checked         =   -1  'True
@@ -400,6 +403,7 @@ Private Sub Form_Load()
     
     mnuV2andV3Code.Checked = GetSetting(App.Title, "Settings", "V2andV3Code", "0") = "1"
     mnuUseTtk.Checked = GetSetting(App.Title, "Settings", "UseTtk", "1") = "1"
+    mnuUseTkNamedFonts.Checked = GetSetting(App.Title, "Settings", "UseTkNamedFonts", "1") = "1"
     mnuRelPos.Checked = GetSetting(App.Title, "Settings", "RelPos", "1") = "1"
     mnuI18n.Checked = GetSetting(App.Title, "Settings", "i18n", "1") = "1"
     mnuUnicodePrefixU.Checked = GetSetting(App.Title, "Settings", "UnicodePrefix", "0") = "1"
@@ -540,12 +544,14 @@ End Sub
 Private Function ResetLstComps(frm As Object) As Long
     
     Dim Obj As Object, ObjClsModule As Object, I As Long, s As String, j As Long, idx As Long
-    Dim nScaleMode As Long, nScaleWidth As Long, nScaleHeight As Long
+    Dim nScaleMode As Long, nScaleWidth As Long, nScaleHeight As Long, useTkFonts As Boolean
     Dim CodeMember As Member, CodeMembers As Members, dMethods As New Dictionary
     Dim ctlsIgnored As String
     
     ResetLstComps = False
     If frm Is Nothing Then Exit Function
+    
+    useTkFonts = mnuUseTkNamedFonts.Checked
     
     LstComps.Clear
     'Erase g_Comps
@@ -558,7 +564,7 @@ Private Function ResetLstComps(frm As Object) As Long
     '因为ScaleX/ScaleY为窗体类独有方法，只能先在这里转换窗体大小为像素单位
     nScaleWidth = Round(ScaleX(frm.Properties("ScaleWidth"), frm.Properties("ScaleMode"), vbPixels))
     nScaleHeight = Round(ScaleY(frm.Properties("ScaleHeight"), frm.Properties("ScaleMode"), vbPixels))
-    g_Comps(0).InitConfig frm, nScaleWidth, nScaleHeight, dMethods
+    g_Comps(0).InitConfig frm, nScaleWidth, nScaleHeight, useTkFonts, dMethods
     g_Comps(0).Name = WTOP
     LstComps.AddItem g_Comps(0).Name & " (Form)"
     I = 1
@@ -614,10 +620,10 @@ Private Function ResetLstComps(frm As Object) As Long
             '初始化各控件对应的类模块对象
             If Obj.Container Is frm.Designer Then
                 g_Comps(I).Parent = IIf(Obj.ClassName = "Menu", "MainMenu", WTOP)
-                g_Comps(I).InitConfig Obj, frm.Properties("ScaleWidth"), frm.Properties("ScaleHeight"), dMethods
+                g_Comps(I).InitConfig Obj, frm.Properties("ScaleWidth"), frm.Properties("ScaleHeight"), useTkFonts, dMethods
             ElseIf Obj.Container.ClassName = "Menu" Then  '子菜单
                 g_Comps(I).Parent = Obj.Container.Properties("Name")
-                g_Comps(I).InitConfig Obj, 0, 0, dMethods
+                g_Comps(I).InitConfig Obj, 0, 0, useTkFonts, dMethods
             Else
                 On Error Resume Next
                 nScaleMode = Obj.Container.Properties("ScaleMode")
@@ -632,7 +638,7 @@ Private Function ResetLstComps(frm As Object) As Long
                 On Error GoTo 0
                 g_Comps(I).ScaleMode = nScaleMode
                 g_Comps(I).Parent = Obj.Container.Properties("Name")
-                g_Comps(I).InitConfig Obj, nScaleWidth, nScaleHeight, dMethods
+                g_Comps(I).InitConfig Obj, nScaleWidth, nScaleHeight, useTkFonts, dMethods
             End If
             
             I = I + 1
@@ -946,7 +952,7 @@ Private Sub CmdGenCode_Click()
     Dim I As Long, cnt As Long, o As Object, sysImport As String
     Dim strHead As New cStrBuilder, strOut As New cStrBuilder, strCmd As New cStrBuilder, strI18n As New cStrBuilder, strTmp As New cStrBuilder
     Dim s As String, finalCode As String, sF As String
-    Dim OutOnlyV3 As Boolean, OutRelPos As Boolean, i18n As Boolean, usettk As Boolean
+    Dim OutOnlyV3 As Boolean, OutRelPos As Boolean, i18n As Boolean, usettk As Boolean, useTkNamedFonts As Boolean
     Dim bUnicodePrefix As Boolean  '临时保存UNICODE前缀方式
     Dim aCompsSorted() As Object '用于排序的代码输出
     
@@ -969,6 +975,7 @@ Private Sub CmdGenCode_Click()
     OutRelPos = mnuRelPos.Checked
     i18n = mnuI18n.Checked
     usettk = mnuUseTtk.Checked
+    useTkNamedFonts = mnuUseTkNamedFonts.Checked
     
     '绝对坐标BUG提示
 '    If Not OutRelPos And m_curFrm.Properties("ScaleMode") <> vbTwips Then
@@ -1803,6 +1810,11 @@ Private Sub mnuUseTtk_Click()
     
     SaveSetting App.Title, "Settings", "UseTtk", IIf(mnuUseTtk.Checked, "1", "0")
     
+End Sub
+
+Private Sub mnuUseTkNamedFonts_Click()
+    mnuUseTkNamedFonts.Checked = Not mnuUseTkNamedFonts.Checked
+    SaveSetting App.Title, "Settings", "UseTkNamedFonts", IIf(mnuUseTkNamedFonts.Checked, "1", "0")
 End Sub
 
 Private Sub mnuV2andV3Code_Click()

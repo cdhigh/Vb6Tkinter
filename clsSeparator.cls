@@ -31,7 +31,9 @@ Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, ByRef 
 End Sub
 
 '创建对象后要马上调用这个函数初始化各参数
-Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, Optional dMethods As Dictionary)
+'useTkFonts: 是否使用tkinter命名字体代替特定字体名（兼容性更强）
+'dMethods：控件名为键，使用逗号分隔的控件事件处理函数名字符串
+Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, Optional useTkFonts As Boolean, Optional dMethods As Dictionary)
     
     Dim W As Long, H As Long, X1 As Long, X2 As Long, Y1 As Long, Y2 As Long
     Dim s As String, sa() As String, I As Long, idx As Long

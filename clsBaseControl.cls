@@ -33,7 +33,7 @@ Private m_vbWidgetInstance As Object                                            
 'rel:是否使用相对坐标,
 'usettk:是否使用TTK主题扩展
 Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, ByRef sI18n As cStrBuilder, ByVal rel As Boolean, ByVal usettk As Boolean, Optional sOtherParams As String = "")
-    Dim s() As String, I As Long, extra As String
+    Dim s() As String, I As Long, extra As String, fontName As String
     Dim sTmp As String, sStyle As String, sCmdName As String, sUnderlineCmd As String
     
     '有些控件只在tk里面存在，即使ttk启用，也不能应用样式
@@ -60,11 +60,8 @@ Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, ByRef 
         sOut.Append "        self." & Dic("listvariable") & " = StringVar(value=" & U(m_Value) & ")"
     End If
     If Not usettk And Len(Dic("font")) Then
-        If Left$(Dic("font"), 1) = "(" Then
-            sOut.Append "        self." & m_Name & "Font = Font(font=" & Dic("font") & ")"
-        Else
-            sOut.Append "        self." & m_Name & "Font = Font(font=(" & Dic("font") & "))"
-        End If
+        fontName = IIf(Left$(Dic("font"), 1) = "(", Dic("font"), "(" & Dic("font") & ")")
+        sOut.Append "        self." & m_Name & "Font = Font(font=" & fontName & ")"
     End If
     
     If Len(Dic("columns")) Then
@@ -101,7 +98,11 @@ Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, ByRef 
         sOut.Append "        self." & m_Name & ".text = lambda : self." & Dic("textvariable") & ".get()"
         'Entry/Text/Combobox里面的文本一般是不需要翻译的
         If m_Type <> "Entry" And m_Type <> "Text" And m_Type <> "Combobox" Then
-            sI18n.Append "        self." & m_Name & ".setText(_(" & U(Dic("text")) & "))"
+            If Dic("text") <> "" Then
+                sI18n.Append "        self." & m_Name & ".setText(_(" & U(Dic("text")) & "))"
+            Else
+                sI18n.Append "        self." & m_Name & ".setText(" & Chr(34) & Chr(34) & ")"
+            End If
         End If
     End If
     

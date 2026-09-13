@@ -187,10 +187,10 @@ DirErr:
     MsgBox L_F("l_msgFileNotExist", "File '{0}' not exist!", sIconFile), vbInformation
 End Function
 
-
 '创建对象后要马上调用这个函数初始化各参数, 窗体大小以像素为单位
-Public Sub InitConfig(o As Object, nWidth As Long, nHeight As Long, dMethods As Dictionary)
-    
+'useTkFonts: 是否使用tkinter命名字体代替特定字体名（兼容性更强）
+'dMethods：控件名为键，使用逗号分隔的控件事件处理函数名字符串
+Public Sub InitConfig(o As Object, nWidth As Long, nHeight As Long, useTkFonts As Boolean, dMethods As Dictionary)
     Dim s As String, cAttr As String, cValue As String, sa() As String, I As Long, idx As Long
     
     m_Base.SetVbWidgetInstance o

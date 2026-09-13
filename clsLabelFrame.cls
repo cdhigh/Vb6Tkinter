@@ -35,12 +35,21 @@ Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, ByRef 
 End Sub
 
 '创建对象后要马上调用这个函数初始化各参数
-Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dMethods As Dictionary)
-    Dim s As String, sa() As String, I As Long, idx As Long, txt As String
+'useTkFonts: 是否使用tkinter命名字体代替特定字体名（兼容性更强）
+'dMethods：控件名为键，使用逗号分隔的控件事件处理函数名字符串
+Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, useTkFonts As Boolean, dMethods As Dictionary)
+    Dim s As String, sa() As String, I As Long, idx As Long, txt As String, fontName As String, defaultFont As String
     
     m_Base.SetVbWidgetInstance o
     
     m_Base.Name = o.Properties("Name")
+    If useTkFonts Then
+        fontName = "'TkDefaultFont'"
+        defaultFont = "('TkDefaultFont',9)"
+    Else
+        fontName = U(CStr(o.Properties("Font")("Name")))
+        defaultFont = "(" & U(GetDefaultFontName()) & ",9)"
+    End If
     
     txt = o.Properties("Caption")
     m_dicTotal("x") = m_Base.toPixelX(o.Properties("Left"))
@@ -57,7 +66,7 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
     m_dicTotal("bg") = TranslateColor(o.Properties("BackColor"))
     m_dicTotal("bd") = ""
     m_dicTotal("labelanchor") = "nw"
-    m_dicTotal("font") = "(" & U(CStr(o.Properties("Font")("Name"))) & "," & Round(o.Properties("Font")("Size")) & _
+    m_dicTotal("font") = "(" & fontName & "," & Round(o.Properties("Font")("Size")) & _
                         IIf(o.Properties("Font")("Bold"), ",'bold'", "") & IIf(o.Properties("Font")("Italic"), ",'italic'", "") & _
                         IIf(o.Properties("Font")("Underline"), ",'underline'", "") & IIf(o.Properties("Font")("Strikethrough"), ",'overstrike')", ")")
     m_dicTotal("cursor") = m_Base.GetCursorName(o.Properties("MousePointer"))
@@ -75,7 +84,7 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
     If m_dicTotal("tooltip") <> "" Then m_Base("tooltip") = m_dicTotal("tooltip")
     If o.Properties("ForeColor") <> vbButtonText Then m_Base("fg") = m_dicTotal("fg")
     If o.Properties("BackColor") <> vbButtonFace Then m_Base("bg") = m_dicTotal("bg")
-    If m_dicTotal("font") <> "(" & U(GetDefaultFontName()) & ",9)" Then m_Base("font") = m_dicTotal("font")
+    If m_dicTotal("font") <> defaultFont Then m_Base("font") = m_dicTotal("font")
     If m_dicTotal("cursor") <> "" Then m_Base("cursor") = m_dicTotal("cursor")
     
     '使用控件的tag属性保存一些额外默认要保存的属性，

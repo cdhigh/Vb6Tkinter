@@ -32,7 +32,7 @@ Private m_IdxCurChild As Long
 'rel:是否使用相对坐标,
 'usettk:是否使用TTK主题扩展
 'index: 这个菜单项在其父菜单下的索引号，从0开始，用于i18n设置label
-Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, ByRef sI18n As cStrBuilder, ByVal rel As Boolean, ByVal usettk As Boolean, index As Long)
+Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, ByRef sI18n As cStrBuilder, ByVal rel As Boolean, ByVal usettk As Boolean, Index As Long)
     Dim I As Long, extra As String, var As String, sTmp As String, s() As String, sr2 As String, sr3 As String
     
     extra = IIf(Len(m_Base("tearoff")), ", tearoff=" & m_Base("tearoff"), "")
@@ -77,7 +77,7 @@ Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, ByRef 
     
     '国际化翻译
     If (Not m_IsSeparator) And Len(m_Base("label")) > 0 Then
-        sI18n.Append "        self." & m_Base.Parent & ".entryconfigure(" & index & ", label=_(" & U(m_Base("label")) & "))"
+        sI18n.Append "        self." & m_Base.Parent & ".entryconfigure(" & Index & ", label=_(" & U(m_Base("label")) & "))"
     End If
     
     '有需要使用bind语句绑定的其他事件处理
@@ -109,7 +109,9 @@ Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, ByRef 
 End Sub
 
 '创建对象后要马上调用这个函数初始化各参数
-Public Sub InitConfig(o As Object, Optional parentWidth As Long, Optional parentHeight As Long, Optional dMethods As Dictionary)
+'useTkFonts: 是否使用tkinter命名字体代替特定字体名（兼容性更强）
+'dMethods：控件名为键，使用逗号分隔的控件事件处理函数名字符串
+Public Sub InitConfig(o As Object, Optional parentWidth As Long, Optional parentHeight As Long, Optional useTkFonts As Boolean, Optional dMethods As Dictionary)
     
     Dim s As String
     

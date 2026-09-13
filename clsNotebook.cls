@@ -87,9 +87,10 @@ Private Sub CreateSingleTabWidget(ByRef sOut As cStrBuilder, ByRef sCmd As cStrB
     sI18n.Append "        self." & m_Base.Name & ".tab(" & (nTabIdx - 1) & ", text=_(" & U(sCaption) & "))"
 End Sub
 
-
 '创建对象后要马上调用这个函数初始化各参数
-Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dMethods As Dictionary)
+'useTkFonts: 是否使用tkinter命名字体代替特定字体名（兼容性更强）
+'dMethods：控件名为键，使用逗号分隔的控件事件处理函数名字符串
+Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, useTkFonts As Boolean, dMethods As Dictionary)
     Dim I As Long, oiTabs As ITabs, s As String, sa() As String, idx As Long
     
     m_Base.SetVbWidgetInstance o

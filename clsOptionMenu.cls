@@ -76,14 +76,22 @@ Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, ByRef 
 End Sub
 
 '创建对象后要马上调用这个函数初始化各参数
-Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dMethods As Dictionary)
-    
-    Dim I As Long, oList As Object, sList As String, numList As Long
+'useTkFonts: 是否使用tkinter命名字体代替特定字体名（兼容性更强）
+'dMethods：控件名为键，使用逗号分隔的控件事件处理函数名字符串
+Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, useTkFonts As Boolean, dMethods As Dictionary)
+    Dim I As Long, oList As Object, sList As String, numList As Long, fontName As String, defaultFont As String
     Dim s As String, sa() As String, idx As Long
     
     m_Base.SetVbWidgetInstance o
     
     m_Base.Name = o.Properties("Name")
+    If useTkFonts Then
+        fontName = "'TkDefaultFont'"
+        defaultFont = "('TkDefaultFont',9)"
+    Else
+        fontName = U(CStr(o.Properties("Font")("Name")))
+        defaultFont = "(" & U(GetDefaultFontName()) & ",9)"
+    End If
     
     '保存下拉选项值
     Set oList = o.Properties("List")
@@ -122,7 +130,7 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
     m_dicTotal("state") = IIf(o.Properties("Enabled"), "'normal'", "'disabled'")
     m_dicTotal("anchor") = "'center'"
     m_dicTotal("takefocus") = IIf(o.Properties("TabStop"), 1, 0)
-    m_dicTotal("font") = "(" & U(CStr(o.Properties("Font")("Name"))) & "," & Round(o.Properties("Font")("Size")) & _
+    m_dicTotal("font") = "(" & fontName & "," & Round(o.Properties("Font")("Size")) & _
                         IIf(o.Properties("Font")("Bold"), ",'bold'", "") & IIf(o.Properties("Font")("Italic"), ",'italic'", "") & _
                         IIf(o.Properties("Font")("Underline"), ",'underline'", "") & IIf(o.Properties("Font")("Strikethrough"), ",'overstrike')", ")")
     m_dicTotal("cursor") = m_Base.GetCursorName(o.Properties("MousePointer"))
@@ -143,7 +151,7 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
     If o.Properties("BackColor") <> vbWindowBackground Then m_Base("bg") = m_dicTotal("bg")
     If m_dicTotal("state") <> "'normal'" Then m_Base("state") = m_dicTotal("state")
     If m_dicTotal("takefocus") = 1 Then m_Base("takefocus") = m_dicTotal("takefocus")
-    If m_dicTotal("font") <> "(" & U(GetDefaultFontName()) & ",9)" Then m_Base("font") = m_dicTotal("font")
+    If m_dicTotal("font") <> defaultFont Then m_Base("font") = m_dicTotal("font")
     If m_dicTotal("cursor") <> "" Then m_Base("cursor") = m_dicTotal("cursor")
     If m_dicTotal("bindcommand") <> "" Then m_Base("bindcommand") = m_dicTotal("bindcommand")
     

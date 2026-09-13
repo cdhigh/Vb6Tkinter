@@ -49,12 +49,21 @@ Public Sub toString(ByRef sOut As cStrBuilder, ByRef sCmd As cStrBuilder, ByRef 
 End Sub
 
 '创建对象后要马上调用这个函数初始化各参数
-Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dMethods As Dictionary)
-    Dim s As String, sa() As String, I As Long, idx As Long
+'useTkFonts: 是否使用tkinter命名字体代替特定字体名（兼容性更强）
+'dMethods：控件名为键，使用逗号分隔的控件事件处理函数名字符串
+Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, useTkFonts As Boolean, dMethods As Dictionary)
+    Dim s As String, sa() As String, I As Long, idx As Long, fontName As String, defaultFont As String
     
     m_Base.SetVbWidgetInstance o
     
     m_Base.Name = o.Properties("Name")
+    If useTkFonts Then
+        fontName = "'TkDefaultFont'"
+        defaultFont = "('TkDefaultFont',9)"
+    Else
+        fontName = U(CStr(o.Properties("Font")("Name")))
+        defaultFont = "(" & U(GetDefaultFontName()) & ",9)"
+    End If
     
     m_dicTotal("x") = m_Base.toPixelX(o.Properties("Left"))
     m_dicTotal("y") = m_Base.toPixelY(o.Properties("Top"))
@@ -70,7 +79,7 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
     m_dicTotal("padding") = ""
     m_dicTotal("selectmode") = "'extended'"
     m_dicTotal("show") = "'tree'"
-    m_dicTotal("font") = "(" & U(CStr(o.Properties("Font")("Name"))) & "," & Round(o.Properties("Font")("Size")) & _
+    m_dicTotal("font") = "(" & fontName & "," & Round(o.Properties("Font")("Size")) & _
                         IIf(o.Properties("Font")("Bold"), ",'bold'", "") & IIf(o.Properties("Font")("Italic"), ",'italic'", "") & _
                         IIf(o.Properties("Font")("Underline"), ",'underline'", "") & IIf(o.Properties("Font")("Strikethrough"), ",'overstrike')", ")")
     m_dicTotal("takefocus") = IIf(o.Properties("TabStop"), 1, 0)
@@ -91,7 +100,7 @@ Public Sub InitConfig(o As Object, parentWidth As Long, parentHeight As Long, dM
     m_Base("relheight") = m_dicTotal("relheight")
     m_Base("show") = m_dicTotal("show")
     If m_dicTotal("tooltip") <> "" Then m_Base("tooltip") = m_dicTotal("tooltip")
-    If m_dicTotal("font") <> "(" & U(GetDefaultFontName()) & ",9)" Then m_Base("font") = m_dicTotal("font")
+    If m_dicTotal("font") <> defaultFont Then m_Base("font") = m_dicTotal("font")
     If m_dicTotal("cursor") <> "" Then m_Base("cursor") = m_dicTotal("cursor")
     If m_dicTotal("bindcommand") <> "" Then m_Base("bindcommand") = m_dicTotal("bindcommand")
     

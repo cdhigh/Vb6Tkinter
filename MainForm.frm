@@ -1194,7 +1194,7 @@ Private Sub CreateTooltipClassCode(ByRef strOut As cStrBuilder)
 "            if y1 + height > s_height - 30:" & vbCrLf & _
 "                y1 = mouse_y - tip_delta[1] - height" & vbCrLf & _
 "                if y1 < 0:" & vbCrLf & _
-"                    Y1 = 0" & vbCrLf & _
+"                    y1 = 0" & vbCrLf & _
 "            return x1, y1" & vbCrLf & vbCrLf & _
 "        self.Hide()" & vbCrLf & _
 "        self.tw = Toplevel(self.widget)" & vbCrLf & _
